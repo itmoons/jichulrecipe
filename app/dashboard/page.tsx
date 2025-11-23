@@ -1,7 +1,7 @@
 // src/app/dashboard/page.tsx
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -81,7 +81,10 @@ function shiftMonth(ym: string, delta: number): string {
   return `${yy}-${mm}`;
 }
 
-export default function DashboardPage() {
+/**
+ * 실제 대시보드 로직 (useSearchParams 사용)
+ */
+function DashboardInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -358,7 +361,7 @@ export default function DashboardPage() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45 }}
-        className="mb-6 flex flex-col gap-3 md:flex-row md:items	end md:justify-between"
+        className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between"
       >
         <div>
           <div className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-[11px] font-medium text-slate-600 shadow-sm">
@@ -442,7 +445,7 @@ export default function DashboardPage() {
 
         {/* 계획 지출 합계 */}
         <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-orange-50">
-          <div className="mb-2 flex items	center justify-between">
+          <div className="mb-2 flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-700">
               계획된 지출 총합
             </span>
@@ -608,5 +611,30 @@ export default function DashboardPage() {
         </div>
       </motion.section>
     </PageContainer>
+  );
+}
+
+/**
+ * Suspense 래퍼: DashboardInner를 감싸서 useSearchParams 경고 제거
+ */
+export default function DashboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <PageContainer title="이 달의 지출 레시피 대시보드">
+          <div className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-[#FFF8EC] via-[#FFFDFC] to-[#F7FAFF]" />
+          <div className="pointer-events-none fixed left-[-80px] top-[40%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,184,108,0.25)] blur-3xl" />
+          <div className="pointer-events-none fixed right-[-60px] bottom-[8%] -z-10 h-52 w-52 rounded-full bg-[rgba(86,115,231,0.18)] blur-3xl" />
+
+          <div className="flex min-h-[60vh] items-center justify-center">
+            <p className="text-xs text-slate-500">
+              이 달의 지출 레시피 대시보드를 준비하고 있어요...
+            </p>
+          </div>
+        </PageContainer>
+      }
+    >
+      <DashboardInner />
+    </Suspense>
   );
 }

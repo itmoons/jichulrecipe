@@ -4,11 +4,16 @@
 import React, { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
+import { Suspense } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 const BRAND_ORANGE = "#FF8A3D";
 
-export default function SignInPage() {
+/**
+ * ✅ 실제 로그인/회원가입 로직이 들어 있는 컴포넌트
+ *   - 여기에서 useSearchParams()를 사용
+ */
+function SignInInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -74,7 +79,7 @@ export default function SignInPage() {
     setSuccessMsg(null);
     setResetMsg(null);
 
-    // 이메일은 항상 trim + 소문자 처리해서 사용 (signup / signin 모두 동일하게)
+    // 이메일은 항상 trim + 소문자 처리해서 사용
     const normalizedEmail = email.trim().toLowerCase();
 
     try {
@@ -94,7 +99,7 @@ export default function SignInPage() {
           return;
         }
 
-        // 회원가입은 성공
+        // 회원가입 성공
         setSuccessMsg(
           "쉐프가 된것을 축하합니다! 이제 로그인하고 나만의 지출 레시피를 시작해 보세요."
         );
@@ -115,7 +120,6 @@ export default function SignInPage() {
         });
 
         if (signInError) {
-          // (이메일 인증을 요구하는 프로젝트 설정 등) 정책 문제일 수 있음
           if (signInError.message === "Invalid login credentials") {
             setErrorMsg(
               "가입은 완료되었지만, 로그인 정보가 올바르지 않습니다. 다시 한 번 이메일/비밀번호를 확인해 주세요."
@@ -129,7 +133,7 @@ export default function SignInPage() {
           return;
         }
 
-        // 자동 로그인까지 성공 → redirectPath 로 이동
+        // 자동 로그인 성공 → redirectPath 이동
         router.push(redirectPath);
       } else {
         // =========================
@@ -153,7 +157,7 @@ export default function SignInPage() {
           return;
         }
 
-        // 로그인 성공 → redirectPath 로 이동
+        // 로그인 성공 → redirectPath 이동
         router.push(redirectPath);
       }
     } catch (err) {
@@ -371,5 +375,26 @@ export default function SignInPage() {
         </div>
       </motion.div>
     </main>
+  );
+}
+
+/**
+ * ✅ 페이지 컴포넌트
+ *   - 여기서 SignInInner를 Suspense로 감싸서
+ *     `useSearchParams must be wrapped in Suspense` 에러를 해결
+ */
+export default function SignInPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#FFF8EC] via-[#FFFDFC] to-[#F7FAFF] px-4">
+          <div className="rounded-3xl bg-white/90 p-6 text-sm text-slate-600 shadow">
+            로그인 화면을 준비 중입니다...
+          </div>
+        </main>
+      }
+    >
+      <SignInInner />
+    </Suspense>
   );
 }
