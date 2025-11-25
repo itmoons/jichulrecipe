@@ -33,7 +33,7 @@ const recipeCards = [
 
 export default function HomePage() {
   return (
-    <PageContainer><meta name="google-site-verification" content="RAjkr0_ylgNzStxYF2VE4HNNWU9hVEaBqX6jHMaijiY" />
+    <PageContainer>
       {/* 배경 데코레이션 */}
       <div className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-[#FFF5E4] via-[#FFF9F0] to-[#FDFDFE]" />
       <div className="pointer-events-none fixed left-[-80px] top-[-80px] -z-10 h-56 w-56 rounded-full bg-[rgba(255,184,108,0.35)] blur-3xl" />
