@@ -49,7 +49,7 @@ export default function HomePage() {
           className="space-y-5"
         >
           <div className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-[11px] font-medium text-slate-600 shadow-sm">
-            <span className="h-2 w-2 rounded-full bg-[color:var(--brand-orange)]" />
+            {/* <span className="h-2 w-2 rounded-full bg-[color:var(--brand-orange)]" /> */}
             <span style={{ ["--brand-orange" as any]: BRAND_ORANGE }}>
               사회초년생 전용 · 지출 레스토랑
             </span>
@@ -62,15 +62,12 @@ export default function HomePage() {
             을 레시피처럼,
             <br />
             <span className="underline decoration-[rgba(86,115,231,0.35)] decoration-4 underline-offset-4">
-              따라 하기만 해도 예산이 완성됩니다.
+              10초만에 예산 계획 완성
             </span>
           </h1>
 
           <p className="max-w-xl text-sm leading-relaxed text-slate-700">
-            지출레시피는 세후 월급과 주거비, 대출만 입력하면
-            <br />
-            당신에게 맞는 <strong>“월 예산 메뉴판”</strong>을 만들어 주는 서비스입니다.
-            복잡한 재무 용어 대신, 레시피처럼 한 접시씩 따라가기만 하면 됩니다.
+            당신에게 맞는 <strong>“월 예산 메뉴판”</strong>을 만들어 주는 서비스, 지출레시피
           </p>
 
           <div className="flex flex-wrap gap-3">
@@ -93,8 +90,10 @@ export default function HomePage() {
             <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[rgba(76,175,80,0.12)] text-[13px]">
               💡
             </span>
-            “월세와 대출을 내고 남는 돈으로, 무엇을 얼마나 써야 할지”
-            에 대한 기준을 레스토랑 메뉴처럼 정리해줍니다.
+            <p className="max-w-xl text-sm leading-relaxed text-slate-700">
+            
+            복잡한 재무 용어 대신 레시피처럼 한 접시씩 따라해보세요!
+          </p>
           </p>
         </motion.div>
 
@@ -198,7 +197,7 @@ export default function HomePage() {
 
       
       {/* 하단: 레시피 카드 3개 */}
-      <section className="space-y-4">
+      {/* <section className="space-y-4">
         <h2 className="text-sm font-semibold text-slate-900">
           지출레시피의 대표 메뉴
         </h2>
@@ -239,7 +238,7 @@ export default function HomePage() {
             </motion.article>
           ))}
         </div>
-      </section>
+      </section> */}
 
       {/* 이용 플로우: 3단계 안내 */}
       <section className="mt-10 rounded-3xl bg-white/90 p-5 shadow-sm shadow-orange-50">
@@ -261,8 +260,7 @@ export default function HomePage() {
               기본 재료(수입·고정비) 넣기
             </h3>
             <p className="text-xs leading-relaxed text-slate-700">
-              세후 월급, 월세·관리비, 대출 상환액만 입력하면 됩니다.
-              어려운 카테고리는 지출레시피가 대신 나눠 담아줍니다.
+              세후 월급, 월세·관리비, 대출 상환액만 입력
             </p>
           </div>
 
@@ -276,11 +274,11 @@ export default function HomePage() {
               <span className="text-lg">📊</span>
             </div>
             <h3 className="text-sm font-semibold text-slate-900">
-              나에게 맞는 레시피 확인
+              나의 레시피 분석
             </h3>
             <p className="text-xs leading-relaxed text-slate-700">
-              필수 지출·저축·여가비가 도넛 차트와 일일 추천 금액으로 정리됩니다.
-              “어디까지 써도 괜찮은지” 기준선을 먼저 잡아보세요.
+              필수 지출·저축·여가비가 비율로 정리.
+              “얼마나 차지하는가” 기준선을 먼저 잡기.
             </p>
           </div>
 
@@ -294,11 +292,11 @@ export default function HomePage() {
               <span className="text-lg">🍽</span>
             </div>
             <h3 className="text-sm font-semibold text-slate-900">
-              한 달 써보고 취향대로 조정
+              한 달 써보고 계획대로 조정
             </h3>
             <p className="text-xs leading-relaxed text-slate-700">
               실제 한 달을 살아보며 “여가비를 조금 줄이고 저축을 더 늘릴까?”
-              같은 식으로 레시피를 조정하면, 나만의 기준이 자리 잡습니다.
+              같은 식으로 레시피를 조정하면, 나만의 기준 잡기
             </p>
           </div>
         </div>

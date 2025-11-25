@@ -1,4 +1,3 @@
-// src/app/setup/page.tsx
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
@@ -369,6 +368,9 @@ export default function SetupPage() {
 
   const fixedTotal = rentNum + loanNum + detailTotal + extraTotal;
   const remain = netIncomeNum - fixedTotal;
+  const usageRate =
+    netIncomeNum > 0 ? Math.min(1, fixedTotal / netIncomeNum) : 0;
+  const isOver = netIncomeNum > 0 && fixedTotal > netIncomeNum;
 
   /** 저장 후 (월별) 대시보드 이동 + Supabase 저장 */
   const handleSubmit = async (e: React.FormEvent) => {
@@ -481,12 +483,12 @@ export default function SetupPage() {
         transition={{ duration: 0.5, ease: "easeOut" }}
         className="mb-6 space-y-3"
       >
-        <div className="inline-flex items-center gap-2 rounded-full bg:white/80 bg-white/80 px-3 py-1 text-[11px] font-medium text-slate-600 shadow-sm">
+        <div className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-[11px] font-medium text-slate-600 shadow-sm">
           <span
             className="h-2 w-2 rounded-full"
             style={{ backgroundColor: BRAND_ORANGE }}
           />
-          <span>연도별 · 월별 예산 레시피 · 기본 재료 주문서</span>
+          <span>연도별 · 월별 예산 레시피 · 재료 준비 단계</span>
         </div>
 
         <h2 className="text-xl font-semibold text-slate-900 md:text-2xl">
@@ -497,20 +499,21 @@ export default function SetupPage() {
           >
             12개월 지출 레시피
           </span>
-          를 차근차근 설계해볼까요?
+          를 쉐프처럼 미리 설계해 볼까요?
         </h2>
-        <p className="text-xs leading-relaxed text-slate-700">
-          세후 월급과 고정비, 생활비 항목들을 월별로 입력하면
-          <br />
-          이번 달뿐 아니라, 작년·내년까지 연도별로 예산 레시피를 관리할 수
-          있습니다.
+        <p className="text-xs leading-relaxed text-slate-700 md:text-[13px]">
+          세후 월급과 고정비, 생활비 항목을 월별로 적어두면
+          <br className="hidden sm:block" />
+          이번 달뿐 아니라, 작년·내년까지{" "}
+          <span className="font-semibold">“나만의 소비 레시피”</span>를 한눈에
+          비교할 수 있어요.
         </p>
       </motion.section>
 
       {/* 연도 + 월 선택 영역 */}
-      <section className="mb-5">
+      <section className="mb-5 rounded-2xl bg-white/80 p-3 shadow-sm shadow-orange-50 md:p-4">
         {/* 연도 네비게이션 */}
-        <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="mb-3 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -520,7 +523,7 @@ export default function SetupPage() {
               ←
             </button>
             <span className="text-sm font-semibold text-slate-900">
-              {currentYear}년
+              {currentYear}년 레시피북
             </span>
             <button
               type="button"
@@ -531,13 +534,12 @@ export default function SetupPage() {
             </button>
           </div>
           <span className="text-[11px] text-slate-500">
-            좌우 화살표로 이전 연도·다음 연도를 이동하며 월별 레시피를 관리할 수
-            있습니다.
+            연도를 넘기면 상단의 1~12월 탭이 해당 연도 기준으로 바뀝니다.
           </span>
         </div>
 
         {/* 1~12월 탭 */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {monthTabs.map((ym) => {
             const isActive = ym === selectedMonth;
             const hasData = !!monthlyStore[ym];
@@ -550,16 +552,19 @@ export default function SetupPage() {
                 whileTap={{ scale: 0.96 }}
                 whileHover={{ y: -1 }}
                 className={[
-                  "relative flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs transition",
+                  "relative flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] transition",
                   isActive
                     ? "border-orange-300 bg-[#FFF4E6] text-orange-700 shadow-sm"
                     : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50",
                 ].join(" ")}
               >
+                <span className="text-[10px] font-semibold uppercase text-slate-400">
+                  STEP
+                </span>
                 <span className="font-semibold">{Number(m)}월</span>
                 {hasData && (
-                  <span className="rounded-full bg-orange-50 px-2 py-0.5 text-[10px] text-orange-600">
-                    레시피 있음
+                  <span className="rounded-full bg-orange-50 px-2 py-0.5 text-[9px] text-orange-600">
+                    레시피 저장됨
                   </span>
                 )}
               </motion.button>
@@ -577,11 +582,11 @@ export default function SetupPage() {
             transition={{ duration: 0.2 }}
             className="mt-3 text-[11px] text-slate-600"
           >
-            현재{" "}
+            지금은{" "}
             <span className="font-semibold text-orange-700">
               {ymToText(selectedMonth)}
             </span>{" "}
-            기본 레시피를 편집하고 있습니다.
+            지출 레시피의 재료를 정리하고 있어요.
           </motion.p>
         </AnimatePresence>
       </section>
@@ -592,30 +597,38 @@ export default function SetupPage() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: "easeOut" }}
-        className="grid gap-4 md:grid-cols-[1.1fr_0.9fr]"
+        className="grid gap-4 md:grid-cols-[minmax(0,1.2fr)_minmax(0,0.9fr)]"
       >
-        {/* 왼쪽: 주요 입력 */}
+        {/* 왼쪽: 레시피 재료 입력 */}
         <div className="space-y-4">
-          {/* 세후 월급 */}
+          {/* STEP 1: 기본 재료 (세후 월급) */}
           <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-orange-50">
-            <div className="mb-2 flex items-center justify-between">
+            <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-lg">💳</span>
-                <h3 className="text-sm font-semibold text-slate-900">
-                  세후 월급
-                </h3>
+                <span className="rounded-full bg-orange-50 px-2 py-1 text-[10px] font-semibold text-orange-600">
+                  STEP 1 · 기본 재료
+                </span>
               </div>
-              <span className="rounded-full bg-slate-50 px-2 py-0.5 text-[10px] text-slate-500">
-                이 달 통장에 들어오는 금액
+              <span className="text-[10px] text-slate-400">
+                한 달 레시피의 전체 양을 정해요
               </span>
             </div>
-            <p className="mb-2 text-[11px] text-slate-600">
-              4대보험·세금을 제외하고 실제로 받는 금액을 적어주세요.
+
+            <div className="mb-2 flex items-center gap-2">
+              <span className="text-lg">💳</span>
+              <h3 className="text-sm font-semibold text-slate-900">
+                세후 월급 (통장에 실제로 들어오는 금액)
+              </h3>
+            </div>
+            <p className="mb-3 text-[11px] text-slate-600">
+              4대보험·세금을 제외하고{" "}
+              <span className="font-semibold">실제로 입금되는 금액</span>을
+              적어주세요. 이 금액을 기준으로 전체 레시피의 비율이 계산됩니다.
             </p>
             <div className="flex items-center gap-2">
               <input
                 type="number"
-                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+                className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-slate-400"
                 placeholder="예: 3000000"
                 value={netIncome}
                 onChange={(e) => setNetIncome(e.target.value)}
@@ -625,26 +638,22 @@ export default function SetupPage() {
             </div>
           </div>
 
-          {/* 월세/대출 + 10개 항목 + 추가 항목 */}
+          {/* STEP 2: 고정비 (월세 + 대출) */}
           <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-orange-50">
-            <div className="mb-2 flex items-center justify-between">
+            <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-lg">🏠</span>
-                <h3 className="text-sm font-semibold text-slate-900">
-                  고정비 · 생활비 재료
-                </h3>
+                <span className="rounded-full bg-[#E9F3FF] px-2 py-1 text-[10px] font-semibold text-[#3F6FD9]">
+                  STEP 2 · 기본 고정비
+                </span>
               </div>
+              <span className="text-[10px] text-slate-400">
+                매달 거의 같은 “베이스 비용”
+              </span>
             </div>
-            <p className="mb-2 text-[11px] text-slate-600">
-              월세·대출 같은 고정비와 적금, 신용카드, 식료품비까지
-              <br />
-              해당 월에 “이 정도로 써보겠다”라는 목표 금액을 적어주세요.
-            </p>
 
-            {/* 월세 + 대출 */}
-            <div className="mb-4 space-y-3 text-sm">
+            <div className="mb-4 grid gap-3 md:grid-cols-2">
               <div>
-                <label className="mb-1 block text-[11px] font-semibold text-slate-700">
+                <label className="mb-1.5 block text-[11px] font-semibold text-slate-700">
                   월세 + 관리비
                 </label>
                 <div className="flex items-center gap-2">
@@ -657,10 +666,13 @@ export default function SetupPage() {
                   />
                   <span className="text-xs text-slate-500">원</span>
                 </div>
+                <p className="mt-1 text-[10px] text-slate-500">
+                  월세, 관리비, 장기주택부담금 등이 있으면 함께 적어주세요.
+                </p>
               </div>
 
               <div>
-                <label className="mb-1 block text-[11px] font-semibold text-slate-700">
+                <label className="mb-1.5 block text-[11px] font-semibold text-slate-700">
                   대출 상환액 (학자금·전세자금·신용대출 등)
                 </label>
                 <div className="flex items-center gap-2">
@@ -673,60 +685,98 @@ export default function SetupPage() {
                   />
                   <span className="text-xs text-slate-500">원</span>
                 </div>
+                <p className="mt-1 text-[10px] text-slate-500">
+                  정기적으로 나가는 상환액이 없다면 0으로 비워두셔도 됩니다.
+                </p>
               </div>
             </div>
+          </div>
 
-            {/* 10개 상세 항목 */}
+          {/* STEP 3: 생활비(양념) + 추가 토핑 */}
+          <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-orange-50">
+            <div className="mb-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="rounded-full bg-[#F3F4FF] px-2 py-1 text-[10px] font-semibold text-[#5B6CD9]">
+                  STEP 3 · 생활비 양념 & 토핑
+                </span>
+              </div>
+              <span className="text-[10px] text-slate-400">
+                매달 조절 가능한 “레시피의 맛” 부분
+              </span>
+            </div>
+
+            <p className="mb-3 text-[11px] text-slate-600">
+              적금·카드·교통·식비 등 생활비를{" "}
+              <span className="font-semibold">“이번 달 목표 예산”</span> 기준으로
+              적어주세요. 나중에 실제 지출과 비교하면서 레시피를 조정하게 됩니다.
+            </p>
+
+            {/* 10개 상세 항목: 2열 그리드 */}
             <div className="space-y-2 rounded-xl bg-slate-50/80 p-3">
-              {DETAIL_CONFIG.map((item) => (
-                <div
-                  key={item.key}
-                  className="flex items-center gap-2 rounded-md bg-white px-2 py-1.5"
-                >
-                  <span className="text-base">{item.emoji}</span>
-                  <div className="w-28">
-                    <div className="text-[11px] font-semibold text-slate-800">
-                      {item.label}
+              <div className="mb-1 flex items-center justify-between">
+                <span className="text-[11px] font-semibold text-slate-700">
+                  생활비 기본 양념 (10개 항목)
+                </span>
+                <span className="text-[10px] text-slate-400">
+                  자주 쓰는 대표 카테고리를 모아두었어요
+                </span>
+              </div>
+
+              <div className="grid gap-2 md:grid-cols-2">
+                {DETAIL_CONFIG.map((item) => (
+                  <div
+                    key={item.key}
+                    className="flex items-center gap-2 rounded-md bg-white px-2.5 py-2"
+                  >
+                    <span className="text-base">{item.emoji}</span>
+                    <div className="w-28 flex-shrink-0">
+                      <div className="text-[11px] font-semibold text-slate-800">
+                        {item.label}
+                      </div>
+                      <div className="text-[10px] text-slate-500">
+                        {item.hint}
+                      </div>
                     </div>
-                    <div className="text-[10px] text-slate-500">
-                      {item.hint}
+                    <div className="flex flex-1 items-center gap-1">
+                      <input
+                        type="number"
+                        className="w-full rounded-md border border-slate-200 px-2 py-1.5 text-[11px] outline-none focus:border-slate-400"
+                        placeholder="0"
+                        value={details[item.key] || ""}
+                        onChange={(e) =>
+                          handleChangeDetail(item.key, e.target.value)
+                        }
+                      />
+                      <span className="text-[11px] text-slate-500">원</span>
                     </div>
                   </div>
-                  <div className="flex flex-1 items-center gap-1">
-                    <input
-                      type="number"
-                      className="w-full rounded-md border border-slate-200 px-2 py-1 text-[11px] outline-none focus:border-slate-400"
-                      placeholder="0"
-                      value={details[item.key] || ""}
-                      onChange={(e) =>
-                        handleChangeDetail(item.key, e.target.value)
-                      }
-                    />
-                    <span className="text-[11px] text-slate-500">원</span>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
 
             {/* 추가 항목 */}
             <div className="mt-4 space-y-2 rounded-xl bg-slate-50/90 p-3">
               <div className="mb-1 flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-slate-700">
-                  추가 지출 항목
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm">🧂</span>
+                  <span className="text-[11px] font-semibold text-slate-700">
+                    추가 지출 항목(나만의 토핑)
+                  </span>
+                </div>
                 <button
                   type="button"
                   onClick={handleAddExtraItem}
-                  className="rounded-full bg-white px-2 py-1 text-[11px] font-medium text-orange-600 shadow-sm hover:bg-orange-50"
+                  className="rounded-full bg-white px-2.5 py-1 text-[11px] font-medium text-orange-600 shadow-sm hover:bg-orange-50"
                 >
-                  + 항목 추가
+                  + 토핑 추가
                 </button>
               </div>
 
               {extraItems.length === 0 && (
                 <p className="text-[11px] text-slate-500">
-                  위 항목에 없는 개인적인 지출(반려동물, 취미, 학원비 등)이 있다면
-                  여기에 추가해서 관리해 보세요.
+                  반려동물, 취미, 학원비 등 위 항목에 없는 지출이 있다면
+                  <br className="hidden sm:block" />
+                  여기에 “토핑”처럼 따로 적어 두고 관리해 보세요.
                 </p>
               )}
 
@@ -734,11 +784,11 @@ export default function SetupPage() {
                 {extraItems.map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center gap-2 rounded-md bg-white px-2 py-1.5"
+                    className="flex flex-col gap-1 rounded-md bg-white px-2.5 py-2 sm:flex-row sm:items-center sm:gap-2"
                   >
                     <input
                       type="text"
-                      className="w-32 rounded-md border border-slate-200 px-2 py-1 text-[11px] outline-none focus:border-slate-400"
+                      className="w-full rounded-md border border-slate-200 px-2 py-1.5 text-[11px] outline-none focus:border-slate-400 sm:w-32"
                       placeholder="예: 반려동물비"
                       value={item.label}
                       onChange={(e) =>
@@ -748,7 +798,7 @@ export default function SetupPage() {
                     <div className="flex flex-1 items-center gap-1">
                       <input
                         type="number"
-                        className="w-full rounded-md border border-slate-200 px-2 py-1 text-[11px] outline-none focus:border-slate-400"
+                        className="w-full rounded-md border border-slate-200 px-2 py-1.5 text-[11px] outline-none focus:border-slate-400"
                         placeholder="0"
                         value={item.amount || ""}
                         onChange={(e) =>
@@ -760,7 +810,7 @@ export default function SetupPage() {
                     <button
                       type="button"
                       onClick={() => handleRemoveExtraItem(item.id)}
-                      className="rounded-md px-2 py-1 text-[11px] text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                      className="self-end rounded-md px-2 py-1 text-[11px] text-slate-400 hover:bg-slate-100 hover:text-slate-700 sm:self-auto"
                     >
                       삭제
                     </button>
@@ -771,30 +821,31 @@ export default function SetupPage() {
           </div>
         </div>
 
-        {/* 오른쪽: 요약 + 안내 */}
-        <div className="space-y-4">
+        {/* 오른쪽: 요약 + 안내 (md 이상 sticky) */}
+        <div className="space-y-4 md:sticky md:top-24">
           <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-orange-50">
-            <h3 className="mb-2 text-sm font-semibold text-slate-900">
-              이 달 기본 레시피 요약
+            <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-900">
+              <span className="text-base">🍲</span>
+              <span>이 달 레시피 한눈에 보기</span>
             </h3>
-            <p className="mb-3 text-[11px] text-slate-600">
+            {/* <p className="mb-3 text-[11px] text-slate-600">
               입력한 금액을 바탕으로, 지출레시피가 한 달 예산 구조를
               도넛 차트와 카테고리별 금액으로 정리해 보여줄 예정입니다.
               <br />
-              연도를 바꿔가며 12개월의 레시피를 비교해보면, 연 단위 지출
+              연도를 바꿔가며 12개월의 레시피를 비교하면, 연 단위 지출
               패턴도 한눈에 보이게 됩니다.
-            </p>
+            </p> */}
 
             <div className="space-y-2 rounded-xl bg-slate-50/80 p-3 text-xs">
               <div className="flex items-center justify-between">
-                <span className="text-slate-700">세후 월급</span>
+                <span className="text-slate-700">세후 월급(전체 반죽)</span>
                 <span className="font-semibold text-slate-900">
                   {netIncomeNum ? netIncomeNum.toLocaleString() : "-"}원
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-slate-700">
-                  월세·대출 + 10개 항목 + 추가 항목 합계
+                  월세·대출 + 생활비 양념 + 토핑 합계
                 </span>
                 <span className="font-semibold text-slate-900">
                   {fixedTotal ? fixedTotal.toLocaleString() : "-"}원
@@ -802,20 +853,62 @@ export default function SetupPage() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-slate-700">
-                  남는 금액(여유자금·예상 오차)
+                  남는 금액(여유 반죽·예상 오차)
                 </span>
                 <span
-                  className="font-semibold text-[color:var(--brand-green)]"
-                  style={{ ["--brand-green" as any]: BRAND_GREEN }}
+                  className={[
+                    "font-semibold",
+                    isOver
+                      ? "text-red-500"
+                      : "text-[color:var(--brand-green)]",
+                  ].join(" ")}
+                  style={
+                    isOver
+                      ? undefined
+                      : ({ ["--brand-green" as any]: BRAND_GREEN } as any)
+                  }
                 >
                   {netIncome ? remain.toLocaleString() : "-"}원
                 </span>
               </div>
+
+              {/* 사용률 바 */}
+              <div className="mt-2 space-y-1">
+                <div className="flex items-center justify-between text-[10px] text-slate-500">
+                  <span>예산 사용률</span>
+                  <span>
+                    {netIncomeNum
+                      ? `${Math.round(usageRate * 100)}%`
+                      : "-"}
+                  </span>
+                </div>
+                <div className="h-2.5 overflow-hidden rounded-full bg-slate-200">
+                  <div
+                    className={
+                      "h-full rounded-full transition-all" +
+                      (isOver
+                        ? " bg-red-400"
+                        : " bg-[color:var(--brand-orange)]")
+                    }
+                    style={{
+                      width: `${Math.min(usageRate * 100, 130)}%`,
+                      ["--brand-orange" as any]: BRAND_ORANGE,
+                    }}
+                  />
+                </div>
+                {isOver && (
+                  <p className="mt-1 text-[10px] text-red-500">
+                    * 예상 지출이 세후 월급을 초과했어요. 일부 양념(생활비)을
+                    줄이거나 토핑을 조정해 보세요.
+                  </p>
+                )}
+              </div>
             </div>
 
             <p className="mt-3 text-[11px] text-slate-500">
-              * 입력값은 “이 정도로 써보겠다”는 목표 예산이며,
-              실제 지출과의 차이는 대시보드에서 확인·조정하게 됩니다.
+              * 입력값은 “이 정도로 써보겠다”는 목표 예산입니다.{" "}
+              실제 지출과의 차이는 대시보드에서 확인·조정하면서 레시피를
+              다듬게 됩니다.
             </p>
           </div>
 
@@ -826,28 +919,28 @@ export default function SetupPage() {
               <p className="text-[11px] leading-relaxed text-slate-700">
                 이 페이지는{" "}
                 <strong>“각 연도의 12개월 지출 재료를 미리 적어두는 단계”</strong>
-                입니다. 대시보드에서 실제 한 달을 살아보며
-                적금·카드·식비·취미 비용을 조정하면, 연 단위로도
-                나만의 지출 레시피가 완성됩니다.
+                예요. 대시보드에서 실제 한 달을 살아보며
+                적금·카드·식비·취미 비용을 조정하면, 연 단위로{" "}
+                <strong>나만의 지출 레시피북</strong>이 완성됩니다.
               </p>
             </div>
 
             {/* 월별 대시보드 버튼 */}
             <button
               type="submit"
-              className="mt-1 inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-orange)] px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-orange-200 hover:bg-[#f27422] transition"
+              className="mt-1 inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-orange)] px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-orange-200 transition hover:bg-[#f27422]"
               style={{ ["--brand-orange" as any]: BRAND_ORANGE }}
             >
-              🍽 {ymToText(selectedMonth)} 기본 레시피 저장하고 대시보드로 가기
+              🍽 {ymToText(selectedMonth)} 레시피 저장하고 대시보드로 가기
             </button>
 
             {/* 연간 통계 대시보드 버튼 */}
             <button
               type="button"
               onClick={handleOpenYearDashboard}
-              className="inline-flex items-center justify-center rounded-xl border border-orange-200 bg-white/70 px-4 py-2.5 text-sm font-semibold text-orange-700 shadow-sm hover:bg-orange-50 transition"
+              className="inline-flex items-center justify-center rounded-xl border border-orange-200 bg-white/70 px-4 py-2.5 text-sm font-semibold text-orange-700 shadow-sm transition hover:bg-orange-50"
             >
-              📊 {currentYear}년 1년치 통계로 분석 데시보드 보기
+              📊 {currentYear}년 12개월 레시피를 통계로 분석하기
             </button>
 
             <p className="text-[10px] text-slate-500">

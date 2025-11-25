@@ -3,7 +3,6 @@
 
 import React, { useEffect, useMemo, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { supabase } from "@/lib/supabaseClient";
@@ -72,8 +71,8 @@ function ymToText(ym: string) {
 /** YYYY-MM을 기준으로 delta개월 이동한 YYYY-MM 반환 */
 function shiftMonth(ym: string, delta: number): string {
   const [y, m] = ym.split("-");
-  let year = Number(y);
-  let monthIdx = Number(m) - 1; // 0-based
+  const year = Number(y);
+  const monthIdx = Number(m) - 1;
 
   const d = new Date(year, monthIdx + delta, 1);
   const yy = d.getFullYear();
@@ -81,9 +80,6 @@ function shiftMonth(ym: string, delta: number): string {
   return `${yy}-${mm}`;
 }
 
-/**
- * 실제 대시보드 로직 (useSearchParams 사용)
- */
 function DashboardInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -100,7 +96,6 @@ function DashboardInner() {
     const init = async () => {
       if (typeof window === "undefined") return;
 
-      // 1) 로그인 유저 확인
       const {
         data: { user },
         error: authError,
@@ -112,7 +107,7 @@ function DashboardInner() {
         console.warn("Supabase auth error in dashboard:", authError.message);
       }
 
-      // 2) 로그인 안 되어 있으면 → localStorage 정리 + /sign-in으로 이동
+      // 로그인 안 되어 있으면 → localStorage 정리 + /sign-in으로 이동
       if (!user) {
         try {
           window.localStorage.removeItem(LS_KEY_MONTHLY);
@@ -127,7 +122,7 @@ function DashboardInner() {
         return;
       }
 
-      // 3) 로그인 되어 있으면: Supabase에서 해당 월 데이터 우선 조회
+      // Supabase에서 해당 월 데이터 조회
       let monthlyFromDb: MonthlySetup | null = null;
 
       try {
@@ -145,7 +140,6 @@ function DashboardInner() {
         if (dbError) {
           console.warn("Supabase monthly_recipes 조회 오류:", dbError.message);
         } else if (row) {
-          // DB → MonthlySetup 형태로 매핑
           monthlyFromDb = {
             netIncome: row.net_income ?? 0,
             rent: row.rent ?? 0,
@@ -158,7 +152,7 @@ function DashboardInner() {
         console.error("Supabase monthly_recipes 처리 중 오류:", err);
       }
 
-      // 4) localStorage에서 전체 store 로딩 (캐시/폴백용)
+      // localStorage에서 store 조회
       let parsedStore: MonthlyStore = {};
       try {
         const raw = window.localStorage.getItem(LS_KEY_MONTHLY);
@@ -168,10 +162,9 @@ function DashboardInner() {
       } catch {
         parsedStore = {};
       }
-
       setStore(parsedStore);
 
-      // 5) 이 월에 대한 데이터 결정: Supabase 우선, 없으면 localStorage
+      // Supabase 우선, 없으면 localStorage
       if (monthlyFromDb) {
         setData(monthlyFromDb);
       } else {
@@ -182,13 +175,11 @@ function DashboardInner() {
     };
 
     init();
-
     return () => {
       mounted = false;
     };
   }, [monthParam, router]);
 
-  // 파생 값들 계산
   const summary = useMemo(() => {
     if (!data) return null;
 
@@ -209,6 +200,19 @@ function DashboardInner() {
     const remain = net - totalPlanned;
     const fixedRatio = net > 0 ? (totalPlanned / net) * 100 : 0;
 
+    const saving = data.details?.saving || 0;
+    const consumption =
+      (data.details.card || 0) +
+      (data.details.groceries || 0) +
+      (data.details.clothes || 0) +
+      (data.details.events || 0) +
+      (data.details.birthday || 0);
+
+    const housingAndLoanRatio =
+      net > 0 ? ((rent + loan) / net) * 100 : 0;
+    const savingRatio = net > 0 ? (saving / net) * 100 : 0;
+    const consumptionRatio = net > 0 ? (consumption / net) * 100 : 0;
+
     return {
       net,
       rent,
@@ -218,10 +222,14 @@ function DashboardInner() {
       totalPlanned,
       remain,
       fixedRatio,
+      saving,
+      consumption,
+      housingAndLoanRatio,
+      savingRatio,
+      consumptionRatio,
     };
   }, [data]);
 
-  // 카테고리 리스트 (표용)
   const categoryRows = useMemo(() => {
     if (!data || !summary) return [];
 
@@ -232,7 +240,6 @@ function DashboardInner() {
       amount: number;
     }[] = [];
 
-    // 월세+관리비
     rows.push({
       key: "rent",
       label: "월세 + 관리비",
@@ -240,7 +247,6 @@ function DashboardInner() {
       amount: summary.rent,
     });
 
-    // 대출 상환
     rows.push({
       key: "loan",
       label: "대출 상환액",
@@ -248,7 +254,6 @@ function DashboardInner() {
       amount: summary.loan,
     });
 
-    // 상세 항목
     (Object.keys(data.details || {}) as DetailKey[]).forEach((k) => {
       rows.push({
         key: k,
@@ -258,7 +263,6 @@ function DashboardInner() {
       });
     });
 
-    // 추가 항목
     (data.extraItems || []).forEach((item) => {
       rows.push({
         key: item.id,
@@ -275,13 +279,19 @@ function DashboardInner() {
     router.push(`/setup?month=${monthParam}`);
   };
 
-  /** 이전달 / 다음달 이동 */
   const handleMoveMonth = (delta: number) => {
     const next = shiftMonth(monthParam, delta);
     router.push(`/dashboard?month=${next}`);
   };
 
-  // 인증/데이터 로딩 중
+  // 도넛 그래프용 수치
+  const donutRatio =
+    summary && summary.net > 0
+      ? Math.max(0, Math.min(summary.fixedRatio, 100))
+      : 0;
+  const radius = 54;
+  const circumference = 2 * Math.PI * radius;
+
   if (checkingAuth) {
     return (
       <PageContainer title="이 달의 지출 레시피 대시보드">
@@ -299,17 +309,19 @@ function DashboardInner() {
   }
 
   if (!data || !summary) {
-    // 해당 월에 기본 레시피가 없을 때
     return (
       <PageContainer title="이 달의 지출 레시피 대시보드">
-        {/* 배경 */}
         <div className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-[#FFF8EC] via-[#FFFDFC] to-[#F7FAFF]" />
         <div className="pointer-events-none fixed left-[-80px] top-[40%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,184,108,0.25)] blur-3xl" />
         <div className="pointer-events-none fixed right-[-60px] bottom-[8%] -z-10 h-52 w-52 rounded-full bg-[rgba(86,115,231,0.18)] blur-3xl" />
 
-        <div className="mx-auto max-w-xl rounded-2xl bg-white/95 p-6 text-center shadow-sm shadow-orange-50">
+        <div className="mx-auto max-w-xl rounded-2xl bg-white/95 p-6 text-center shadow-sm shadow-orange-50 border border-orange-50">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-orange-50/80 px-3 py-1 text-[11px] font-medium text-slate-600">
+            <span className="text-sm">📖</span>
+            <span>{ymToText(monthParam)} 레시피 표지가 아직 비어 있어요</span>
+          </div>
+
           <div className="mb-3 flex items-center justify-center gap-3 text-sm font-semibold text-slate-900">
-            {/* 월 이동 컨트롤 */}
             <button
               type="button"
               onClick={() => handleMoveMonth(-1)}
@@ -328,13 +340,12 @@ function DashboardInner() {
           </div>
 
           <h2 className="mb-2 text-base font-semibold text-slate-900">
-            {ymToText(monthParam)} 기본 레시피가 아직 없어요
+            {ymToText(monthParam)} 기본 지출 레시피를 먼저 적어볼까요?
           </h2>
           <p className="mb-4 text-sm text-slate-600">
-            먼저 기본 레시피 페이지에서 이 달의 세후 월급과 지출 항목을 입력해
-            주세요.
+            세후 월급과 고정비·생활비·저축을 입력하면,
             <br />
-            그러면 여기에서 지출 구조를 레시피처럼 분석해서 보여 드릴게요.
+            이 화면에서 자동으로 “레시피 요약표”를 만들어 드립니다.
           </p>
           <button
             type="button"
@@ -342,7 +353,7 @@ function DashboardInner() {
             className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-orange)] px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-orange-200 hover:bg-[#f27422] transition"
             style={{ ["--brand-orange" as any]: BRAND_ORANGE }}
           >
-            🍽 {ymToText(monthParam)} 기본 레시피 만들러 가기
+            🍽 {ymToText(monthParam)} 레시피 쓰러 가기
           </button>
         </div>
       </PageContainer>
@@ -351,174 +362,417 @@ function DashboardInner() {
 
   return (
     <PageContainer title="이 달의 지출 레시피 대시보드">
-      {/* 배경 */}
+      {/* 공통 배경 */}
       <div className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-[#FFF8EC] via-[#FFFDFC] to-[#F7FAFF]" />
-      <div className="pointer-events-none fixed left-[-80px] top-[40%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,184,108,0.25)] blur-3xl" />
-      <div className="pointer-events-none fixed right-[-60px] bottom-[8%] -z-10 h-52 w-52 rounded-full bg-[rgba(86,115,231,0.18)] blur-3xl" />
+      <div className="pointer-events-none fixed left-[-80px] top-[40%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,184,108,0.22)] blur-3xl" />
+      <div className="pointer-events-none fixed right-[-60px] bottom-[8%] -z-10 h-52 w-52 rounded-full bg-[rgba(86,115,231,0.16)] blur-3xl" />
 
-      {/* 헤더 영역 */}
+      {/* 1. 레시피 표지 영역 */}
       <motion.section
-        initial={{ opacity: 0, y: 12 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45 }}
-        className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between"
+        className="mb-6"
       >
-        <div>
-          <div className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-[11px] font-medium text-slate-600 shadow-sm">
-            <span
-              className="h-2 w-2 rounded-full"
-              style={{ backgroundColor: BRAND_ORANGE }}
-            />
-            <span>{ymToText(monthParam)} · 지출 레시피 분석</span>
-          </div>
-          <h2 className="mt-2 text-xl font-semibold text-slate-900 md:text-2xl">
-            {ymToText(monthParam)}{" "}
-            <span
-              className="text-[color:var(--brand-orange)]"
-              style={{ ["--brand-orange" as any]: BRAND_ORANGE }}
-            >
-              예산 레시피
-            </span>{" "}
-            요약
-          </h2>
-          <p className="mt-1 text-xs text-slate-600">
-            기본 레시피에 입력한 값을 바탕으로, 한 달 지출 구조를
-            <br className="hidden md:block" />
-            고정비·저축·소비 항목별로 나눠서 보여줍니다.
-          </p>
-        </div>
-
-        {/* 우측: 월 이동 + 설정 버튼 */}
-        <div className="flex flex-col items-end gap-2 text-[11px] text-slate-500">
-          <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-2 py-1 shadow-sm">
-            <button
-              type="button"
-              onClick={() => handleMoveMonth(-1)}
-              className="flex h-6 w-6 items-center justify-center rounded-full text-xs text-slate-600 hover:bg-slate-50"
-            >
-              ←
-            </button>
-            <span className="px-1 text-xs font-semibold text-slate-800">
-              {ymToText(monthParam)}
-            </span>
-            <button
-              type="button"
-              onClick={() => handleMoveMonth(1)}
-              className="flex h-6 w-6 items-center justify-center rounded-full text-xs text-slate-600 hover:bg-slate-50"
-            >
-              →
-            </button>
+        <div className="mx-auto flex flex-col gap-4 rounded-3xl border border-orange-50 bg-white/95 p-4 shadow-sm shadow-orange-50 md:flex-row md:items-center md:justify-between">
+          {/* 왼쪽: 타이틀 + 설명 */}
+          <div>
+            <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-orange-50/80 px-3 py-1 text-[11px] font-medium text-slate-700">
+              <span>📖</span>
+              <span>{ymToText(monthParam)} 지출 레시피</span>
+            </div>
+            <h1 className="text-xl font-semibold text-slate-900 md:text-2xl">
+              {ymToText(monthParam)}{" "}
+              <span
+                className="text-[color:var(--brand-orange)]"
+                style={{ ["--brand-orange" as any]: BRAND_ORANGE }}
+              >
+                예산 레시피
+              </span>
+            </h1>
+            <p className="mt-1 text-xs leading-relaxed text-slate-600">
+              세후 월급 {summary.net.toLocaleString()}원을 기준으로,
+              <br className="hidden md:block" />
+              집세·대출·저축·생활비를{" "}
+              <span className="font-semibold">레시피처럼 분해</span>해서
+              보여주는 페이지입니다.
+            </p>
           </div>
 
-          <button
-            type="button"
-            onClick={handleGoSetup}
-            className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1 hover:bg-slate-50"
-          >
-            ✏️ 기본 레시피 수정하기
-          </button>
+          {/* 오른쪽: 월 이동 + 스냅샷 + 설정 버튼 */}
+          <div className="flex flex-col items-end gap-2 text-[11px] text-slate-500">
+            <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-2 py-1 shadow-sm">
+              <button
+                type="button"
+                onClick={() => handleMoveMonth(-1)}
+                className="flex h-6 w-6 items-center justify-center rounded-full text-xs text-slate-600 hover:bg-slate-50"
+              >
+                ←
+              </button>
+              <span className="px-1 text-xs font-semibold text-slate-800">
+                {ymToText(monthParam)}
+              </span>
+              <button
+                type="button"
+                onClick={() => handleMoveMonth(1)}
+                className="flex h-6 w-6 items-center justify-center rounded-full text-xs text-slate-600 hover:bg-slate-50"
+              >
+                →
+              </button>
+            </div>
+
+            <div className="rounded-2xl bg-slate-50 px-3 py-2 text-right shadow-inner">
+              <p className="text-[11px] font-semibold text-slate-800">
+                계획 지출{" "}
+                <span className="text-[color:var(--brand-orange)]">
+                  {summary.totalPlanned.toLocaleString()}원
+                </span>{" "}
+                ({summary.fixedRatio.toFixed(1)}%)
+              </p>
+              <p className="text-[10px] text-slate-500">
+                남는 금액{" "}
+                <span
+                  className="font-semibold text-[color:var(--brand-green)]"
+                  style={{ ["--brand-green" as any]: BRAND_GREEN }}
+                >
+                  {summary.remain.toLocaleString()}원
+                </span>
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleGoSetup}
+              className="mt-1 inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1 hover:bg-slate-50"
+            >
+              ✏️ 기본 레시피 수정하기
+            </button>
+          </div>
         </div>
       </motion.section>
 
-      {/* 상단 요약 카드 */}
+      {/* 2. 기본 재료 카드 + 중앙 도넛 + 비율 카드 */}
       <motion.section
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.05 }}
-        className="mb-4 grid gap-4 md:grid-cols-3"
+        className="mb-6 grid gap-4 lg:grid-cols-[1.2fr_0.9fr_0.9fr]"
       >
-        {/* 세후 월급 */}
-        <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-orange-50">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-700">
-              세후 월급
+        {/* 왼쪽: 기본 재료 카드 */}
+        <div className="rounded-3xl border border-slate-100 bg-white/95 p-4 shadow-sm shadow-orange-50">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-slate-900">
+              기본 재료표
+            </h2>
+            <span className="text-[11px] text-slate-500">
+              세후 월급 기준 핵심 항목입니다
             </span>
-            <span className="text-[11px] text-slate-400">Income</span>
           </div>
-          <p className="text-lg font-bold text-slate-900">
-            {summary.net.toLocaleString()}원
-          </p>
-          <p className="mt-1 text-[11px] text-slate-500">
-            한 달에 실제로 통장에 들어오는 금액입니다.
-          </p>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            {/* 세후 월급 */}
+            <div className="rounded-2xl border border-slate-100 bg-slate-50/60 p-3">
+              <p className="text-[11px] font-semibold text-slate-700">
+                세후 월급
+              </p>
+              <p className="mt-1 text-lg font-bold text-slate-900">
+                {summary.net.toLocaleString()}원
+              </p>
+              <p className="mt-1 text-[10px] text-slate-500">
+                이번 달 레시피의 총 예산입니다.
+              </p>
+            </div>
+
+            {/* 주거비 */}
+            <div className="rounded-2xl border border-slate-100 bg-slate-50/60 p-3">
+              <p className="text-[11px] font-semibold text-slate-700">
+                주거비 (월세+대출)
+              </p>
+              <p className="mt-1 text-lg font-bold text-slate-900">
+                {(summary.rent + summary.loan).toLocaleString()}원
+              </p>
+              <p className="mt-1 text-[10px] text-slate-500">
+                월급의{" "}
+                <span className="font-semibold">
+                  {summary.housingAndLoanRatio.toFixed(1)}%
+                </span>{" "}
+                를 차지합니다.
+              </p>
+            </div>
+
+            {/* 저축 */}
+            <div className="rounded-2xl border border-slate-100 bg-slate-50/60 p-3">
+              <p className="text-[11px] font-semibold text-slate-700">
+                적금 · 저축
+              </p>
+              <p className="mt-1 text-lg font-bold text-slate-900">
+                {summary.saving.toLocaleString()}원
+              </p>
+              <p className="mt-1 text-[10px] text-slate-500">
+                저축률{" "}
+                <span className="font-semibold">
+                  {summary.savingRatio.toFixed(1)}%
+                </span>
+                입니다.
+              </p>
+            </div>
+
+            {/* 소비성 지출 */}
+            <div className="rounded-2xl border border-slate-100 bg-slate-50/60 p-3">
+              <p className="text-[11px] font-semibold text-slate-700">
+                소비성 지출 (카드·식비·의류·경조사)
+              </p>
+              <p className="mt-1 text-lg font-bold text-slate-900">
+                {summary.consumption.toLocaleString()}원
+              </p>
+              <p className="mt-1 text-[10px] text-slate-500">
+                월급의{" "}
+                <span className="font-semibold">
+                  {summary.consumptionRatio.toFixed(1)}%
+                </span>{" "}
+                수준입니다.
+              </p>
+            </div>
+          </div>
         </div>
 
-        {/* 계획 지출 합계 */}
-        <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-orange-50">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-700">
-              계획된 지출 총합
-            </span>
-            <span className="text-[11px] text-slate-400">Planned Outflow</span>
+        {/* 중앙: 도넛 그래프 (레시피 그릇 느낌) */}
+        <div className="flex items-center justify-center rounded-3xl border border-slate-100 bg-white/95 p-4 shadow-sm shadow-orange-50">
+          <div className="flex flex-col items-center gap-3 text-center">
+            <h2 className="text-sm font-semibold text-slate-900">
+              그릇 위 지출 비율
+            </h2>
+            <p className="text-[11px] text-slate-500 mb-1">
+              월급이라는 그릇에서 어느 정도를 사용하기로 했는지 보여줍니다.
+            </p>
+            <div className="relative h-44 w-44">
+              <svg viewBox="0 0 140 140" className="h-full w-full">
+                {/* 바닥 원 (그릇) */}
+                <circle
+                  cx="70"
+                  cy="70"
+                  r={radius}
+                  className="fill-none stroke-slate-100"
+                  strokeWidth="12"
+                />
+                {/* 사용 비율 */}
+                <motion.circle
+                  cx="70"
+                  cy="70"
+                  r={radius}
+                  className="fill-none"
+                  stroke="url(#grad-main)"
+                  strokeWidth="12"
+                  strokeLinecap="round"
+                  strokeDasharray={circumference}
+                  initial={{ strokeDashoffset: circumference }}
+                  animate={{
+                    strokeDashoffset:
+                      circumference * (1 - donutRatio / 100),
+                  }}
+                  transition={{ duration: 0.85, delay: 0.1, ease: "easeOut" }}
+                />
+                <defs>
+                  <linearGradient
+                    id="grad-main"
+                    x1="0%"
+                    y1="0%"
+                    x2="100%"
+                    y2="100%"
+                  >
+                    <stop offset="0%" stopColor="#FFB86C" />
+                    <stop offset="100%" stopColor="#FF8A3D" />
+                  </linearGradient>
+                </defs>
+              </svg>
+
+              {/* 중앙 텍스트 */}
+              <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
+                <p className="text-[11px] text-slate-500">지출 비율</p>
+                <p className="text-2xl font-bold text-slate-900">
+                  {summary.fixedRatio.toFixed(1)}%
+                </p>
+                <p className="mt-0.5 text-[10px] text-slate-400">
+                  남는 금액 {summary.remain.toLocaleString()}원
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-1 flex flex-col gap-1 text-[10px] text-slate-500">
+              <p>
+                ● 지출 계획{" "}
+                <span className="font-semibold text-slate-800">
+                  {summary.totalPlanned.toLocaleString()}원
+                </span>
+              </p>
+              <p>
+                ○ 남는 금액{" "}
+                <span
+                  className="font-semibold text-[color:var(--brand-green)]"
+                  style={{ ["--brand-green" as any]: BRAND_GREEN }}
+                >
+                  {summary.remain.toLocaleString()}원
+                </span>
+              </p>
+            </div>
           </div>
-          <p className="text-lg font-bold text-slate-900">
-            {summary.totalPlanned.toLocaleString()}원
-          </p>
-          <p className="mt-1 text-[11px] text-slate-500">
-            월세·대출·각 항목·추가 지출까지 모두 더한 금액입니다.
-          </p>
         </div>
 
-        {/* 남는 금액 & 비율 */}
-        <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-orange-50">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-700">
-              남는 금액 · 지출 비율
+        {/* 오른쪽: 비율 카드 */}
+        <div className="rounded-3xl border border-slate-100 bg-white/95 p-4 shadow-sm shadow-orange-50">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-slate-900">
+              레시피 비율
+            </h2>
+            <span className="text-[11px] text-slate-500">
+              직관적인 비율 바 형태로 정리했어요
             </span>
-            <span className="text-[11px] text-slate-400">Balance</span>
           </div>
-          <p
-            className="text-lg font-bold text-[color:var(--brand-green)]"
-            style={{ ["--brand-green" as any]: BRAND_GREEN }}
-          >
-            {summary.remain.toLocaleString()}원
-          </p>
-          <p className="mt-1 text-[11px] text-slate-500">
-            총 지출이 세후 월급의{" "}
-            <span className="font-semibold text-slate-800">
-              {summary.fixedRatio.toFixed(1)}%
-            </span>
-            를 차지합니다.
-          </p>
+
+          <div className="space-y-3 text-[11px]">
+            {/* 전체 지출 비율 */}
+            <div>
+              <div className="mb-1 flex items-center justify-between">
+                <span className="font-semibold text-slate-700">
+                  전체 지출 비율
+                </span>
+                <span className="text-slate-500">
+                  {summary.fixedRatio.toFixed(1)}%
+                </span>
+              </div>
+              <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{
+                    width: `${Math.min(100, Math.max(0, summary.fixedRatio))}%`,
+                  }}
+                  transition={{ duration: 0.6 }}
+                  className="h-full rounded-full bg-gradient-to-r from-[#FFB86C] via-[#FF8A3D] to-[#FF6B3D]"
+                />
+              </div>
+              <p className="mt-1 text-[10px] text-slate-500">
+                세후 월급 대비, 이번 달에{" "}
+                <span className="font-semibold">
+                  {summary.totalPlanned.toLocaleString()}원
+                </span>
+                을 사용할 계획입니다.
+              </p>
+            </div>
+
+            {/* 주거비 비율 */}
+            <div>
+              <div className="mb-1 flex items-center justify-between">
+                <span className="font-semibold text-slate-700">
+                  주거비 비율 (월세+대출)
+                </span>
+                <span className="text-slate-500">
+                  {summary.housingAndLoanRatio.toFixed(1)}%
+                </span>
+              </div>
+              <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{
+                    width: `${Math.min(
+                      100,
+                      Math.max(0, summary.housingAndLoanRatio)
+                    )}%`,
+                  }}
+                  transition={{ duration: 0.6, delay: 0.05 }}
+                  className="h-full rounded-full bg-[#FFCD6C]"
+                />
+              </div>
+              <p className="mt-1 text-[10px] text-slate-500">
+                주거비가 월급에서 차지하는 비중입니다.{" "}
+                <span className="font-semibold">30% 전후</span>가 일반적인
+                권장선입니다.
+              </p>
+            </div>
+
+            {/* 저축 비율 */}
+            <div>
+              <div className="mb-1 flex items-center justify-between">
+                <span className="font-semibold text-slate-700">
+                  저축 비율
+                </span>
+                <span className="text-slate-500">
+                  {summary.savingRatio.toFixed(1)}%
+                </span>
+              </div>
+              <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{
+                    width: `${Math.min(
+                      100,
+                      Math.max(0, summary.savingRatio)
+                    )}%`,
+                  }}
+                  transition={{ duration: 0.6, delay: 0.1 }}
+                  className="h-full rounded-full bg-[#7FD1AE]"
+                />
+              </div>
+              <p className="mt-1 text-[10px] text-slate-500">
+                미래 준비를 위한 비율입니다. 본인이 목표로 삼는{" "}
+                <span className="font-semibold">저축률 기준</span>과 비교해
+                보세요.
+              </p>
+            </div>
+          </div>
         </div>
       </motion.section>
 
-      {/* 하단: 카테고리별 표 + 간단 분석 */}
+      {/* 3. 상세 재료 리스트 + 셰프 노트 */}
       <motion.section
-        initial={{ opacity: 0, y: 8 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
-        className="grid gap-4 md:grid-cols-[1.2fr_0.8fr]"
+        className="grid gap-4 lg:grid-cols-[1.3fr_0.7fr]"
       >
-        {/* 카테고리 테이블 */}
-        <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-orange-50">
+        {/* 상세 재료 리스트 */}
+        <div className="rounded-3xl border border-slate-100 bg-white/95 p-4 shadow-sm shadow-orange-50">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-slate-900">
-              카테고리별 지출 레시피
-            </h3>
+            <h2 className="text-sm font-semibold text-slate-900">
+              상세 재료 리스트
+            </h2>
             <span className="text-[11px] text-slate-500">
-              세후 월급 대비 비율 기준
+              항목별 금액과 비율을 재료처럼 나열했어요
             </span>
           </div>
 
-          <div className="max-h-[420px] space-y-1 overflow-auto pr-1 text-xs">
-            <div className="grid grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_60px] gap-2 rounded-lg bg-slate-50 px-2 py-2 text-[11px] font-semibold text-slate-600">
-              <div>항목</div>
+          <div className="max-h-[420px] space-y-1.5 overflow-auto pr-1 text-xs">
+            <div className="grid grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)_72px] gap-2 rounded-lg bg-slate-50 px-2 py-2 text-[11px] font-semibold text-slate-600">
+              <div>재료</div>
               <div className="text-right">금액</div>
-              <div className="text-right">비율</div>
+              <div className="text-right">월급대비</div>
             </div>
 
             {categoryRows.map((row) => {
               const ratio =
                 summary.net > 0 ? (row.amount / summary.net) * 100 : 0;
+              const width = Math.max(
+                4,
+                Math.min(100, Math.round(ratio))
+              );
+
               return (
                 <div
                   key={row.key}
-                  className="grid grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_60px] items-center gap-2 rounded-lg px-2 py-1.5 text-[11px] hover:bg-slate-50"
+                  className="grid grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)_72px] items-center gap-2 rounded-lg px-2 py-1.5 text-[11px] hover:bg-slate-50"
                 >
-                  <div className="flex items-center gap-2">
-                    <span>{row.emoji}</span>
-                    <span className="text-slate-800">{row.label}</span>
+                  <div className="flex items-start gap-2">
+                    <span className="mt-0.5">{row.emoji}</span>
+                    <div className="flex-1">
+                      <p className="text-slate-800">{row.label}</p>
+                      <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${width}%` }}
+                          transition={{ duration: 0.5 }}
+                          className="h-full rounded-full bg-gradient-to-r from-[#FFB86C] via-[#FF8A3D] to-[#FF6B3D]"
+                        />
+                      </div>
+                    </div>
                   </div>
                   <div className="text-right text-slate-800">
                     {row.amount ? row.amount.toLocaleString() : 0}원
@@ -532,80 +786,76 @@ function DashboardInner() {
           </div>
         </div>
 
-        {/* 간단 분석 카드 */}
+        {/* 셰프(회계사) 노트 */}
         <div className="space-y-4">
-          <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-orange-50">
-            <h3 className="mb-2 text-sm font-semibold text-slate-900">
-              이 달 레시피 한 줄 요약
-            </h3>
+          <div className="rounded-3xl border border-slate-100 bg-white/95 p-4 shadow-sm shadow-orange-50">
+            <div className="mb-2 flex items-center gap-2">
+              <span className="text-lg">👨‍🍳</span>
+              <h2 className="text-sm font-semibold text-slate-900">
+                이번 달 셰프 노트
+              </h2>
+            </div>
+
             <ul className="space-y-1.5 text-[11px] leading-relaxed text-slate-700">
               <li>
                 • 전체 지출이 세후 월급의{" "}
                 <span className="font-semibold">
                   {summary.fixedRatio.toFixed(1)}%
-                </span>
-                를 차지하고 있습니다.
-              </li>
-              <li>
-                • 월세+관리비와 대출 상환액이 합쳐서{" "}
-                <span className="font-semibold">
-                  {summary.net > 0
-                    ? (
-                        ((summary.rent + summary.loan) / summary.net) *
-                        100
-                      ).toFixed(1)
-                    : "0.0"}
-                  %
                 </span>{" "}
-                수준입니다.
+                입니다.
               </li>
               <li>
-                • 적금(저축) 항목은{" "}
+                • 주거비(월세+대출)는{" "}
                 <span className="font-semibold">
-                  {(data.details.saving || 0).toLocaleString()}원
-                </span>
-                으로, 세후 월급의{" "}
+                  {summary.housingAndLoanRatio.toFixed(1)}%
+                </span>{" "}
+                수준으로, 본인이 생각하는 적정선과 비교해 보세요.
+              </li>
+              <li>
+                • 적금(저축)은{" "}
                 <span className="font-semibold">
-                  {summary.net > 0
-                    ? (
-                        ((data.details.saving || 0) / summary.net) *
-                        100
-                      ).toFixed(1)
-                    : "0.0"}
-                  %
+                  {summary.saving.toLocaleString()}원
+                </span>{" "}
+                으로, 저축률은{" "}
+                <span className="font-semibold">
+                  {summary.savingRatio.toFixed(1)}%
                 </span>
                 입니다.
               </li>
               <li>
-                • 카드·식비·의류·경조사 등 소비성 지출은 합산 시{" "}
+                • 카드·식비·의류·경조사 등 소비성 지출 합계는{" "}
                 <span className="font-semibold">
-                  {(
-                    (data.details.card || 0) +
-                    (data.details.groceries || 0) +
-                    (data.details.clothes || 0) +
-                    (data.details.events || 0) +
-                    (data.details.birthday || 0)
-                  ).toLocaleString()}
-                  원
+                  {summary.consumption.toLocaleString()}원
+                </span>
+                입니다.
+              </li>
+              <li>
+                • 남는 금액{" "}
+                <span
+                  className="font-semibold text-[color:var(--brand-green)]"
+                  style={{ ["--brand-green" as any]: BRAND_GREEN }}
+                >
+                  {summary.remain.toLocaleString()}원
                 </span>{" "}
-                수준입니다.
+                은 비상자금·투자·여행 등에 어떻게 배분할지 미리 정해두면
+                좋습니다.
               </li>
             </ul>
           </div>
 
-          <div className="rounded-2xl bg-gradient-to-r from-[#FFF7EB] to-[#FFF4E5] p-4 text-[11px] leading-relaxed text-slate-700 shadow-sm shadow-orange-50">
+          <div className="rounded-3xl bg-gradient-to-r from-[#FFF7EB] to-[#FFF4E5] p-4 text-[11px] leading-relaxed text-slate-700 shadow-sm shadow-orange-50">
             <p className="mb-2">
-              👨‍🍳 <strong>TIP.</strong> 이번 달을 실제로 살아보면서, 카드 사용액과
-              식비가 예상보다 많이 나간다면 다음 달 기본 레시피에서
+              🧂 <strong>셰프 TIP.</strong> 실제 한 달을 살아본 뒤, 카드 사용액과
+              식비가 계획보다 많이 나갔다면,
               <br />
-              해당 항목 금액을 조금 줄이고, 적금이나 여유자금으로 돌려 보는
-              식으로 점진적으로 레시피를 조정해 보세요.
+              다음 달에는 해당 재료(지출)를 조금 줄이고 저축이나 여유자금으로
+              다시 배치해 보세요.
             </p>
             <p className="text-[10px] text-slate-500">
-              이 화면은 입력한 “예산 계획” 기준 분석이며, 나중에 실제 지출 데이터
-              (카드·가계부)를 연동하면
+              이 화면은 입력한 “예산 계획” 기준 분석이며, 나중에 실제 지출
+              데이터(카드·가계부)를 연동하면
               <br />
-              계획 vs 실제를 비교하는 통계 대시보드로 확장할 수 있습니다.
+              계획 vs 실제를 비교하는 정교한 회계 리포트로 확장할 수 있습니다.
             </p>
           </div>
         </div>
@@ -614,9 +864,6 @@ function DashboardInner() {
   );
 }
 
-/**
- * Suspense 래퍼: DashboardInner를 감싸서 useSearchParams 경고 제거
- */
 export default function DashboardPage() {
   return (
     <Suspense
