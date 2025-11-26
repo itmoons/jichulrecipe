@@ -86,15 +86,16 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <p className="flex items-center gap-2 text-xs text-slate-500">
-            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[rgba(76,175,80,0.12)] text-[13px]">
+          <div className="flex items-center gap-2 text-xs text-slate-500">
+            <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5">
               💡
             </span>
             <p className="max-w-xl text-sm leading-relaxed text-slate-700">
-            
-            복잡한 재무 용어 대신 레시피처럼 한 접시씩 따라해보세요!
-          </p>
-          </p>
+              복잡한 재무 용어 대신 레시피처럼 한 접시씩 따라해보세요!
+            </p>
+          </div>
+
+
         </motion.div>
 
         {/* 오른쪽: 요리/차트 일러스트 카드 */}
