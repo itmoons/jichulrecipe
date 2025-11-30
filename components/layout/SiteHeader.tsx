@@ -4,13 +4,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 const BRAND_ORANGE = "#FF8A3D";
 
 export function SiteHeader() {
   const router = useRouter();
+  const pathname = usePathname();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [checking, setChecking] = useState(true); // 초기 깜빡임 방지용
   const [isNavOpen, setIsNavOpen] = useState(false); // 모바일 메뉴 열림 여부
@@ -54,17 +55,27 @@ export function SiteHeader() {
   const toggleNav = () => setIsNavOpen((prev) => !prev);
   const closeNav = () => setIsNavOpen(false);
 
+  const isCalendar = pathname?.startsWith("/dashboard/calendar");
+  const isDashboard = pathname === "/dashboard";
+  const isYearly = pathname?.startsWith("/dashboard/yearly");
+
   return (
-    <header className="sticky top-0 z-40 border-b border-orange-100 bg-gradient-to-r from-[#FFF7EB] via-[#FFF1DF] to-[#FFE7CF]/95 backdrop-blur">
-      {/* 상단 바 */}
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-        {/* 좌측: 햄버거 + 로고 (모바일), 로고 단독(데스크톱) */}
+    <header
+      className={[
+        "sticky top-0 z-40 border-b border-orange-100/70",
+        "bg-gradient-to-r from-[#FFF9F2] via-[#FFF3E2] to-[#FFE7CF]/95",
+        "backdrop-blur shadow-[0_2px_8px_rgba(248,153,75,0.12)]",
+      ].join(" ")}
+    >
+      {/* 상단 바 (PC에서 65% 폭만 사용) */}
+      <div className="mx-auto flex w-full max-w-full md:max-w-[67%] items-center justify-between px-4 py-3">
+        {/* 좌측: 햄버거 + 로고 */}
         <div className="flex items-center gap-2">
           {/* 햄버거 버튼 - 모바일 전용, 왼쪽 배치 */}
           <button
             type="button"
             onClick={toggleNav}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-orange-200 bg-white/80 text-slate-700 shadow-sm md:hidden"
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-orange-200 bg-white/90 text-slate-700 shadow-sm md:hidden"
             aria-label="메뉴 열기"
             aria-expanded={isNavOpen}
           >
@@ -79,13 +90,15 @@ export function SiteHeader() {
             className="flex items-center gap-2"
             onClick={closeNav}
           >
-            <Image
-              src="/logo/logo.png"
-              alt="지출레시피 로고"
-              width={40}
-              height={40}
-              priority
-            />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white shadow-sm border border-orange-100">
+              <Image
+                src="/logo/logo.png"
+                alt="지출레시피 로고"
+                width={26}
+                height={26}
+                priority
+              />
+            </div>
             <div className="flex flex-col leading-tight">
               <span className="text-sm font-semibold text-slate-900">
                 지출레시피
@@ -98,26 +111,29 @@ export function SiteHeader() {
         </div>
 
         {/* 데스크톱 내비게이션 */}
-        <nav className="hidden items-center gap-3 text-xs font-medium text-slate-700 md:flex">
-          <Link href="/setup" className="hover:text-slate-900">
-            레시피 입력/수정
-          </Link>
-          <Link href="/dashboard" className="hover:text-slate-900">
-            레시피 분석(월별)
+        <nav className="hidden items-center gap-4 text-xs font-medium text-slate-700 md:flex">
+          <Link
+            href="/dashboard/calendar"
+            className={[
+              "rounded-full px-3 py-1 transition",
+              isCalendar
+                ? "bg-white text-slate-900 shadow-sm border border-orange-100"
+                : "text-slate-700 hover:bg-white/70 hover:text-slate-900 border border-transparent",
+            ].join(" ")}
+          >
+            레시피 달력
           </Link>
           <Link
-            href="/dashboard/yearly?year=2025"
-            className="hover:text-slate-900"
+            href="/dashboard"
+            className={[
+              "rounded-full px-3 py-1 transition",
+              isDashboard
+                ? "bg-white text-slate-900 shadow-sm border border-orange-100"
+                : "text-slate-700 hover:bg-white/70 hover:text-slate-900 border border-transparent",
+            ].join(" ")}
           >
-            레시피 분석(연별)
+            레시피 분석
           </Link>
-
-          <span
-            className="rounded-full border border-orange-200 bg-white/70 px-3 py-1 text-[11px] text-[color:var(--brand-orange)] shadow-sm"
-            style={{ ["--brand-orange" as any]: BRAND_ORANGE }}
-          >
-            오늘의 메뉴: 예산 세팅
-          </span>
 
           {/* 로그인 / 로그아웃 버튼 */}
           {!checking && (
@@ -174,34 +190,38 @@ export function SiteHeader() {
       {/* 모바일 드롭다운 메뉴 */}
       {isNavOpen && (
         <div className="border-t border-orange-100 bg-white/95 md:hidden">
-          <nav className="mx-auto flex max-w-5xl flex-col gap-1 px-4 py-3 text-sm font-medium text-slate-700">
+          <nav className="mx-auto flex w-full max-w-full md:max-w-[65%] flex-col gap-1 px-4 py-3 text-sm font-medium text-slate-700">
             <Link
-              href="/setup"
-              className="rounded-md px-2 py-1.5 hover:bg-orange-50"
+              href="/dashboard/calendar"
+              className={[
+                "rounded-md px-2 py-1.5",
+                pathname?.startsWith("/dashboard/calendar")
+                  ? "bg-orange-50 text-slate-900"
+                  : "hover:bg-orange-50",
+              ].join(" ")}
               onClick={closeNav}
             >
-              레시피 입력/수정
+              레시피 달력
             </Link>
             <Link
               href="/dashboard"
-              className="rounded-md px-2 py-1.5 hover:bg-orange-50"
+              className={[
+                "rounded-md px-2 py-1.5",
+                pathname === "/dashboard"
+                  ? "bg-orange-50 text-slate-900"
+                  : "hover:bg-orange-50",
+              ].join(" ")}
               onClick={closeNav}
             >
-              레시피 분석(월별)
-            </Link>
-            <Link
-              href="/dashboard/yearly?year=2025"
-              className="rounded-md px-2 py-1.5 hover:bg-orange-50"
-              onClick={closeNav}
-            >
-              레시피 분석(연별)
+              레시피 분석
             </Link>
 
             <span
-              className="mt-2 inline-flex items-center justify-center rounded-full border border-orange-200 bg-[#FFF7EB] px-3 py-1 text-[11px] text-[color:var(--brand-orange)] shadow-sm"
+              className="mt-3 inline-flex items-center justify-center gap-1 rounded-full border border-orange-200 bg-[#FFF7EB] px-3 py-1 text-[11px] text-[color:var(--brand-orange)] shadow-sm"
               style={{ ["--brand-orange" as any]: BRAND_ORANGE }}
             >
-              오늘의 메뉴: 예산 세팅
+              <span>🍳</span>
+              <span>오늘의 메뉴: 예산 세팅</span>
             </span>
           </nav>
         </div>

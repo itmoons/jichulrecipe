@@ -60,9 +60,6 @@ export const metadata: Metadata = {
     images: [OG_IMAGE],
   },
 
-  viewport:
-    "width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover",
-
   authors: [{ name: SITE_NAME }],
   category: "finance",
 };

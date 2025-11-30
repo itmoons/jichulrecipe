@@ -22,7 +22,7 @@ function SignInInner() {
     searchParams.get("mode") === "register" ? "register" : "login";
 
   // 로그인 후 되돌아갈 경로 (?redirect=...)
-  const redirectPath = searchParams.get("redirect") || "/setup";
+  const redirectPath = searchParams.get("redirect") || "/";
 
   const [mode, setMode] = useState<"login" | "register">(initialMode);
   const [email, setEmail] = useState("");
