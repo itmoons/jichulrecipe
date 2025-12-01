@@ -217,13 +217,12 @@ export default function HomePage() {
                 을 요리하듯 기록하고
                 <br className="hidden sm:block" />
                 <span className="underline decoration-[rgba(86,115,231,0.3)] decoration-[6px] underline-offset-[7px]">
-                  나만의 월 예산 레시피
+                  나만의 예산 레시피
                 </span>
                 를 만드세요.
               </h1>
               <p className="mx-auto max-w-xl text-sm leading-relaxed text-slate-700">
-                숫자 가득한 가계부 대신, 오늘 쓴 돈을 한 끼 식단처럼 남기는 방식입니다.
-                한 번 레시피를 만들어 두면, 한 달 동안 기준만 따라가면 돼요.
+                숫자 가득한 가계부 대신 오늘 쓴 돈을 한 끼 식단처럼 남기는 방식입니다.
               </p>
             </div>
 
@@ -467,7 +466,7 @@ export default function HomePage() {
                       </div>
                     ) : (
                       <div className="mt-auto text-[9px] sm:text-[10px] text-neutral-300">
-                        재료 부족
+                        -
                       </div>
                     )}
                   </div>
@@ -604,77 +603,85 @@ export default function HomePage() {
 
         {/* 오늘의 샘플 레시피 섹션 */}
         <section className="mt-4 mb-2 rounded-3xl border border-dashed border-orange-200 bg-gradient-to-r from-[#FFF7EB] to-[#FFF9F3] p-4 sm:p-5">
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <div className="text-center sm:text-left">
-              <h2 className="text-sm font-semibold text-slate-900">
-                샘플 레시피로 감만 먼저 잡아보세요
-              </h2>
-              <p className="text-xs text-slate-600">
-                세후 월급 구간별로 많이 선택된 비율을 단순 예시로 보여드립니다.
-              </p>
-            </div>
-            <span className="rounded-full bg-white/80 px-3 py-1 text-[11px] font-medium text-orange-500 shadow-sm">
-              나중에 내 상황에 맞게 자유롭게 수정 가능
-            </span>
-          </div>
+  {/* 상단 안내 + 배지 영역 (전체 중앙 정렬) */}
+  <div className="min-w-full mb-3 flex flex-col items-center justify-center gap-2 text-center">
+    <div>
+      <h2 className="text-xs text-slate-600 text-center">
+        샘플 레시피로 감만 먼저 잡아보세요
+      </h2>
+      <p className="text-xs text-slate-600 text-center">
+        세후 월급 구간별로 많이 선택된 비율을 단순 예시
+      </p>
+    </div>
+    <span className="rounded-full bg-white/80 px-3 py-1 text-[11px] font-medium text-orange-500 shadow-sm">
+      나중에 내 상황에 맞게 자유롭게 수정 가능
+    </span>
+  </div>
 
-          <div className="overflow-x-auto text-xs">
-            <table className="min-w-full border-separate border-spacing-y-2">
-              <thead className="text-[11px] text-slate-500">
-                <tr>
-                  <th className="px-2 py-1 text-left">세후 월급</th>
-                  <th className="px-2 py-1 text-left">필수 지출</th>
-                  <th className="px-2 py-1 text-left">저축·비상자금</th>
-                  <th className="px-2 py-1 text-left">여가·취미</th>
-                  <th className="px-2 py-1 text-left">기타 버퍼</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  {
-                    income: "2,300,000원",
-                    essential: "900,000원 (약 39%)",
-                    saving: "500,000원 (약 22%)",
-                    leisure: "250,000원 (약 11%)",
-                    etc: "150,000원 (약 6%)",
-                  },
-                  {
-                    income: "2,800,000원",
-                    essential: "1,050,000원 (약 38%)",
-                    saving: "650,000원 (약 23%)",
-                    leisure: "300,000원 (약 11%)",
-                    etc: "200,000원 (약 7%)",
-                  },
-                  {
-                    income: "3,100,000원",
-                    essential: "1,150,000원 (약 37%)",
-                    saving: "750,000원 (약 24%)",
-                    leisure: "330,000원 (약 11%)",
-                    etc: "220,000원 (약 7%)",
-                  },
-                ].map((row) => (
-                  <tr
-                    key={row.income}
-                    className="rounded-xl bg-white/95 shadow-sm shadow-orange-50"
-                  >
-                    <td className="px-2 py-2 font-semibold text-slate-800">
-                      {row.income}
-                    </td>
-                    <td className="px-2 py-2 text-slate-700">{row.essential}</td>
-                    <td className="px-2 py-2 text-slate-700">{row.saving}</td>
-                    <td className="px-2 py-2 text-slate-700">{row.leisure}</td>
-                    <td className="px-2 py-2 text-slate-700">{row.etc}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+  {/* 샘플 테이블 */}
+<div className="overflow-x-auto text-xs">
+  {/* ✅ 테이블 최소 폭 유지 + 중앙 정렬용 래퍼 */}
+  <div className="inline-block min-w-[640px] align-middle mx-auto">
+    <table className="w-full table-fixed border-separate border-spacing-y-2">
+      <thead className="text-[11px] text-slate-500">
+        <tr>
+          <th className="px-2 py-1 text-left">세후 월급</th>
+          <th className="px-2 py-1 text-left">필수 지출</th>
+          <th className="px-2 py-1 text-left">저축·비상자금</th>
+          <th className="px-2 py-1 text-left">여가·취미</th>
+          <th className="px-2 py-1 text-left">기타 버퍼</th>
+        </tr>
+      </thead>
+      <tbody>
+        {[
+          {
+            income: "2,300,000원",
+            essential: "900,000원 (39%)",
+            saving: "500,000원 (22%)",
+            leisure: "250,000원 (11%)",
+            etc: "150,000원 (6%)",
+          },
+          {
+            income: "2,800,000원",
+            essential: "1,050,000원 (38%)",
+            saving: "650,000원 (23%)",
+            leisure: "300,000원 (11%)",
+            etc: "200,000원 (7%)",
+          },
+          {
+            income: "3,100,000원",
+            essential: "1,150,000원 (37%)",
+            saving: "750,000원 (24%)",
+            leisure: "330,000원 (11%)",
+            etc: "220,000원 (7%)",
+          },
+        ].map((row) => (
+          <tr
+            key={row.income}
+            className="rounded-xl bg-white/95 shadow-sm shadow-orange-50"
+          >
+            <td className="px-2 py-2 font-semibold text-slate-800">
+              {row.income}
+            </td>
+            <td className="px-2 py-2 text-slate-700">{row.essential}</td>
+            <td className="px-2 py-2 text-slate-700">{row.saving}</td>
+            <td className="px-2 py-2 text-slate-700">{row.leisure}</td>
+            <td className="px-2 py-2 text-slate-700">{row.etc}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
 
-          <p className="mt-3 text-[11px] text-slate-500 text-center sm:text-left">
-            * 위 수치는 어디까지나 &quot;적당히 무리 없는 예시&quot;일 뿐입니다.
-            내 상황에 맞게 필수·저축·여가 비율을 직접 조정하는 것이 가장 중요합니다.
-          </p>
-        </section>
+
+  {/* 하단 주석도 중앙 정렬 */}
+  <p className="mt-3 text-[11px] text-slate-500 text-center">
+    * 위 수치는 어디까지나 &quot;적당히 무리 없는 예시&quot;일 뿐입니다.
+    내 상황에 맞게 필수·저축·여가 비율을 직접 조정하는 것이 가장 중요합니다.
+  </p>
+</section>
+
       </div>
 
       {/* ===== 모달들 ===== */}

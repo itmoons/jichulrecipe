@@ -6,7 +6,7 @@ export default function CalendarEditPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen flex items-center justify-center bg-[radial-gradient(circle_at_1px_1px,#e5e7eb_1px,transparent_0)] [background-size:18px_18px] px-4">
+        <main className="min-h-screen flex items-center justify-center  bg-white [background-size:18px_18px] px-4">
           <div className="rounded-2xl bg-white/95 px-4 py-3 text-xs text-slate-600 shadow">
             하루 지출 레시피 편집 화면을 준비하고 있어요...
           </div>

@@ -887,7 +887,7 @@ function MemoCard({
       type="button"
       onClick={onClick}
       className={[
-        "w-full text-left rounded-2xl px-3 py-2.5 flex flex-col gap-1.5 border shadow-sm transition hover:bg-amber-50 cursor-pointer",
+        "w-full text-left rounded-2xl px-3 py-2.5 flex flex-col gap-1.5 border shadow-sm transition hover:bg-amber-50 cursor-pointer bg-white",
         base,
       ].join(" ")}
     >

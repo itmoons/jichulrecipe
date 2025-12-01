@@ -304,7 +304,7 @@ export default function CalendarEditClient() {
   return (
     <main
       className={[
-        "min-h-screen text-neutral-900 flex flex-col items-stretch",
+        "min-h-screen text-neutral-900 flex flex-col items-stretch bg-white",
         "bg-[radial-gradient(circle_at_1px_1px,#e5e7eb_1px,transparent_0)]",
         "[background-size:18px_18px]",
       ].join(" ")}
@@ -327,7 +327,7 @@ export default function CalendarEditClient() {
                 </h1>
               </div>
               <p className="text-[11px] sm:text-xs text-neutral-500">
-                한 끼 식단처럼 수입·지출·적금 항목을 나눠서 기록해요.
+                수입·지출·적금 항목을 나눠서 기록해요.
               </p>
             </div>
           </div>
@@ -335,12 +335,13 @@ export default function CalendarEditClient() {
           <button
             type="submit"
             form="daily-recipe-form"
-            className="inline-flex items-center gap-1.5 rounded-full px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium shadow-sm"
+            className="inline-flex min-w-[120px] items-center justify-center gap-1.5 rounded-full px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium shadow-sm"
             style={{ backgroundColor: BRAND_ORANGE, color: "#f5f5f5ff" }}
           >
             <Check size={16} />
-            오늘 레시피 저장
+            레시피 저장
           </button>
+
         </header>
 
         {/* 내용 */}
