@@ -466,7 +466,7 @@ function DashboardInner() {
             </h2>
             <p className="mb-4 text-[11px] text-slate-600 leading-relaxed">
               <span className="font-semibold text-slate-900">
-                /dashboard/calendar
+                레시피 달력
               </span>{" "}
               에서 날짜별로 수입·지출·저축을 입력하면,
               <br />
