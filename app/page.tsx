@@ -92,7 +92,6 @@ export default function HomePage() {
 
   // 모달 상태
   const [recipeModalOpen, setRecipeModalOpen] = useState(false);
-  const [dashboardModalOpen, setDashboardModalOpen] = useState(false);
 
   /** 로그인 상태 확인 */
   useEffect(() => {
@@ -167,12 +166,10 @@ export default function HomePage() {
   );
 
   /* ==============================
-   *  CTA 핸들러 (모달 열기)
+   *  CTA 핸들러
    * ============================== */
   const openRecipeModal = () => setRecipeModalOpen(true);
-  const openDashboardModal = () => setDashboardModalOpen(true);
   const closeRecipeModal = () => setRecipeModalOpen(false);
-  const closeDashboardModal = () => setDashboardModalOpen(false);
 
   /* 실제 이동 액션 */
   const goTodayRecipeEdit = () => {
@@ -183,6 +180,19 @@ export default function HomePage() {
   const goCalendar = () => router.push("/dashboard/calendar");
   const goDashboard = () => router.push("/dashboard");
   const goSignIn = () => router.push("/sign-in");
+
+  // 📊 이번 달 소비 분석 보기 클릭 시 분기
+  const handleDashboardClick = () => {
+    if (authChecking) {
+      // 로그인 상태 확인 중이면 일단 대기
+      return;
+    }
+    if (isLoggedIn) {
+      router.push("/dashboard");
+    } else {
+      router.push("/sign-in");
+    }
+  };
 
   return (
     <PageContainer>
@@ -237,7 +247,7 @@ export default function HomePage() {
               </button>
               <button
                 type="button"
-                onClick={openDashboardModal}
+                onClick={handleDashboardClick}
                 className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white/80 px-5 py-2.5 text-sm text-slate-800 shadow-sm hover:bg-white"
               >
                 📊 이번 달 소비 분석 보기
@@ -603,85 +613,91 @@ export default function HomePage() {
 
         {/* 오늘의 샘플 레시피 섹션 */}
         <section className="mt-4 mb-2 rounded-3xl border border-dashed border-orange-200 bg-gradient-to-r from-[#FFF7EB] to-[#FFF9F3] p-4 sm:p-5">
-  {/* 상단 안내 + 배지 영역 (전체 중앙 정렬) */}
-  <div className="min-w-full mb-3 flex flex-col items-center justify-center gap-2 text-center">
-    <div>
-      <h2 className="text-xs text-slate-600 text-center">
-        샘플 레시피로 감만 먼저 잡아보세요
-      </h2>
-      <p className="text-xs text-slate-600 text-center">
-        세후 월급 구간별로 많이 선택된 비율을 단순 예시
-      </p>
-    </div>
-    <span className="rounded-full bg-white/80 px-3 py-1 text-[11px] font-medium text-orange-500 shadow-sm">
-      나중에 내 상황에 맞게 자유롭게 수정 가능
-    </span>
-  </div>
+          {/* 상단 안내 + 배지 영역 (전체 중앙 정렬) */}
+          <div className="min-w-full mb-3 flex flex-col items-center justify-center gap-2 text-center">
+            <div>
+              <h2 className="text-xs text-slate-600 text-center">
+                샘플 레시피로 감만 먼저 잡아보세요
+              </h2>
+              <p className="text-xs text-slate-600 text-center">
+                세후 월급 구간별로 많이 선택된 비율을 단순 예시
+              </p>
+            </div>
+            <span className="rounded-full bg-white/80 px-3 py-1 text-[11px] font-medium text-orange-500 shadow-sm">
+              나중에 내 상황에 맞게 자유롭게 수정 가능
+            </span>
+          </div>
 
-  {/* 샘플 테이블 */}
-<div className="overflow-x-auto text-xs">
-  {/* ✅ 테이블 최소 폭 유지 + 중앙 정렬용 래퍼 */}
-  <div className="inline-block min-w-[640px] align-middle mx-auto">
-    <table className="w-full table-fixed border-separate border-spacing-y-2">
-      <thead className="text-[11px] text-slate-500">
-        <tr>
-          <th className="px-2 py-1 text-left">세후 월급</th>
-          <th className="px-2 py-1 text-left">필수 지출</th>
-          <th className="px-2 py-1 text-left">저축·비상자금</th>
-          <th className="px-2 py-1 text-left">여가·취미</th>
-          <th className="px-2 py-1 text-left">기타 버퍼</th>
-        </tr>
-      </thead>
-      <tbody>
-        {[
-          {
-            income: "2,300,000원",
-            essential: "900,000원 (39%)",
-            saving: "500,000원 (22%)",
-            leisure: "250,000원 (11%)",
-            etc: "150,000원 (6%)",
-          },
-          {
-            income: "2,800,000원",
-            essential: "1,050,000원 (38%)",
-            saving: "650,000원 (23%)",
-            leisure: "300,000원 (11%)",
-            etc: "200,000원 (7%)",
-          },
-          {
-            income: "3,100,000원",
-            essential: "1,150,000원 (37%)",
-            saving: "750,000원 (24%)",
-            leisure: "330,000원 (11%)",
-            etc: "220,000원 (7%)",
-          },
-        ].map((row) => (
-          <tr
-            key={row.income}
-            className="rounded-xl bg-white/95 shadow-sm shadow-orange-50"
-          >
-            <td className="px-2 py-2 font-semibold text-slate-800">
-              {row.income}
-            </td>
-            <td className="px-2 py-2 text-slate-700">{row.essential}</td>
-            <td className="px-2 py-2 text-slate-700">{row.saving}</td>
-            <td className="px-2 py-2 text-slate-700">{row.leisure}</td>
-            <td className="px-2 py-2 text-slate-700">{row.etc}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-</div>
+          {/* 샘플 테이블 */}
+          <div className="overflow-x-auto text-xs">
+            {/* ✅ 테이블 최소 폭 유지 + 중앙 정렬용 래퍼 */}
+            <div className="inline-block min-w-[640px] align-middle mx-auto">
+              <table className="w-full table-fixed border-separate border-spacing-y-2">
+                <thead className="text-[11px] text-slate-500">
+                  <tr>
+                    <th className="px-2 py-1 text-left">세후 월급</th>
+                    <th className="px-2 py-1 text-left">필수 지출</th>
+                    <th className="px-2 py-1 text-left">저축·비상자금</th>
+                    <th className="px-2 py-1 text-left">여가·취미</th>
+                    <th className="px-2 py-1 text-left">기타 버퍼</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    {
+                      income: "2,300,000원",
+                      essential: "900,000원 (39%)",
+                      saving: "500,000원 (22%)",
+                      leisure: "250,000원 (11%)",
+                      etc: "150,000원 (6%)",
+                    },
+                    {
+                      income: "2,800,000원",
+                      essential: "1,050,000원 (38%)",
+                      saving: "650,000원 (23%)",
+                      leisure: "300,000원 (11%)",
+                      etc: "200,000원 (7%)",
+                    },
+                    {
+                      income: "3,100,000원",
+                      essential: "1,150,000원 (37%)",
+                      saving: "750,000원 (24%)",
+                      leisure: "330,000원 (11%)",
+                      etc: "220,000원 (7%)",
+                    },
+                  ].map((row) => (
+                    <tr
+                      key={row.income}
+                      className="rounded-xl bg-white/95 shadow-sm shadow-orange-50"
+                    >
+                      <td className="px-2 py-2 font-semibold text-slate-800">
+                        {row.income}
+                      </td>
+                      <td className="px-2 py-2 text-slate-700">
+                        {row.essential}
+                      </td>
+                      <td className="px-2 py-2 text-slate-700">
+                        {row.saving}
+                      </td>
+                      <td className="px-2 py-2 text-slate-700">
+                        {row.leisure}
+                      </td>
+                      <td className="px-2 py-2 text-slate-700">
+                        {row.etc}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
 
-
-  {/* 하단 주석도 중앙 정렬 */}
-  <p className="mt-3 text-[11px] text-slate-500 text-center">
-    * 위 수치는 어디까지나 &quot;적당히 무리 없는 예시&quot;일 뿐입니다.
-    내 상황에 맞게 필수·저축·여가 비율을 직접 조정하는 것이 가장 중요합니다.
-  </p>
-</section>
-
+          {/* 하단 주석도 중앙 정렬 */}
+          <p className="mt-3 text-[11px] text-slate-500 text-center">
+            * 위 수치는 어디까지나 &quot;적당히 무리 없는 예시&quot;일 뿐입니다.
+            내 상황에 맞게 필수·저축·여가 비율을 직접 조정하는 것이 가장 중요합니다.
+          </p>
+        </section>
       </div>
 
       {/* ===== 모달들 ===== */}
@@ -768,50 +784,6 @@ export default function HomePage() {
                   </>
                 )}
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 대시보드 모달 */}
-      {dashboardModalOpen && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/30 px-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white shadow-2xl border border-slate-100">
-            <div className="px-4 py-3 border-b border-slate-100">
-              <h2 className="text-sm font-semibold text-slate-900">
-                이번 달 소비 분석 페이지로 이동할까요?
-              </h2>
-              <p className="mt-1 text-[11px] text-slate-600">
-                달력에 기록된 레시피를 바탕으로, 이번 달의 소비 패턴을
-                그래프와 카드로 정리해 보여줍니다.
-              </p>
-            </div>
-
-            <div className="px-4 py-3 space-y-2 text-[12px] text-slate-700">
-              <p>
-                아직 기록된 레시피가 없더라도, 기본 구조를 미리 살펴보면서
-                어떤 식으로 관리되는지 확인할 수 있어요.
-              </p>
-              <p className="text-[11px] text-slate-500">
-                * 분석 결과는 브라우저/계정에 저장된 데이터를 기준으로 합니다.
-              </p>
-            </div>
-
-            <div className="flex items-center justify-between gap-2 px-4 py-3 border-t border-slate-100 bg-slate-50/70 rounded-b-2xl">
-              <button
-                type="button"
-                onClick={closeDashboardModal}
-                className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
-              >
-                홈에 머무르기
-              </button>
-              <button
-                type="button"
-                onClick={goDashboard}
-                className="rounded-full bg-slate-900 px-4 py-1.5 text-[11px] font-semibold text-white shadow-sm hover:bg-black"
-              >
-                분석 페이지 열기
-              </button>
             </div>
           </div>
         </div>
