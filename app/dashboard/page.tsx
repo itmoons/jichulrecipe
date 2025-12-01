@@ -5,8 +5,8 @@ import React, { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { PageContainer } from "@/components/layout/PageContainer";
+import { supabase } from "@/lib/supabaseClient";
 
-const LS_KEY_DAILY = "jichulrecipe_daily_recipes_v1";
 const BRAND_ORANGE = "#FF8A3D";
 const BRAND_GREEN = "#22C55E";
 
@@ -92,6 +92,24 @@ function shiftMonth(ym: string, delta: number): string {
   return `${yy}-${mm}`;
 }
 
+function getMonthRangeKeys(ym: string) {
+  const [y, m] = ym.split("-");
+  const year = Number(y);
+  const monthIdx = Number(m) - 1;
+  const first = new Date(year, monthIdx, 1);
+  const last = new Date(year, monthIdx + 1, 0);
+
+  const fmt = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+      d.getDate()
+    ).padStart(2, "0")}`;
+
+  return {
+    firstKey: fmt(first),
+    lastKey: fmt(last),
+  };
+}
+
 function compareDateKey(a: string, b: string) {
   return a < b ? -1 : a > b ? 1 : 0;
 }
@@ -100,7 +118,7 @@ function compareDateKey(a: string, b: string) {
 function normalizeDaily(date: string, entry: any): NormalizedDaily | null {
   if (!entry) return null;
 
-  // 새 구조
+  // 새 구조 (camelCase)
   if (entry.incomeItems || entry.expenseItems || entry.savingItems) {
     const incomeItems: MoneyItem[] = (entry.incomeItems ?? []).map((i: any) => ({
       id: i.id ?? `inc-${date}-${Math.random().toString(36).slice(2, 7)}`,
@@ -374,23 +392,114 @@ function DashboardInner() {
   const monthParam = searchParams.get("month") || getYearMonth();
 
   const [dailyStore, setDailyStore] = useState<DailyStore>({});
-  const [ready, setReady] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
+  // Supabase에서 monthParam에 해당하는 daily_recipes 조회
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const raw = window.localStorage.getItem(LS_KEY_DAILY);
-      if (raw) setDailyStore(JSON.parse(raw) as DailyStore);
-      else setDailyStore({});
-    } catch {
+    let mounted = true;
+    const fetchMonth = async () => {
+      setLoading(true);
+      setLoadError(null);
       setDailyStore({});
-    }
-    setReady(true);
-  }, []);
+
+      try {
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
+
+        if (!mounted) return;
+
+        if (authError) {
+          console.warn("Supabase auth error (dashboard):", authError.message);
+          setLoadError("로그인 정보를 불러오지 못했어요.");
+          setLoading(false);
+          return;
+        }
+
+        if (!user) {
+          // 로그인 안되어 있으면 그냥 빈 데이터로 처리
+          setDailyStore({});
+          setLoading(false);
+          return;
+        }
+
+        const { firstKey, lastKey } = getMonthRangeKeys(monthParam);
+
+        const { data, error } = await supabase
+          .from("daily_recipes")
+          .select(
+            `
+            date,
+            income_items,
+            expense_items,
+            saving_items,
+            income_total,
+            expense_total,
+            saving_total,
+            created_at,
+            updated_at
+          `
+          )
+          .eq("user_id", user.id)
+          .gte("date", firstKey)
+          .lte("date", lastKey);
+
+        if (!mounted) return;
+
+        if (error) {
+          console.error("daily_recipes 조회 실패 (dashboard):", error.message);
+          setLoadError("이 달의 레시피를 불러오는 중 문제가 발생했어요.");
+          setDailyStore({});
+          setLoading(false);
+          return;
+        }
+
+        const store: DailyStore = {};
+        (data || []).forEach((row: any) => {
+          const dateKey = row.date as string;
+          store[dateKey] = {
+            incomeItems: (row.income_items as MoneyItem[] | null) ?? [],
+            expenseItems: (row.expense_items as MoneyItem[] | null) ?? [],
+            savingItems: (row.saving_items as MoneyItem[] | null) ?? [],
+            incomeTotal:
+              typeof row.income_total === "number"
+                ? row.income_total
+                : undefined,
+            expenseTotal:
+              typeof row.expense_total === "number"
+                ? row.expense_total
+                : undefined,
+            savingTotal:
+              typeof row.saving_total === "number"
+                ? row.saving_total
+                : undefined,
+            createdAt: row.created_at,
+            updatedAt: row.updated_at,
+          } satisfies DailyRecipeNew;
+        });
+
+        setDailyStore(store);
+        setLoading(false);
+      } catch (err) {
+        if (!mounted) return;
+        console.error("dashboard daily_recipes 로딩 중 오류:", err);
+        setLoadError("이 달의 레시피를 불러오는 중 오류가 발생했어요.");
+        setDailyStore({});
+        setLoading(false);
+      }
+    };
+
+    fetchMonth();
+    return () => {
+      mounted = false;
+    };
+  }, [monthParam]);
 
   const stats = useMemo(
-    () => (ready ? buildMonthStats(dailyStore, monthParam) : null),
-    [ready, dailyStore, monthParam]
+    () => buildMonthStats(dailyStore, monthParam),
+    [dailyStore, monthParam]
   );
   const health = useMemo(() => getHealthStatus(stats), [stats]);
   const dailySeries = useMemo(() => getDailySeries(stats), [stats]);
@@ -416,7 +525,7 @@ function DashboardInner() {
     router.push(`/dashboard?month=${next}`);
   };
 
-  if (!ready) {
+  if (loading) {
     return (
       <PageContainer title="">
         <div className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-[#FFF7EB] via-[#FFFDFC] to-[#F3F4FF]" />
@@ -460,6 +569,10 @@ function DashboardInner() {
                 </button>
               </div>
             </div>
+
+            {loadError && (
+              <p className="mb-2 text-[11px] text-red-500">{loadError}</p>
+            )}
 
             <h2 className="mb-2 text-sm font-semibold text-slate-900">
               {ymToText(monthParam)} 하루 지출 레시피부터 적어볼까요?
@@ -923,14 +1036,14 @@ function DashboardInner() {
                     {stats.maxExpenseDay && (
                       <li>
                         • 가장 지출이 컸던 날은{" "}
-                        <span className="font-semibold">
-                          {formatKoreanDate(stats.maxExpenseDay.date)}
-                        </span>
-                        로,{" "}
-                        <span className="font-semibold text-orange-700">
-                          {stats.maxExpenseDay.amount.toLocaleString()}원
-                        </span>
-                        을 사용했습니다.
+                          <span className="font-semibold">
+                            {formatKoreanDate(stats.maxExpenseDay.date)}
+                          </span>
+                          로,{" "}
+                          <span className="font-semibold text-orange-700">
+                            {stats.maxExpenseDay.amount.toLocaleString()}원
+                          </span>
+                          을 사용했습니다.
                       </li>
                     )}
                   </ul>

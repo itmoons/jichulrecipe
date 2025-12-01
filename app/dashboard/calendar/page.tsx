@@ -7,18 +7,22 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 const BRAND_ORANGE = "#FF8A3D"; // 지출레시피 메인 컬러
-const LS_KEY_DAILY = "jichulrecipe_daily_recipes_v1";
 
-/** edit 페이지와 맞추는 타입 */
+/** edit 페이지와 유사한 MoneyItem 타입 (DB JSON과 호환) */
+type MoneyItem = {
+  id?: string;
+  label: string;
+  amount: number;
+};
+
+/** Supabase에서 가져와서 달력이 쓰는 구조 */
 type DailyRecipe = {
-  incomeAmount: number;
-  incomeMemo: string;
-  expenseAmount: number;
-  expenseMemo: string;
-  savingAmount: number;
-  savingMemo: string;
-  createdAt?: string;
-  updatedAt?: string;
+  incomeItems: MoneyItem[];
+  expenseItems: MoneyItem[];
+  savingItems: MoneyItem[];
+  incomeTotal: number;
+  expenseTotal: number;
+  savingTotal: number;
 };
 
 type DailyStore = {
@@ -82,8 +86,10 @@ export default function SpendingCalendarPage() {
     return new Date(today.getFullYear(), today.getMonth(), 1);
   });
 
-  /** 날짜별 레시피 (localStorage) */
+  /** 날짜별 레시피 (Supabase에서 로드한 데이터) */
   const [dailyStore, setDailyStore] = useState<DailyStore>({});
+  const [dailyLoading, setDailyLoading] = useState(false);
+  const [dailyError, setDailyError] = useState<string | null>(null);
 
   /** 오늘 날짜 key (YYYY-MM-DD) */
   const todayKey = useMemo(() => getDateKey(new Date()), []);
@@ -104,18 +110,113 @@ export default function SpendingCalendarPage() {
   const [memoSubmitting, setMemoSubmitting] = useState(false);
   const [memoFormError, setMemoFormError] = useState<string | null>(null);
 
-  // 최초 로드: localStorage → dailyStore
+  const currentMonthKey = getMonthKey(currentDate);
+
+  /** ⬇ 이 달의 daily_recipes를 Supabase에서 불러오기 */
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const raw = window.localStorage.getItem(LS_KEY_DAILY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as DailyStore;
-      setDailyStore(parsed || {});
-    } catch {
-      // 파싱 실패 시 조용히 무시
-    }
-  }, []);
+    let mounted = true;
+
+    const loadDailyRecipes = async () => {
+      setDailyLoading(true);
+      setDailyError(null);
+
+      try {
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
+
+        if (!mounted) return;
+
+        if (authError) {
+          console.warn(
+            "Supabase auth error (daily_recipes calendar):",
+            authError.message
+          );
+          setDailyStore({});
+          setDailyError("로그인 정보를 불러오지 못했어요.");
+          setDailyLoading(false);
+          return;
+        }
+
+        if (!user) {
+          // 로그인 안 되어 있으면 레시피는 비워둔다
+          setDailyStore({});
+          setDailyLoading(false);
+          return;
+        }
+
+        // 해당 월의 시작일과 마지막일 계산
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth(); // 0~11
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+
+        const firstKey = getDateKey(firstDay); // YYYY-MM-01
+        const lastKey = getDateKey(lastDay); // YYYY-MM-마지막날
+
+        const { data, error } = await supabase
+          .from("daily_recipes")
+          .select(
+            `
+              date,
+              income_items,
+              expense_items,
+              saving_items,
+              income_total,
+              expense_total,
+              saving_total
+            `
+          )
+          .eq("user_id", user.id)
+          .gte("date", firstKey)
+          .lte("date", lastKey);
+
+        if (!mounted) return;
+
+        if (error) {
+          console.error("daily_recipes 조회 실패:", error.message);
+          setDailyStore({});
+          setDailyError("이번 달 레시피를 불러오는 중 문제가 발생했어요.");
+          setDailyLoading(false);
+          return;
+        }
+
+        const nextStore: DailyStore = {};
+        (data || []).forEach((row: any) => {
+          const dateKey = row.date as string; // 'YYYY-MM-DD' 형식이라고 가정
+
+          const incomeItems = (row.income_items as MoneyItem[] | null) ?? [];
+          const expenseItems = (row.expense_items as MoneyItem[] | null) ?? [];
+          const savingItems = (row.saving_items as MoneyItem[] | null) ?? [];
+
+          nextStore[dateKey] = {
+            incomeItems,
+            expenseItems,
+            savingItems,
+            incomeTotal: Number(row.income_total ?? 0),
+            expenseTotal: Number(row.expense_total ?? 0),
+            savingTotal: Number(row.saving_total ?? 0),
+          };
+        });
+
+        setDailyStore(nextStore);
+        setDailyLoading(false);
+      } catch (err) {
+        if (!mounted) return;
+        console.error("daily_recipes 로딩 중 오류:", err);
+        setDailyStore({});
+        setDailyError("이번 달 레시피를 불러오는 중 오류가 발생했어요.");
+        setDailyLoading(false);
+      }
+    };
+
+    loadDailyRecipes();
+
+    return () => {
+      mounted = false;
+    };
+  }, [currentDate]);
 
   /** 오늘의 메모 Supabase에서 불러오기 */
   useEffect(() => {
@@ -184,8 +285,6 @@ export default function SpendingCalendarPage() {
     };
   }, [todayKey]);
 
-  const currentMonthKey = getMonthKey(currentDate);
-
   /** 이 달에 해당하는 날짜만 필터링해서 월 합계 계산 */
   const totals = useMemo(() => {
     let income = 0;
@@ -194,9 +293,9 @@ export default function SpendingCalendarPage() {
 
     Object.entries(dailyStore).forEach(([date, recipe]) => {
       if (!date.startsWith(currentMonthKey)) return;
-      income += Number(recipe.incomeAmount || 0);
-      expense += Number(recipe.expenseAmount || 0);
-      saving += Number(recipe.savingAmount || 0);
+      income += Number(recipe.incomeTotal || 0);
+      expense += Number(recipe.expenseTotal || 0);
+      saving += Number(recipe.savingTotal || 0);
     });
 
     const net = income - expense - saving;
@@ -471,7 +570,10 @@ export default function SpendingCalendarPage() {
               onClick={handlePrevMonth}
               className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-neutral-200 bg-white hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:bg-neutral-800"
             >
-              <ChevronLeft size={18} className="text-neutral-700 dark:text-neutral-200" />
+              <ChevronLeft
+                size={18}
+                className="text-neutral-700 dark:text-neutral-200"
+              />
             </button>
             <div className="px-4 py-1.5 rounded-full bg-amber-50 text-sm font-medium text-neutral-800 border border-amber-100 shadow-[0_2px_0_rgba(248,250,252,1)] whitespace-nowrap dark:bg-neutral-800 dark:text-amber-100 dark:border-neutral-700">
               {monthLabel} 레시피북
@@ -480,7 +582,10 @@ export default function SpendingCalendarPage() {
               onClick={handleNextMonth}
               className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-neutral-200 bg-white hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:bg-neutral-800"
             >
-              <ChevronRight size={18} className="text-neutral-700 dark:text-neutral-200" />
+              <ChevronRight
+                size={18}
+                className="text-neutral-700 dark:text-neutral-200"
+              />
             </button>
           </div>
         </header>
@@ -566,16 +671,22 @@ export default function SpendingCalendarPage() {
                   const dateKey = getDateKey(cell);
 
                   const recipe = dailyStore[dateKey];
-                  const income = Number(recipe?.incomeAmount || 0);
-                  const expense = Number(recipe?.expenseAmount || 0);
-                  const saving = Number(recipe?.savingAmount || 0);
+                  const income = Number(recipe?.incomeTotal || 0);
+                  const expense = Number(recipe?.expenseTotal || 0);
+                  const saving = Number(recipe?.savingTotal || 0);
 
-                  // 대표 메모: 지출 메모 > 수입 메모 > 적금 메모 순으로 하나만 표시
-                  const mainMemo =
-                    recipe?.expenseMemo?.trim() ||
-                    recipe?.incomeMemo?.trim() ||
-                    recipe?.savingMemo?.trim() ||
+                  // 대표 메모: 각 items의 label 중 하나만 뽑아서 간단히 표시
+                  const expenseLabel =
+                    recipe?.expenseItems?.find((i) => i.label?.trim())?.label ??
                     "";
+                  const incomeLabel =
+                    recipe?.incomeItems?.find((i) => i.label?.trim())?.label ??
+                    "";
+                  const savingLabel =
+                    recipe?.savingItems?.find((i) => i.label?.trim())?.label ??
+                    "";
+                  const mainMemo =
+                    expenseLabel || incomeLabel || savingLabel || "";
 
                   const isTodayKey = dateKey === todayKey;
 
@@ -659,6 +770,15 @@ export default function SpendingCalendarPage() {
                   );
                 })}
               </div>
+
+              {dailyLoading && (
+                <p className="mt-2 text-[11px] text-neutral-400">
+                  이번 달 레시피를 불러오는 중입니다…
+                </p>
+              )}
+              {!dailyLoading && dailyError && (
+                <p className="mt-2 text-[11px] text-red-500">{dailyError}</p>
+              )}
             </div>
           </div>
 
@@ -754,7 +874,10 @@ export default function SpendingCalendarPage() {
                   onClick={closeMemoModal}
                   className="inline-flex h-7 w-7 items-center justify-center rounded-full hover:bg-amber-50 dark:hover:bg-neutral-800"
                 >
-                  <X size={16} className="text-neutral-500 dark:text-neutral-300" />
+                  <X
+                    size={16}
+                    className="text-neutral-500 dark:text-neutral-300"
+                  />
                 </button>
               </div>
 

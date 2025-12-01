@@ -12,9 +12,8 @@ import { supabase } from "@/lib/supabaseClient";
 const BRAND_ORANGE = "#FF8A3D";
 const BRAND_GREEN = "#4CAF50";
 const BRAND_BLUE = "#5673E7";
-const LS_KEY_DAILY = "jichulrecipe_daily_recipes_v1";
 
-/** localStorage 구조(느슨하게) */
+/** Supabase에서 불러온 하루 레시피 저장용 (dateKey → entry) */
 type DailyStore = {
   [date: string]: any;
 };
@@ -56,6 +55,19 @@ function getDateKey(date: Date) {
   )}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
+/** 해당 달의 첫 날, 마지막 날을 YYYY-MM-DD로 반환 */
+function getMonthRange(date: Date) {
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const first = new Date(year, month, 1);
+  const last = new Date(year, month + 1, 0);
+
+  return {
+    firstKey: getDateKey(first),
+    lastKey: getDateKey(last),
+  };
+}
+
 /** 월별 달력 셀 생성 */
 function buildCalendar(date: Date) {
   const year = date.getFullYear();
@@ -83,6 +95,9 @@ export default function HomePage() {
 
   // 달력 프리뷰용
   const [dailyStore, setDailyStore] = useState<DailyStore>({});
+  const [loadingDaily, setLoadingDaily] = useState(false);
+  const [dailyError, setDailyError] = useState<string | null>(null);
+
   const [currentDate] = useState(() => {
     const today = new Date();
     return new Date(today.getFullYear(), today.getMonth(), 1);
@@ -118,18 +133,113 @@ export default function HomePage() {
     };
   }, []);
 
-  /** localStorage에서 레시피 데이터 로드 */
+  /** Supabase에서 이번 달 레시피 데이터 로드 */
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const raw = window.localStorage.getItem(LS_KEY_DAILY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as DailyStore;
-      setDailyStore(parsed || {});
-    } catch {
-      // 무시
-    }
-  }, []);
+    let mounted = true;
+
+    const fetchDaily = async () => {
+      if (authChecking) return;
+      if (!isLoggedIn) {
+        setDailyStore({});
+        return;
+      }
+
+      setLoadingDaily(true);
+      setDailyError(null);
+
+      try {
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
+
+        if (!mounted) return;
+
+        if (authError) {
+          console.warn("Supabase auth error (home):", authError.message);
+          setDailyError("로그인 정보를 불러오지 못했어요.");
+          setDailyStore({});
+          setLoadingDaily(false);
+          return;
+        }
+
+        if (!user) {
+          setDailyStore({});
+          setLoadingDaily(false);
+          return;
+        }
+
+        const { firstKey, lastKey } = getMonthRange(currentDate);
+
+        const { data, error } = await supabase
+          .from("daily_recipes")
+          .select(
+            `
+            date,
+            income_items,
+            expense_items,
+            saving_items,
+            income_total,
+            expense_total,
+            saving_total,
+            created_at,
+            updated_at
+          `
+          )
+          .eq("user_id", user.id)
+          .gte("date", firstKey)
+          .lte("date", lastKey);
+
+        if (!mounted) return;
+
+        if (error) {
+          console.error("daily_recipes 조회 실패 (home):", error.message);
+          setDailyError("이번 달 레시피를 불러오는 중 문제가 발생했어요.");
+          setDailyStore({});
+          setLoadingDaily(false);
+          return;
+        }
+
+        const store: DailyStore = {};
+        (data || []).forEach((row: any) => {
+          const dateKey = row.date as string;
+          store[dateKey] = {
+            incomeTotal:
+              typeof row.income_total === "number"
+                ? row.income_total
+                : undefined,
+            expenseTotal:
+              typeof row.expense_total === "number"
+                ? row.expense_total
+                : undefined,
+            savingTotal:
+              typeof row.saving_total === "number"
+                ? row.saving_total
+                : undefined,
+            incomeItems: row.income_items ?? [],
+            expenseItems: row.expense_items ?? [],
+            savingItems: row.saving_items ?? [],
+            createdAt: row.created_at,
+            updatedAt: row.updated_at,
+          };
+        });
+
+        setDailyStore(store);
+        setLoadingDaily(false);
+      } catch (err) {
+        if (!mounted) return;
+        console.error("home daily_recipes 로딩 중 오류:", err);
+        setDailyError("이번 달 레시피를 불러오는 중 오류가 발생했어요.");
+        setDailyStore({});
+        setLoadingDaily(false);
+      }
+    };
+
+    fetchDaily();
+    return () => {
+      mounted = false;
+    };
+  }, [authChecking, isLoggedIn, currentDate]);
 
   const monthKey = useMemo(() => getMonthKey(currentDate), [currentDate]);
   const calendarCells = useMemo(
@@ -171,7 +281,6 @@ export default function HomePage() {
   const openRecipeModal = () => setRecipeModalOpen(true);
   const closeRecipeModal = () => setRecipeModalOpen(false);
 
-  /* 실제 이동 액션 */
   const goTodayRecipeEdit = () => {
     const d = new Date();
     const key = getDateKey(d);
@@ -183,10 +292,7 @@ export default function HomePage() {
 
   // 📊 이번 달 소비 분석 보기 클릭 시 분기
   const handleDashboardClick = () => {
-    if (authChecking) {
-      // 로그인 상태 확인 중이면 일단 대기
-      return;
-    }
+    if (authChecking) return;
     if (isLoggedIn) {
       router.push("/dashboard");
     } else {
@@ -201,7 +307,7 @@ export default function HomePage() {
       <div className="pointer-events-none fixed left-[-80px] top-[-80px] -z-10 h-56 w-56 rounded-full bg-[rgba(255,184,108,0.3)] blur-3xl" />
       <div className="pointer-events-none fixed right-[-60px] bottom-[-60px] -z-10 h-52 w-52 rounded-full bg-[rgba(86,115,231,0.22)] blur-3xl" />
 
-      {/* ✨ 중앙 래퍼: 반응형 폭 정리 */}
+      {/* ✨ 중앙 래퍼 */}
       <div className="mx-auto flex w-full max-w-5xl flex-col px-4 pb-8 pt-4 sm:px-6 lg:px-0 space-y-8">
         {/* 상단 히어로 */}
         <section className="grid gap-8 md:grid-cols-[1.05fr_0.95fr] md:items-center">
@@ -304,9 +410,9 @@ export default function HomePage() {
                   <div
                     className="absolute inset-1.5 rounded-full border-[7px] border-transparent border-t-[7px] border-r-[7px] border-b-[7px]"
                     style={{
-                      borderTopColor: BRAND_GREEN, // 필수
-                      borderRightColor: BRAND_BLUE, // 저축
-                      borderBottomColor: BRAND_ORANGE, // 여가
+                      borderTopColor: BRAND_GREEN,
+                      borderRightColor: BRAND_BLUE,
+                      borderBottomColor: BRAND_ORANGE,
                     }}
                   />
                   <div className="absolute inset-6 rounded-full bg-white" />
@@ -375,6 +481,9 @@ export default function HomePage() {
                 <p className="text-xs text-slate-600">
                   이미 기록된 날을 한눈에 보고, 캘린더 화면으로 바로 이동할 수 있어요.
                 </p>
+                {dailyError && (
+                  <p className="mt-1 text-[11px] text-red-500">{dailyError}</p>
+                )}
               </div>
               <button
                 type="button"
@@ -476,7 +585,7 @@ export default function HomePage() {
                       </div>
                     ) : (
                       <div className="mt-auto text-[9px] sm:text-[10px] text-neutral-300">
-                        -
+                        {loadingDaily ? "…" : "-"}
                       </div>
                     )}
                   </div>
@@ -533,7 +642,7 @@ export default function HomePage() {
                     {item.desc}
                   </p>
                 </div>
-                <div className="mt-3 flex items-center justify-between text-[11px] text-slate-500">
+                <div className="mt-3 flex items-center justify_between text-[11px] text-slate-500">
                   <span>기본 레시피에서 자동으로 추천됩니다.</span>
                   <span
                     className="text-[11px] text-[color:var(--brand-blue)] group-hover:underline"
@@ -613,7 +722,7 @@ export default function HomePage() {
 
         {/* 오늘의 샘플 레시피 섹션 */}
         <section className="mt-4 mb-2 rounded-3xl border border-dashed border-orange-200 bg-gradient-to-r from-[#FFF7EB] to-[#FFF9F3] p-4 sm:p-5">
-          {/* 상단 안내 + 배지 영역 (전체 중앙 정렬) */}
+          {/* 상단 안내 + 배지 영역 */}
           <div className="min-w-full mb-3 flex flex-col items-center justify-center gap-2 text-center">
             <div>
               <h2 className="text-xs text-slate-600 text-center">
@@ -630,7 +739,6 @@ export default function HomePage() {
 
           {/* 샘플 테이블 */}
           <div className="overflow-x-auto text-xs">
-            {/* ✅ 테이블 최소 폭 유지 + 중앙 정렬용 래퍼 */}
             <div className="inline-block min-w-[640px] align-middle mx-auto">
               <table className="w-full table-fixed border-separate border-spacing-y-2">
                 <thead className="text-[11px] text-slate-500">
@@ -692,7 +800,6 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* 하단 주석도 중앙 정렬 */}
           <p className="mt-3 text-[11px] text-slate-500 text-center">
             * 위 수치는 어디까지나 &quot;적당히 무리 없는 예시&quot;일 뿐입니다.
             내 상황에 맞게 필수·저축·여가 비율을 직접 조정하는 것이 가장 중요합니다.
@@ -701,7 +808,6 @@ export default function HomePage() {
       </div>
 
       {/* ===== 모달들 ===== */}
-      {/* 레시피 시작 모달 */}
       {recipeModalOpen && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/30 px-4">
           <div className="w-full max-w-sm rounded-2xl bg-white shadow-2xl border border-orange-100">
@@ -751,7 +857,7 @@ export default function HomePage() {
                 onClick={closeRecipeModal}
                 className="rounded-full border border-orange-200 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-orange-50"
               >
-                나중에
+                나중에 할래요
               </button>
 
               <div className="flex gap-2">

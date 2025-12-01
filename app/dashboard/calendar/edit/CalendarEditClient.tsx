@@ -7,7 +7,6 @@ import { ArrowLeft, Check, Plus, X } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 
 const BRAND_ORANGE = "#FF8A3D";
-const LS_KEY_DAILY = "jichulrecipe_daily_recipes_v1";
 
 /** 항목 단위 (이름 + 금액) */
 type MoneyItem = {
@@ -26,11 +25,6 @@ type DailyRecipeNew = {
   savingTotal: number;
   createdAt?: string;
   updatedAt?: string;
-};
-
-/** localStorage 전체 구조: key = YYYY-MM-DD */
-type DailyStore = {
-  [date: string]: any; // 구버전 호환을 위해 any
 };
 
 type FormState = {
@@ -74,101 +68,102 @@ export default function CalendarEditClient() {
     return `${y}년 ${m}월 ${d}일 (${weekday})`;
   }, [dateParam]);
 
-  const [store, setStore] = useState<DailyStore>({});
   const [form, setForm] = useState<FormState>({
     incomeItems: [createItem()],
     expenseItems: [createItem()],
     savingItems: [createItem()],
   });
+  const [loading, setLoading] = useState(false);
 
-  /** 1) 최초 1회: localStorage에서 store만 로드 */
-  useEffect(() => {
-    if (typeof window === "undefined") return;
+  /** 1) dateParam이 바뀔 때마다 Supabase에서 해당 날짜 데이터 조회 */
+// 1) dateParam이 바뀔 때마다 Supabase에서 해당 날짜 데이터 조회
+useEffect(() => {
+  if (!dateParam) return;
+  const dateKey = dateParam as string;
+
+  let cancelled = false;
+
+  async function fetchFromSupabase() {
     try {
-      const raw = window.localStorage.getItem(LS_KEY_DAILY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as DailyStore;
-      setStore(parsed || {});
-    } catch {
-      // ignore
-    }
-  }, []);
+      setLoading(true);
 
-  /** 2) dateParam 또는 store 바뀔 때마다 form 재구성 */
-  useEffect(() => {
-    if (!dateParam) return;
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
 
-    const entry = store[dateParam];
+      if (authError) {
+        console.warn("Supabase auth error (daily_recipes load):", authError);
+        setLoading(false);
+        return;
+      }
+      if (!user) {
+        setLoading(false);
+        return;
+      }
 
-    // 저장된 데이터가 없으면 빈 폼 초기화
-    if (!entry) {
+      const { data, error } = await supabase
+        .from("daily_recipes")
+        .select(
+          `
+            income_items,
+            expense_items,
+            saving_items,
+            income_total,
+            expense_total,
+            saving_total
+          `
+        )
+        .eq("user_id", user.id)
+        .eq("date", dateKey)
+        .maybeSingle();
+
+      if (error) {
+        console.warn("Supabase daily_recipes load error:", error);
+        setLoading(false);
+        return;
+      }
+      if (cancelled) {
+        setLoading(false);
+        return;
+      }
+
+      if (!data) {
+        // 해당 날짜 데이터가 없으면 빈 폼
+        setForm({
+          incomeItems: [createItem()],
+          expenseItems: [createItem()],
+          savingItems: [createItem()],
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Supabase row -> 폼으로
+      let incomeItems = (data.income_items as MoneyItem[] | null) ?? [];
+      let expenseItems = (data.expense_items as MoneyItem[] | null) ?? [];
+      let savingItems = (data.saving_items as MoneyItem[] | null) ?? [];
+
       setForm({
-        incomeItems: [createItem()],
-        expenseItems: [createItem()],
-        savingItems: [createItem()],
+        incomeItems: incomeItems.length > 0 ? incomeItems : [createItem()],
+        expenseItems: expenseItems.length > 0 ? expenseItems : [createItem()],
+        savingItems: savingItems.length > 0 ? savingItems : [createItem()],
       });
-      return;
+
+      setLoading(false);
+    } catch (err) {
+      console.error("Supabase daily_recipes load exception:", err);
+      setLoading(false);
     }
+  }
 
-    // ✅ 새 구조 (items 기반) 우선
-    if (entry.incomeItems || entry.expenseItems || entry.savingItems) {
-      setForm({
-        incomeItems:
-          entry.incomeItems && entry.incomeItems.length > 0
-            ? entry.incomeItems
-            : [createItem()],
-        expenseItems:
-          entry.expenseItems && entry.expenseItems.length > 0
-            ? entry.expenseItems
-            : [createItem()],
-        savingItems:
-          entry.savingItems && entry.savingItems.length > 0
-            ? entry.savingItems
-            : [createItem()],
-      });
-      return;
-    }
+  fetchFromSupabase();
 
-    // ✅ 구 구조 (incomeAmount, incomeMemo 등) → 1개 항목으로 변환
-    const incomeItem =
-      entry.incomeAmount || entry.incomeMemo
-        ? [
-            {
-              id: createItem().id,
-              label: entry.incomeMemo || "",
-              amount: Number(entry.incomeAmount || 0),
-            },
-          ]
-        : [createItem()];
+  return () => {
+    cancelled = true;
+  };
+}, [dateParam]);
 
-    const expenseItem =
-      entry.expenseAmount || entry.expenseMemo
-        ? [
-            {
-              id: createItem().id,
-              label: entry.expenseMemo || "",
-              amount: Number(entry.expenseAmount || 0),
-            },
-          ]
-        : [createItem()];
-
-    const savingItem =
-      entry.savingAmount || entry.savingMemo
-        ? [
-            {
-              id: createItem().id,
-              label: entry.savingMemo || "",
-              amount: Number(entry.savingAmount || 0),
-            },
-          ]
-        : [createItem()];
-
-    setForm({
-      incomeItems: incomeItem,
-      expenseItems: expenseItem,
-      savingItems: savingItem,
-    });
-  }, [dateParam, store]);
 
   /** 섹션별 아이템 접근용 유틸 */
   const getItems = (section: SectionKey) =>
@@ -238,119 +233,83 @@ export default function CalendarEditClient() {
     );
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    if (!dateParam) {
-      alert("날짜 정보가 없어 저장할 수 없습니다.");
+  if (!dateParam) {
+    alert("날짜 정보가 없어 저장할 수 없습니다.");
+    return;
+  }
+  const dateKey = dateParam as string;
+
+  const cleanedIncome = form.incomeItems.filter(
+    (i) => i.label.trim() || i.amount
+  );
+  const cleanedExpense = form.expenseItems.filter(
+    (i) => i.label.trim() || i.amount
+  );
+  const cleanedSaving = form.savingItems.filter(
+    (i) => i.label.trim() || i.amount
+  );
+
+  // 합계는 그대로 사용
+  const now = new Date().toISOString();
+
+  try {
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError) {
+      console.warn("Supabase auth error (daily_recipes save):", authError);
+      alert("로그인 정보를 불러오지 못했어요. 다시 로그인해 주세요.");
       return;
     }
 
-    const cleanedIncome = form.incomeItems.filter(
-      (i) => i.label.trim() || i.amount
-    );
-    const cleanedExpense = form.expenseItems.filter(
-      (i) => i.label.trim() || i.amount
-    );
-    const cleanedSaving = form.savingItems.filter(
-      (i) => i.label.trim() || i.amount
-    );
-
-    const now = new Date().toISOString();
-
-    // 🔹 옛 포맷과 호환을 위해 메모 문자열도 만들어준다
-    const incomeMemoText = cleanedIncome.map((i) => i.label).join(", ");
-    const expenseMemoText = cleanedExpense.map((i) => i.label).join(", ");
-    const savingMemoText = cleanedSaving.map((i) => i.label).join(", ");
-
-    // 🔹 새 포맷 + 옛 포맷을 함께 저장
-    const prev = store[dateParam] || {};
-
-    const next: any = {
-      // --- 새 구조 ---
-      incomeItems: cleanedIncome.length > 0 ? cleanedIncome : [],
-      expenseItems: cleanedExpense.length > 0 ? cleanedExpense : [],
-      savingItems: cleanedSaving.length > 0 ? cleanedSaving : [],
-      incomeTotal,
-      expenseTotal,
-      savingTotal,
-
-      // --- 옛 구조 (캘린더에서 아직 읽고 있음) ---
-      incomeAmount: incomeTotal,
-      incomeMemo: incomeMemoText,
-      expenseAmount: expenseTotal,
-      expenseMemo: expenseMemoText,
-      savingAmount: savingTotal,
-      savingMemo: savingMemoText,
-
-      createdAt: prev.createdAt ?? now,
-      updatedAt: now,
-    };
-
-    const nextStore: DailyStore = {
-      ...store,
-      [dateParam]: next,
-    };
-
-    // 1) localStorage 저장 (기존 구조 유지)
-    setStore(nextStore);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(LS_KEY_DAILY, JSON.stringify(nextStore));
-      console.log("✅ 저장된 daily_recipes (localStorage):", nextStore);
+    if (!user) {
+      alert("로그인 후에 레시피를 서버에 저장할 수 있어요.");
+      router.push("/sign-in");
+      return;
     }
 
-    // 2) Supabase에도 저장 (user별 + 날짜별 upsert)
-    try {
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
+    const { error: upsertError } = await supabase
+      .from("daily_recipes")
+      .upsert(
+        {
+          user_id: user.id,
+          date: dateKey,
+          // 새 구조만 저장
+          income_items: cleanedIncome,
+          expense_items: cleanedExpense,
+          saving_items: cleanedSaving,
+          income_total: incomeTotal,
+          expense_total: expenseTotal,
+          saving_total: savingTotal,
+          // created_at / updated_at 컬럼을 DB에서 따로 관리한다면
+          // 트리거/DEFAULT로 처리하고 여기서는 안 보낸다.
+        },
+        {
+          onConflict: "user_id,date",
+        }
+      );
 
-      if (authError) {
-        console.warn("Supabase auth error (daily_recipes):", authError.message);
-        alert("로그인 정보를 불러오지 못했어요. 다시 로그인해 주세요.");
-        return;
-      }
-
-      if (!user) {
-        alert("로그인 후에 레시피를 서버에 저장할 수 있어요.");
-        router.push("/sign-in");
-        return;
-      }
-
-      const { error: upsertError } = await supabase
-        .from("daily_recipes")
-        .upsert(
-          {
-            user_id: user.id,
-            date: dateParam,
-            income_items: cleanedIncome,
-            expense_items: cleanedExpense,
-            saving_items: cleanedSaving,
-            income_total: incomeTotal,
-            expense_total: expenseTotal,
-            saving_total: savingTotal,
-          },
-          {
-            onConflict: "user_id,date", // (user_id, date) 복합 unique 인덱스가 있다고 가정
-          }
-        );
-
-      if (upsertError) {
-        console.error("daily_recipes upsert 실패:", upsertError.message);
-        alert(
-          "서버에 레시피 저장 중 오류가 발생했어요. (브라우저에는 저장되었습니다.)"
-        );
-        return;
-      }
-
-      alert("오늘 지출 레시피가 저장되었어요!");
-      router.push("/dashboard/calendar");
-    } catch (err) {
-      console.error("daily_recipes 저장 처리 중 오류:", err);
-      alert("서버에 레시피 저장 중 알 수 없는 오류가 발생했어요.");
+    if (upsertError) {
+      console.error("daily_recipes upsert 실패:", upsertError.message);
+      alert(
+        "서버에 레시피 저장 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요."
+      );
+      return;
     }
-  };
+
+    alert("오늘 지출 레시피가 저장되었어요!");
+    router.push("/dashboard/calendar");
+  } catch (err) {
+    console.error("daily_recipes 저장 처리 중 오류:", err);
+    alert("서버에 레시피 저장 중 알 수 없는 오류가 발생했어요.");
+  }
+};
+
 
   return (
     <main
@@ -505,6 +464,12 @@ export default function CalendarEditClient() {
                 placeholderAmount="50000"
               />
             </div>
+
+            {loading && (
+              <p className="text-[11px] text-neutral-400">
+                서버에서 오늘 레시피를 불러오는 중입니다…
+              </p>
+            )}
           </form>
         </section>
       </div>
@@ -568,9 +533,7 @@ function RecipeCard({
           <p className="text-[11px] text-neutral-500">{subtitle}</p>
         </div>
         <div className="text-right">
-          <span className="block text-[10px] text-neutral-400">
-            오늘 합계
-          </span>
+          <span className="block text-[10px] text-neutral-400">오늘 합계</span>
           <span
             className={`text-sm font-semibold ${totalColor} whitespace-nowrap`}
           >
