@@ -4,6 +4,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ArrowLeft, Check, Plus, X } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
 
 const BRAND_ORANGE = "#FF8A3D";
 const LS_KEY_DAILY = "jichulrecipe_daily_recipes_v1";
@@ -237,7 +238,7 @@ export default function CalendarEditClient() {
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!dateParam) {
@@ -291,14 +292,64 @@ export default function CalendarEditClient() {
       [dateParam]: next,
     };
 
+    // 1) localStorage 저장 (기존 구조 유지)
     setStore(nextStore);
     if (typeof window !== "undefined") {
       window.localStorage.setItem(LS_KEY_DAILY, JSON.stringify(nextStore));
-      console.log("✅ 저장된 daily_recipes:", nextStore); // 디버깅용
+      console.log("✅ 저장된 daily_recipes (localStorage):", nextStore);
     }
 
-    alert("오늘 지출 레시피가 저장되었어요!");
-    router.push("/dashboard/calendar");
+    // 2) Supabase에도 저장 (user별 + 날짜별 upsert)
+    try {
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+
+      if (authError) {
+        console.warn("Supabase auth error (daily_recipes):", authError.message);
+        alert("로그인 정보를 불러오지 못했어요. 다시 로그인해 주세요.");
+        return;
+      }
+
+      if (!user) {
+        alert("로그인 후에 레시피를 서버에 저장할 수 있어요.");
+        router.push("/sign-in");
+        return;
+      }
+
+      const { error: upsertError } = await supabase
+        .from("daily_recipes")
+        .upsert(
+          {
+            user_id: user.id,
+            date: dateParam,
+            income_items: cleanedIncome,
+            expense_items: cleanedExpense,
+            saving_items: cleanedSaving,
+            income_total: incomeTotal,
+            expense_total: expenseTotal,
+            saving_total: savingTotal,
+          },
+          {
+            onConflict: "user_id,date", // (user_id, date) 복합 unique 인덱스가 있다고 가정
+          }
+        );
+
+      if (upsertError) {
+        console.error("daily_recipes upsert 실패:", upsertError.message);
+        alert(
+          "서버에 레시피 저장 중 오류가 발생했어요. (브라우저에는 저장되었습니다.)"
+        );
+        return;
+      }
+
+      alert("오늘 지출 레시피가 저장되었어요!");
+      router.push("/dashboard/calendar");
+    } catch (err) {
+      console.error("daily_recipes 저장 처리 중 오류:", err);
+      alert("서버에 레시피 저장 중 알 수 없는 오류가 발생했어요.");
+    }
   };
 
   return (
@@ -312,7 +363,7 @@ export default function CalendarEditClient() {
       {/* 가운데 65% 폭 컨테이너 */}
       <div className="w-full max-w-full lg:max-w-[65vw] mx-auto flex flex-col">
         {/* 상단 바 */}
-        <header className="flex items-center justify-between px-4 sm:px-8 lg:px-0 py-4  bg-white/90 ">
+        <header className="flex items-center justify-between px-4 sm:px-8 lg:px-0 py-4 bg-white/90">
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push("/dashboard/calendar")}
@@ -341,7 +392,6 @@ export default function CalendarEditClient() {
             <Check size={16} />
             레시피 저장
           </button>
-
         </header>
 
         {/* 내용 */}
@@ -349,7 +399,7 @@ export default function CalendarEditClient() {
           <form
             id="daily-recipe-form"
             onSubmit={handleSubmit}
-            className="w-full  space-y-4"
+            className="w-full space-y-4"
           >
             {/* 날짜 정보 + 이전/다음날 이동 */}
             <div className="rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3 shadow-sm">

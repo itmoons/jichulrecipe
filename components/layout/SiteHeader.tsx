@@ -59,6 +59,10 @@ export function SiteHeader() {
   const isDashboard = pathname === "/dashboard";
   const isYearly = pathname?.startsWith("/dashboard/yearly");
 
+  // 로그인 가드용 링크 헬퍼
+  const guardedHref = (target: string) =>
+    isLoggedIn ? target : "/sign-in";
+
   return (
     <header
       className={[
@@ -113,7 +117,7 @@ export function SiteHeader() {
         {/* 데스크톱 내비게이션 */}
         <nav className="hidden items-center gap-4 text-xs font-medium text-slate-700 md:flex">
           <Link
-            href="/dashboard/calendar"
+            href={guardedHref("/dashboard/calendar")}
             className={[
               "rounded-full px-3 py-1 transition",
               isCalendar
@@ -124,10 +128,10 @@ export function SiteHeader() {
             레시피 달력
           </Link>
           <Link
-            href="/dashboard"
+            href={guardedHref("/dashboard")}
             className={[
               "rounded-full px-3 py-1 transition",
-              isDashboard
+              isDashboard || isYearly
                 ? "bg-white text-slate-900 shadow-sm border border-orange-100"
                 : "text-slate-700 hover:bg-white/70 hover:text-slate-900 border border-transparent",
             ].join(" ")}
@@ -192,7 +196,7 @@ export function SiteHeader() {
         <div className="border-t border-orange-100 bg-white/95 md:hidden">
           <nav className="mx-auto flex w-full max-w-full md:max-w-[65%] flex-col gap-1 px-4 py-3 text-sm font-medium text-slate-700">
             <Link
-              href="/dashboard/calendar"
+              href={guardedHref("/dashboard/calendar")}
               className={[
                 "rounded-md px-2 py-1.5",
                 pathname?.startsWith("/dashboard/calendar")
@@ -204,10 +208,10 @@ export function SiteHeader() {
               레시피 달력
             </Link>
             <Link
-              href="/dashboard"
+              href={guardedHref("/dashboard")}
               className={[
                 "rounded-md px-2 py-1.5",
-                pathname === "/dashboard"
+                pathname === "/dashboard" || pathname?.startsWith("/dashboard/yearly")
                   ? "bg-orange-50 text-slate-900"
                   : "hover:bg-orange-50",
               ].join(" ")}
