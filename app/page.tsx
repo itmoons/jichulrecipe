@@ -751,7 +751,7 @@ export default function HomePage() {
                 onClick={closeRecipeModal}
                 className="rounded-full border border-orange-200 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-orange-50"
               >
-                나중에 할래요
+                나중에
               </button>
 
               <div className="flex gap-2">
@@ -771,7 +771,7 @@ export default function HomePage() {
                       onClick={goCalendar}
                       className="rounded-full border border-orange-200 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-700 hover:bg-orange-50"
                     >
-                      달력 먼저 보기
+                      달력 보기
                     </button>
                     <button
                       type="button"
@@ -779,7 +779,7 @@ export default function HomePage() {
                       className="rounded-full bg-[color:var(--brand-orange)] px-4 py-1.5 text-[11px] font-semibold text-white shadow-sm hover:bg-[#f27422]"
                       style={{ ["--brand-orange" as any]: BRAND_ORANGE }}
                     >
-                      오늘 레시피 쓰러 가기
+                      오늘 레시피 쓰기
                     </button>
                   </>
                 )}

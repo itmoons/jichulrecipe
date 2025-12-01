@@ -444,7 +444,7 @@ export default function SpendingCalendarPage() {
       {/* 가운데 고정 폭 컨테이너 */}
       <div className="w-full max-w-5xl mx-auto flex flex-col px-4 sm:px-6 lg:px-0 pb-16">
         {/* 상단 바 - 레시피 타이틀 */}
-        <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pt-8 pb-4 bg-white/90 dark:bg-neutral-900/90">
+        <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pt-8 pb-4 bg-white dark:bg-neutral-900">
           <div className="flex items-start sm:items-center gap-3">
             <span
               className="inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold shadow-sm shrink-0"
