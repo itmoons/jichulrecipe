@@ -541,7 +541,7 @@ export default function SpendingCalendarPage() {
       ].join(" ")}
     >
       {/* 가운데 고정 폭 컨테이너 */}
-      <div className="w-full max-w-5xl mx-auto flex flex-col px-4 sm:px-6 lg:px-0 pb-16">
+      <div className="w-full lg:w-[65%] mx-auto flex flex-col px-4 sm:px-6 lg:px-0 pb-16">
         {/* 상단 바 - 레시피 타이틀 */}
         <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pt-8 pb-4 bg-white dark:bg-neutral-900">
           <div className="flex items-start sm:items-center gap-3">
@@ -725,41 +725,46 @@ export default function SpendingCalendarPage() {
                         )}
                       </div>
 
-                      <div className="space-y-0.5 text-[10px] sm:text-[11px] leading-tight">
-                        {income > 0 && (
-                          <div className="flex justify-between">
-                            <span className="text-neutral-400 dark:text-neutral-500">
-                              재료(+)
-                            </span>
-                            <span className="font-medium text-sky-600 dark:text-sky-300 whitespace-nowrap">
-                              {income.toLocaleString("ko-KR")}
-                            </span>
-                          </div>
-                        )}
-                        {expense > 0 && (
-                          <div className="flex justify-between">
-                            <span className="text-neutral-400 dark:text-neutral-500">
-                              사용(-)
-                            </span>
-                            <span
-                              className="font-medium whitespace-nowrap"
-                              style={{ color: "#B45309" }}
-                            >
-                              -{expense.toLocaleString("ko-KR")}
-                            </span>
-                          </div>
-                        )}
-                        {saving > 0 && (
-                          <div className="flex justify-between">
-                            <span className="text-neutral-400 dark:text-neutral-500">
-                              적금
-                            </span>
-                            <span className="font-medium text-emerald-600 dark:text-emerald-300 whitespace-nowrap">
-                              {saving.toLocaleString("ko-KR")}
-                            </span>
-                          </div>
-                        )}
-                      </div>
+<div className="space-y-0.5 text-[10px] sm:text-[11px] leading-tight">
+  {income > 0 && (
+    <div className="flex justify-end sm:justify-between items-baseline">
+      {/* ⬇ 라벨: 모바일에서는 숨기고, sm 이상에서만 표기 */}
+      <span className="hidden sm:inline text-neutral-400 dark:text-neutral-500">
+        재료(+)
+      </span>
+      <span className="font-medium text-sky-600 dark:text-sky-300 whitespace-nowrap">
+        {income.toLocaleString("ko-KR")}
+      </span>
+    </div>
+  )}
+
+  {expense > 0 && (
+    <div className="flex justify-end sm:justify-between items-baseline">
+      <span className="hidden sm:inline text-neutral-400 dark:text-neutral-500">
+        사용(-)
+      </span>
+      <span
+        className="font-medium whitespace-nowrap"
+        style={{ color: "#B45309" }}
+      >
+        -{expense.toLocaleString("ko-KR")}
+      </span>
+    </div>
+  )}
+
+  {saving > 0 && (
+    <div className="flex justify-end sm:justify-between items-baseline">
+      <span className="hidden sm:inline text-neutral-400 dark:text-neutral-500">
+        적금
+      </span>
+      <span className="font-medium text-emerald-600 dark:text-emerald-300 whitespace-nowrap">
+        {saving.toLocaleString("ko-KR")}
+      </span>
+    </div>
+  )}
+</div>
+
+
 
                       {mainMemo && (
                         <div className="mt-1 pt-1 border-t border-dashed border-amber-100 dark:border-neutral-700 text-[9px] sm:text-[10px] text-neutral-500 dark:text-neutral-400 truncate">

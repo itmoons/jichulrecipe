@@ -308,7 +308,7 @@ export default function HomePage() {
       <div className="pointer-events-none fixed right-[-60px] bottom-[-60px] -z-10 h-52 w-52 rounded-full bg-[rgba(86,115,231,0.22)] blur-3xl" />
 
       {/* ✨ 중앙 래퍼 */}
-      <div className="mx-auto flex w-full max-w-5xl flex-col px-4 pb-8 pt-4 sm:px-6 lg:px-0 space-y-8">
+      <div className="mx-auto flex w-full flex-col px-4 pb-8 pt-4 sm:px-6 lg:px-0 space-y-8">
         {/* 상단 히어로 */}
         <section className="grid gap-8 md:grid-cols-[1.05fr_0.95fr] md:items-center">
           {/* 왼쪽: 카피 · CTA */}
@@ -566,7 +566,7 @@ export default function HomePage() {
                       <div className="mt-auto text-[9px] sm:text-[10px] text-neutral-500 leading-tight">
                         {expense > 0 && (
                           <div className="flex justify-between">
-                            <span>지출</span>
+                            {/* <span>지출</span> */}
                             <span>
                               {expense.toLocaleString("ko-KR")}
                               <span className="ml-0.5">원</span>
@@ -575,7 +575,7 @@ export default function HomePage() {
                         )}
                         {saving > 0 && (
                           <div className="flex justify-between">
-                            <span>적금</span>
+                            {/* <span>적금</span> */}
                             <span>
                               {saving.toLocaleString("ko-KR")}
                               <span className="ml-0.5">원</span>
