@@ -138,6 +138,17 @@ export function SiteHeader() {
           >
             레시피 분석
           </Link>
+          <Link
+            href={guardedHref("/saving")}
+            className={[
+              "rounded-full px-3 py-1 transition",
+              isDashboard || isYearly
+                ? "bg-white text-slate-900 shadow-sm border border-orange-100"
+                : "text-slate-700 hover:bg-white/70 hover:text-slate-900 border border-transparent",
+            ].join(" ")}
+          >
+            재료 저장(적금 관리)
+          </Link>
 
           {/* 로그인 / 로그아웃 버튼 */}
           {!checking && (
@@ -218,6 +229,18 @@ export function SiteHeader() {
               onClick={closeNav}
             >
               레시피 분석
+            </Link>
+            <Link
+              href={guardedHref("/saving")}
+              className={[
+                "rounded-md px-2 py-1.5",
+                pathname === "/dashboard" || pathname?.startsWith("/saving")
+                  ? "bg-orange-50 text-slate-900"
+                  : "hover:bg-orange-50",
+              ].join(" ")}
+              onClick={closeNav}
+            >
+              재료 저장(적금)
             </Link>
 
             <span
