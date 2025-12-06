@@ -72,7 +72,7 @@ export function SiteHeader() {
       ].join(" ")}
     >
       {/* 상단 바 (PC에서 65% 폭만 사용) */}
-      <div className="mx-auto flex w-full max-w-full md:max-w-[67%] items-center justify-between px-4 py-3">
+      <div className="mx-auto flex w-full max-w-full md:max-w-[100%] items-center justify-between px-4 py-3">
         {/* 좌측: 햄버거 + 로고 */}
         <div className="flex items-center gap-2">
           {/* 햄버거 버튼 - 모바일 전용, 왼쪽 배치 */}
