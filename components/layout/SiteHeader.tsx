@@ -128,6 +128,17 @@ export function SiteHeader() {
             레시피 달력
           </Link>
           <Link
+            href={guardedHref("/dashboard/recurring")}
+            className={[
+              "rounded-full px-3 py-1 transition",
+              isCalendar
+                ? "bg-white text-slate-900 shadow-sm border border-orange-100"
+                : "text-slate-700 hover:bg-white/70 hover:text-slate-900 border border-transparent",
+            ].join(" ")}
+          >
+            정기레시피 등록
+          </Link>
+          <Link
             href={guardedHref("/dashboard")}
             className={[
               "rounded-full px-3 py-1 transition",
@@ -217,6 +228,18 @@ export function SiteHeader() {
               onClick={closeNav}
             >
               레시피 달력
+            </Link>
+            <Link
+              href={guardedHref("/recurring")}
+              className={[
+                "rounded-md px-2 py-1.5",
+                pathname === "/dashboard" || pathname?.startsWith("/recurring")
+                  ? "bg-orange-50 text-slate-900"
+                  : "hover:bg-orange-50",
+              ].join(" ")}
+              onClick={closeNav}
+            >
+              정기레시피 등록
             </Link>
             <Link
               href={guardedHref("/dashboard")}

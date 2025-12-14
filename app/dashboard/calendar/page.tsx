@@ -40,15 +40,40 @@ type TodayMemo = {
   created_at: string;
 };
 
+/** ============================
+ *  Recurring → daily_recipes 월 반영 유틸
+ *  ============================ */
+
+type Frequency = "monthly" | "weekly" | "yearly";
+type Category = "expense" | "income" | "saving";
+
+type RuleRow = {
+  id: number;
+  user_id: string;
+  title: string;
+  category: Category;
+  frequency: Frequency;
+  start_date: string; // date
+  end_date: string | null; // date
+  day_of_month: number | null;
+  day_of_week: number | null;
+  default_amount: number; // numeric
+};
+
+type OverrideRow = {
+  rule_id: number;
+  date: string; // YYYY-MM-DD (db: date)
+  amount: number | null;
+  is_skipped: boolean;
+  note: string | null;
+};
+
 function formatMoney(v: number) {
   return v.toLocaleString("ko-KR") + "원";
 }
 
 function getMonthKey(date: Date) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-    2,
-    "0"
-  )}`;
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
 
 function getDateKey(date: Date) {
@@ -77,6 +102,251 @@ function buildCalendar(date: Date) {
   return cells;
 }
 
+function lastDayOfMonth(year: number, month1to12: number) {
+  return new Date(year, month1to12, 0).getDate();
+}
+
+function sumItems(items: MoneyItem[]) {
+  return items.reduce((acc, it) => acc + (Number(it.amount) || 0), 0);
+}
+
+function pickColumn(category: Category) {
+  if (category === "income") return { itemsCol: "income_items", totalCol: "income_total" };
+  if (category === "saving") return { itemsCol: "saving_items", totalCol: "saving_total" };
+  return { itemsCol: "expense_items", totalCol: "expense_total" };
+}
+
+/** rule + (rangeStart~rangeEnd) 범위에서 발생 날짜 생성 */
+function generateOccurrencesForRange(
+  rule: RuleRow,
+  rangeStart: string,
+  rangeEnd: string
+): string[] {
+  const start = new Date(rangeStart + "T00:00:00");
+  const end = new Date(rangeEnd + "T00:00:00");
+
+  const ruleStart = new Date(rule.start_date + "T00:00:00");
+  const ruleEnd = rule.end_date ? new Date(rule.end_date + "T00:00:00") : null;
+
+  const from = ruleStart > start ? ruleStart : start;
+  const to = ruleEnd && ruleEnd < end ? ruleEnd : end;
+  if (from > to) return [];
+
+  const out: string[] = [];
+
+  if (rule.frequency === "monthly") {
+    const dom = rule.day_of_month ?? ruleStart.getDate();
+    let y = from.getFullYear();
+    let m = from.getMonth(); // 0-based
+    while (true) {
+      const month1to12 = m + 1;
+      const ld = lastDayOfMonth(y, month1to12);
+      const day = Math.min(dom, ld); // 31일인데 없는 달이면 말일로
+      const d = new Date(y, m, day);
+
+      if (d >= from && d <= to) out.push(getDateKey(d));
+
+      m += 1;
+      if (m >= 12) {
+        m = 0;
+        y += 1;
+      }
+      if (new Date(y, m, 1) > to) break;
+    }
+  }
+
+  if (rule.frequency === "weekly") {
+    const targetDow = rule.day_of_week ?? ruleStart.getDay();
+    const cur = new Date(from);
+    const diff = (targetDow - cur.getDay() + 7) % 7;
+    cur.setDate(cur.getDate() + diff);
+
+    while (cur <= to) {
+      out.push(getDateKey(cur));
+      cur.setDate(cur.getDate() + 7);
+    }
+  }
+
+  if (rule.frequency === "yearly") {
+    const base = new Date(rule.start_date + "T00:00:00");
+    const mm = base.getMonth();
+    const dd = base.getDate();
+    let y = from.getFullYear();
+
+    while (true) {
+      const ld = lastDayOfMonth(y, mm + 1);
+      const day = Math.min(dd, ld);
+      const d = new Date(y, mm, day);
+
+      if (d >= from && d <= to) out.push(getDateKey(d));
+
+      y += 1;
+      if (new Date(y, 0, 1) > to) break;
+    }
+  }
+
+  return Array.from(new Set(out)).sort();
+}
+
+async function chunkedUpsertDailyRecipes(rows: any[], chunkSize = 200) {
+  for (let i = 0; i < rows.length; i += chunkSize) {
+    const chunk = rows.slice(i, i + chunkSize);
+    const { error } = await supabase.from("daily_recipes").upsert(chunk, {
+      onConflict: "user_id,date",
+    });
+    if (error) throw error;
+  }
+}
+
+function makeRecurringItemId(ruleId: number, date: string, category: Category) {
+  return `rr:${ruleId}:${category}:${date}`;
+}
+
+function stripRecurringItems(items: any[]) {
+  if (!Array.isArray(items)) return [];
+  return items.filter((it) => {
+    const id = typeof it?.id === "string" ? it.id : "";
+    // ✅ 우리가 만든 정기항목 id prefix
+    return !id.startsWith("rr:");
+  });
+}
+
+
+/** 이 월(rangeStart~rangeEnd)에 대해 모든 정기 규칙을 daily_recipes에 반영 */
+async function applyRecurringToRange(params: {
+  userId: string;
+  rangeStart: string; // YYYY-MM-DD
+  rangeEnd: string; // YYYY-MM-DD
+}) {
+  const { userId, rangeStart, rangeEnd } = params;
+
+  // 1) rules
+  const { data: rules, error: rErr } = await supabase
+    .from("recurring_rules")
+    .select(
+      "id,user_id,title,category,frequency,start_date,end_date,day_of_month,day_of_week,default_amount"
+    )
+    .eq("user_id", userId);
+
+  if (rErr) throw rErr;
+
+  const ruleList = (rules || []) as RuleRow[];
+
+  // 2) overrides (해당 월 범위)
+  const ruleIds = ruleList.map((r) => r.id);
+  const { data: ovs, error: oErr } = await supabase
+    .from("recurring_rule_overrides")
+    .select("rule_id,date,amount,is_skipped,note")
+    .in("rule_id", ruleIds)
+    .gte("date", rangeStart)
+    .lte("date", rangeEnd);
+
+  if (oErr) throw oErr;
+
+  const ovMap = new Map<string, OverrideRow>(); // key: `${ruleId}|${date}`
+  (ovs || []).forEach((x: any) => {
+    ovMap.set(`${x.rule_id}|${x.date}`, x as OverrideRow);
+  });
+
+  // 3) existing daily_recipes (해당 월 범위)
+  const { data: existing, error: dErr } = await supabase
+    .from("daily_recipes")
+    .select("date,income_items,expense_items,saving_items")
+    .eq("user_id", userId)
+    .gte("date", rangeStart)
+    .lte("date", rangeEnd);
+
+  if (dErr) throw dErr;
+
+  const dayMap = new Map<
+    string,
+    { income: MoneyItem[]; expense: MoneyItem[]; saving: MoneyItem[] }
+  >();
+
+  const touched = new Set<string>();
+
+  (existing || []).forEach((row: any) => {
+    dayMap.set(row.date, {
+      income: stripRecurringItems(row.income_items),
+      expense: stripRecurringItems(row.expense_items),
+      saving: stripRecurringItems(row.saving_items),
+    });
+
+    // ✅ 룰이 0개여도 "청소된 결과"를 DB에 반영하기 위해 touched 처리
+    touched.add(row.date);
+  });
+
+
+  // 4) 누적 반영
+  for (const rule of ruleList) {
+    const dates = generateOccurrencesForRange(rule, rangeStart, rangeEnd);
+    if (dates.length === 0) continue;
+
+    const label = rule.title.trim();
+    const defAmt = Number(rule.default_amount) || 0;
+    const { itemsCol } = pickColumn(rule.category);
+
+    for (const date of dates) {
+      const ov = ovMap.get(`${rule.id}|${date}`);
+      if (ov?.is_skipped) continue;
+
+      const amt = ov?.amount != null ? Number(ov.amount) : defAmt;
+      if (!(amt > 0) || !label) continue;
+
+      const prev = dayMap.get(date) ?? { income: [], expense: [], saving: [] };
+
+      const next = {
+        income: [...prev.income],
+        expense: [...prev.expense],
+        saving: [...prev.saving],
+      };
+
+      const target =
+        itemsCol === "income_items"
+          ? next.income
+          : itemsCol === "saving_items"
+          ? next.saving
+          : next.expense;
+
+      // 같은 label 있으면 덮어쓰기(정기 규칙 1개=label 1개)
+      const recurringId = makeRecurringItemId(rule.id, date, rule.category);
+
+// 같은 rule_id 기반 id가 있으면 덮어쓰기(라벨 변경에도 안정적)
+const idx = target.findIndex((it) => it?.id === recurringId);
+
+const nextItem: MoneyItem = { id: recurringId, label, amount: amt };
+
+if (idx >= 0) target[idx] = nextItem;
+else target.push(nextItem);
+
+
+      dayMap.set(date, next);
+      touched.add(date);
+    }
+  }
+
+  // 5) upsert payload
+  const payload: any[] = [];
+  for (const date of touched) {
+    const row = dayMap.get(date)!;
+    payload.push({
+      user_id: userId,
+      date,
+      income_items: row.income,
+      expense_items: row.expense,
+      saving_items: row.saving,
+      income_total: sumItems(row.income),
+      expense_total: sumItems(row.expense),
+      saving_total: sumItems(row.saving),
+      updated_at: new Date().toISOString(),
+    });
+  }
+
+  if (payload.length) {
+    await chunkedUpsertDailyRecipes(payload);
+  }
+}
+
 export default function SpendingCalendarPage() {
   const router = useRouter();
 
@@ -101,9 +371,7 @@ export default function SpendingCalendarPage() {
 
   /** 메모 모달 상태 */
   const [memoModalOpen, setMemoModalOpen] = useState(false);
-  const [memoModalMode, setMemoModalMode] = useState<"create" | "edit">(
-    "create"
-  );
+  const [memoModalMode, setMemoModalMode] = useState<"create" | "edit">("create");
   const [editingMemo, setEditingMemo] = useState<TodayMemo | null>(null);
   const [memoTitleInput, setMemoTitleInput] = useState("");
   const [memoDetailInput, setMemoDetailInput] = useState("");
@@ -112,7 +380,7 @@ export default function SpendingCalendarPage() {
 
   const currentMonthKey = getMonthKey(currentDate);
 
-  /** ⬇ 이 달의 daily_recipes를 Supabase에서 불러오기 */
+  /** ⬇ 이 달의 daily_recipes를 Supabase에서 불러오기 (+ 정기 납부 자동 반영) */
   useEffect(() => {
     let mounted = true;
 
@@ -129,10 +397,7 @@ export default function SpendingCalendarPage() {
         if (!mounted) return;
 
         if (authError) {
-          console.warn(
-            "Supabase auth error (daily_recipes calendar):",
-            authError.message
-          );
+          console.warn("Supabase auth error (daily_recipes calendar):", authError.message);
           setDailyStore({});
           setDailyError("로그인 정보를 불러오지 못했어요.");
           setDailyLoading(false);
@@ -154,6 +419,17 @@ export default function SpendingCalendarPage() {
 
         const firstKey = getDateKey(firstDay); // YYYY-MM-01
         const lastKey = getDateKey(lastDay); // YYYY-MM-마지막날
+
+        // ✅ 정기 납부를 먼저 daily_recipes에 반영(실패해도 달력은 열리게)
+        try {
+          await applyRecurringToRange({
+            userId: user.id,
+            rangeStart: firstKey,
+            rangeEnd: lastKey,
+          });
+        } catch (e) {
+          console.warn("정기 납부 월 반영 실패(달력은 계속 로딩):", e);
+        }
 
         const { data, error } = await supabase
           .from("daily_recipes")
@@ -184,7 +460,7 @@ export default function SpendingCalendarPage() {
 
         const nextStore: DailyStore = {};
         (data || []).forEach((row: any) => {
-          const dateKey = row.date as string; // 'YYYY-MM-DD' 형식이라고 가정
+          const dateKey = row.date as string; // 'YYYY-MM-DD'
 
           const incomeItems = (row.income_items as MoneyItem[] | null) ?? [];
           const expenseItems = (row.expense_items as MoneyItem[] | null) ?? [];
@@ -234,10 +510,7 @@ export default function SpendingCalendarPage() {
         if (!mounted) return;
 
         if (authError) {
-          console.warn(
-            "Supabase auth error (calendar memo):",
-            authError.message
-          );
+          console.warn("Supabase auth error (calendar memo):", authError.message);
           setTodayMemos([]);
           setMemoGlobalError("로그인 정보를 불러오지 못했어요.");
           setMemoLoading(false);
@@ -299,7 +572,6 @@ export default function SpendingCalendarPage() {
     });
 
     const net = income - expense - saving;
-
     return { income, expense, saving, net };
   }, [dailyStore, currentMonthKey]);
 
@@ -324,10 +596,7 @@ export default function SpendingCalendarPage() {
   );
 
   /** 모달 열기 - 공통 (로그인 체크) */
-  const openMemoModalBase = async (
-    mode: "create" | "edit",
-    memo?: TodayMemo | null
-  ) => {
+  const openMemoModalBase = async (mode: "create" | "edit", memo?: TodayMemo | null) => {
     setMemoFormError(null);
     setMemoGlobalError(null);
 
@@ -461,9 +730,7 @@ export default function SpendingCalendarPage() {
         }
 
         setTodayMemos((prev) =>
-          prev.map((m) =>
-            m.id === editingMemo.id ? { ...m, title, detail } : m
-          )
+          prev.map((m) => (m.id === editingMemo.id ? { ...m, title, detail } : m))
         );
       }
 
@@ -480,9 +747,7 @@ export default function SpendingCalendarPage() {
   const handleMemoDelete = async () => {
     if (!editingMemo || memoSubmitting) return;
 
-    const confirmDelete = window.confirm(
-      "이 메모를 정말 삭제할까요? 되돌릴 수 없어요."
-    );
+    const confirmDelete = window.confirm("이 메모를 정말 삭제할까요? 되돌릴 수 없어요.");
     if (!confirmDelete) return;
 
     setMemoFormError(null);
@@ -559,8 +824,7 @@ export default function SpendingCalendarPage() {
                 이번 달 지출 레시피
               </h1>
               <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                하루치 소비를 한 끼 레시피처럼 기록하고, 한 달의 식단표처럼
-                모아서 봅니다.
+                하루치 소비를 한 끼 레시피처럼 기록하고, 한 달의 식단표처럼 모아서 봅니다.
               </p>
             </div>
           </div>
@@ -570,22 +834,26 @@ export default function SpendingCalendarPage() {
               onClick={handlePrevMonth}
               className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-neutral-200 bg-white hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:bg-neutral-800"
             >
-              <ChevronLeft
-                size={18}
-                className="text-neutral-700 dark:text-neutral-200"
-              />
+              <ChevronLeft size={18} className="text-neutral-700 dark:text-neutral-200" />
             </button>
+
             <div className="px-4 py-1.5 rounded-full bg-amber-50 text-sm font-medium text-neutral-800 border border-amber-100 shadow-[0_2px_0_rgba(248,250,252,1)] whitespace-nowrap dark:bg-neutral-800 dark:text-amber-100 dark:border-neutral-700">
               {monthLabel} 레시피북
             </div>
+
             <button
               onClick={handleNextMonth}
               className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-neutral-200 bg-white hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:bg-neutral-800"
             >
-              <ChevronRight
-                size={18}
-                className="text-neutral-700 dark:text-neutral-200"
-              />
+              <ChevronRight size={18} className="text-neutral-700 dark:text-neutral-200" />
+            </button>
+
+            {/* 정기 납부 관리로 이동(원하면 경로 조정) */}
+            <button
+              onClick={() => router.push("/dashboard/recurring")}
+              className="rounded-full border border-amber-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-1.5 text-[11px] font-medium text-neutral-700 dark:text-neutral-200 hover:bg-amber-50 dark:hover:bg-neutral-800"
+            >
+              정기 납부 관리
             </button>
           </div>
         </header>
@@ -631,10 +899,7 @@ export default function SpendingCalendarPage() {
                     수입 재료
                   </span>
                   <span className="inline-flex items-center gap-1">
-                    <span
-                      className="h-2 w-2 rounded-full"
-                      style={{ backgroundColor: BRAND_ORANGE }}
-                    />
+                    <span className="h-2 w-2 rounded-full" style={{ backgroundColor: BRAND_ORANGE }} />
                     지출 재료
                   </span>
                   <span className="inline-flex items-center gap-1">
@@ -677,16 +942,12 @@ export default function SpendingCalendarPage() {
 
                   // 대표 메모: 각 items의 label 중 하나만 뽑아서 간단히 표시
                   const expenseLabel =
-                    recipe?.expenseItems?.find((i) => i.label?.trim())?.label ??
-                    "";
+                    recipe?.expenseItems?.find((i) => i.label?.trim())?.label ?? "";
                   const incomeLabel =
-                    recipe?.incomeItems?.find((i) => i.label?.trim())?.label ??
-                    "";
+                    recipe?.incomeItems?.find((i) => i.label?.trim())?.label ?? "";
                   const savingLabel =
-                    recipe?.savingItems?.find((i) => i.label?.trim())?.label ??
-                    "";
-                  const mainMemo =
-                    expenseLabel || incomeLabel || savingLabel || "";
+                    recipe?.savingItems?.find((i) => i.label?.trim())?.label ?? "";
+                  const mainMemo = expenseLabel || incomeLabel || savingLabel || "";
 
                   const isTodayKey = dateKey === todayKey;
 
@@ -709,62 +970,52 @@ export default function SpendingCalendarPage() {
                         </span>
                         {(income > 0 || expense > 0 || saving > 0) && (
                           <span className="flex gap-0.5">
-                            {income > 0 && (
-                              <span className="h-1.5 w-1.5 rounded-full bg-sky-400" />
-                            )}
+                            {income > 0 && <span className="h-1.5 w-1.5 rounded-full bg-sky-400" />}
                             {expense > 0 && (
                               <span
                                 className="h-1.5 w-1.5 rounded-full"
                                 style={{ backgroundColor: BRAND_ORANGE }}
                               />
                             )}
-                            {saving > 0 && (
-                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                            )}
+                            {saving > 0 && <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />}
                           </span>
                         )}
                       </div>
 
-<div className="space-y-0.5 text-[10px] sm:text-[11px] leading-tight">
-  {income > 0 && (
-    <div className="flex justify-end sm:justify-between items-baseline">
-      {/* ⬇ 라벨: 모바일에서는 숨기고, sm 이상에서만 표기 */}
-      <span className="hidden sm:inline text-neutral-400 dark:text-neutral-500">
-        재료(+)
-      </span>
-      <span className="font-medium text-sky-600 dark:text-sky-300 whitespace-nowrap">
-        {income.toLocaleString("ko-KR")}
-      </span>
-    </div>
-  )}
+                      <div className="space-y-0.5 text-[10px] sm:text-[11px] leading-tight">
+                        {income > 0 && (
+                          <div className="flex justify-end sm:justify-between items-baseline">
+                            <span className="hidden sm:inline text-neutral-400 dark:text-neutral-500">
+                              재료(+)
+                            </span>
+                            <span className="font-medium text-sky-600 dark:text-sky-300 whitespace-nowrap">
+                              {income.toLocaleString("ko-KR")}
+                            </span>
+                          </div>
+                        )}
 
-  {expense > 0 && (
-    <div className="flex justify-end sm:justify-between items-baseline">
-      <span className="hidden sm:inline text-neutral-400 dark:text-neutral-500">
-        사용(-)
-      </span>
-      <span
-        className="font-medium whitespace-nowrap"
-        style={{ color: "#B45309" }}
-      >
-        -{expense.toLocaleString("ko-KR")}
-      </span>
-    </div>
-  )}
+                        {expense > 0 && (
+                          <div className="flex justify-end sm:justify-between items-baseline">
+                            <span className="hidden sm:inline text-neutral-400 dark:text-neutral-500">
+                              사용(-)
+                            </span>
+                            <span className="font-medium whitespace-nowrap" style={{ color: "#B45309" }}>
+                              -{expense.toLocaleString("ko-KR")}
+                            </span>
+                          </div>
+                        )}
 
-  {saving > 0 && (
-    <div className="flex justify-end sm:justify-between items-baseline">
-      <span className="hidden sm:inline text-neutral-400 dark:text-neutral-500">
-        적금
-      </span>
-      <span className="font-medium text-emerald-600 dark:text-emerald-300 whitespace-nowrap">
-        {saving.toLocaleString("ko-KR")}
-      </span>
-    </div>
-  )}
-</div>
-
-
+                        {saving > 0 && (
+                          <div className="flex justify-end sm:justify-between items-baseline">
+                            <span className="hidden sm:inline text-neutral-400 dark:text-neutral-500">
+                              적금
+                            </span>
+                            <span className="font-medium text-emerald-600 dark:text-emerald-300 whitespace-nowrap">
+                              {saving.toLocaleString("ko-KR")}
+                            </span>
+                          </div>
+                        )}
+                      </div>
 
                       {mainMemo && (
                         <div className="mt-1 pt-1 border-t border-dashed border-amber-100 dark:border-neutral-700 text-[9px] sm:text-[10px] text-neutral-500 dark:text-neutral-400 truncate">
@@ -777,9 +1028,7 @@ export default function SpendingCalendarPage() {
               </div>
 
               {dailyLoading && (
-                <p className="mt-2 text-[11px] text-neutral-400">
-                  이번 달 레시피를 불러오는 중입니다…
-                </p>
+                <p className="mt-2 text-[11px] text-neutral-400">이번 달 레시피를 불러오는 중입니다…</p>
               )}
               {!dailyLoading && dailyError && (
                 <p className="mt-2 text-[11px] text-red-500">{dailyError}</p>
@@ -796,8 +1045,7 @@ export default function SpendingCalendarPage() {
                     오늘의 메모
                   </span>
                   <span className="text-[11px] text-amber-700/80 dark:text-amber-200/80 whitespace-nowrap overflow-hidden text-ellipsis">
-                    {todayKey.replace(/-/g, ".")} 장보기·약속·결제 알림을
-                    적어두세요.
+                    {todayKey.replace(/-/g, ".")} 장보기·약속·결제 알림을 적어두세요.
                   </span>
                 </div>
                 <button
@@ -827,8 +1075,7 @@ export default function SpendingCalendarPage() {
 
                 {!memoLoading && !memoGlobalError && todayMemos.length === 0 && (
                   <div className="text-xs text-neutral-400 dark:text-neutral-500">
-                    아직 오늘 메모가 없어요. 상단의 ‘+’ 버튼을 눌러 오늘의
-                    소비·일정을 기록해 보세요.
+                    아직 오늘 메모가 없어요. 상단의 ‘+’ 버튼을 눌러 오늘의 소비·일정을 기록해 보세요.
                   </div>
                 )}
 
@@ -866,9 +1113,7 @@ export default function SpendingCalendarPage() {
               <div className="flex items-center justify-between px-4 py-3 border-b border-amber-100 dark:border-neutral-700">
                 <div className="flex flex-col gap-0.5">
                   <span className="text-xs font-semibold text-amber-900 dark:text-amber-100">
-                    {memoModalMode === "create"
-                      ? "오늘의 메모 추가"
-                      : "오늘의 메모 수정"}
+                    {memoModalMode === "create" ? "오늘의 메모 추가" : "오늘의 메모 수정"}
                   </span>
                   <span className="text-[11px] text-amber-700/80 dark:text-amber-200/80">
                     {todayKey.replace(/-/g, ".")} 기준 메모입니다.
@@ -879,10 +1124,7 @@ export default function SpendingCalendarPage() {
                   onClick={closeMemoModal}
                   className="inline-flex h-7 w-7 items-center justify-center rounded-full hover:bg-amber-50 dark:hover:bg-neutral-800"
                 >
-                  <X
-                    size={16}
-                    className="text-neutral-500 dark:text-neutral-300"
-                  />
+                  <X size={16} className="text-neutral-500 dark:text-neutral-300" />
                 </button>
               </div>
 
@@ -946,11 +1188,7 @@ export default function SpendingCalendarPage() {
                   className="rounded-full bg-[color:var(--brand-orange)] px-4 py-1.5 text-[11px] font-semibold text-white shadow-sm hover:bg-[#f27422] disabled:opacity-60"
                   style={{ ["--brand-orange" as any]: BRAND_ORANGE }}
                 >
-                  {memoSubmitting
-                    ? "저장 중..."
-                    : memoModalMode === "create"
-                    ? "메모 저장"
-                    : "수정 완료"}
+                  {memoSubmitting ? "저장 중..." : memoModalMode === "create" ? "메모 저장" : "수정 완료"}
                 </button>
               </div>
             </form>
@@ -1006,13 +1244,9 @@ function SummaryChip({ label, value, tone, emphasis, note }: SummaryChipProps) {
           summary
         </span>
       </div>
-      <span className="mt-1 text-base font-semibold whitespace-nowrap">
-        {value}
-      </span>
+      <span className="mt-1 text-base font-semibold whitespace-nowrap">{value}</span>
       {note && (
-        <span className="mt-1 text-[10px] text-neutral-500 dark:text-neutral-400">
-          {note}
-        </span>
+        <span className="mt-1 text-[10px] text-neutral-500 dark:text-neutral-400">{note}</span>
       )}
     </div>
   );
@@ -1026,13 +1260,7 @@ type MemoCardProps = {
   onClick?: () => void;
 };
 
-function MemoCard({
-  title,
-  dateLabel,
-  detail,
-  tone = "strong",
-  onClick,
-}: MemoCardProps) {
+function MemoCard({ title, dateLabel, detail, tone = "strong", onClick }: MemoCardProps) {
   const base =
     tone === "strong"
       ? "bg-white/90 border-amber-200 dark:bg-neutral-900/90 dark:border-neutral-700"
@@ -1048,9 +1276,7 @@ function MemoCard({
       ].join(" ")}
     >
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-amber-900 dark:text-amber-100">
-          {title}
-        </span>
+        <span className="text-xs font-semibold text-amber-900 dark:text-amber-100">{title}</span>
         <span className="text-[10px] text-amber-700/80 dark:text-amber-200/80 whitespace-nowrap">
           {dateLabel}
         </span>

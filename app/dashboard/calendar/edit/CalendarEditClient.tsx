@@ -48,11 +48,12 @@ function getAdjacentDate(dateStr: string, delta: number) {
 
 function createItem(defaultLabel = ""): MoneyItem {
   return {
-    id: `item-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    id: crypto.randomUUID(),
     label: defaultLabel,
     amount: 0,
   };
 }
+
 
 export default function CalendarEditClient() {
   const router = useRouter();
@@ -140,9 +141,26 @@ useEffect(() => {
       }
 
       // Supabase row -> 폼으로
-      let incomeItems = (data.income_items as MoneyItem[] | null) ?? [];
-      let expenseItems = (data.expense_items as MoneyItem[] | null) ?? [];
-      let savingItems = (data.saving_items as MoneyItem[] | null) ?? [];
+const normalizeItems = (arr: any[] | null, section: SectionKey): MoneyItem[] => {
+  const items = Array.isArray(arr) ? arr : [];
+  return items.map((it, idx) => {
+    const label = typeof it?.label === "string" ? it.label : "";
+    const amount = Number(it?.amount ?? 0) || 0;
+
+    // ✅ id가 없거나 비어 있으면 생성 (섹션/날짜/순번 기반으로 안정성)
+    const id =
+      typeof it?.id === "string" && it.id.trim()
+        ? it.id
+        : `legacy-${section}-${dateKey}-${idx}-${Math.random().toString(36).slice(2, 7)}`;
+
+    return { id, label, amount };
+  });
+};
+
+const incomeItems = normalizeItems(data.income_items as any[] | null, "income");
+const expenseItems = normalizeItems(data.expense_items as any[] | null, "expense");
+const savingItems = normalizeItems(data.saving_items as any[] | null, "saving");
+
 
       setForm({
         incomeItems: incomeItems.length > 0 ? incomeItems : [createItem()],
@@ -242,15 +260,13 @@ const handleSubmit = async (e: React.FormEvent) => {
   }
   const dateKey = dateParam as string;
 
-  const cleanedIncome = form.incomeItems.filter(
-    (i) => i.label.trim() || i.amount
-  );
-  const cleanedExpense = form.expenseItems.filter(
-    (i) => i.label.trim() || i.amount
-  );
-  const cleanedSaving = form.savingItems.filter(
-    (i) => i.label.trim() || i.amount
-  );
+const ensureIds = (items: MoneyItem[]) =>
+  items.map((i) => ({ ...i, id: i.id?.trim() ? i.id : crypto.randomUUID() }));
+
+const cleanedIncome = ensureIds(form.incomeItems).filter((i) => i.label.trim() || i.amount);
+const cleanedExpense = ensureIds(form.expenseItems).filter((i) => i.label.trim() || i.amount);
+const cleanedSaving = ensureIds(form.savingItems).filter((i) => i.label.trim() || i.amount);
+
 
   // 합계는 그대로 사용
   const now = new Date().toISOString();
