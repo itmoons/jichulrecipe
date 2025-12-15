@@ -230,7 +230,7 @@ export function SiteHeader() {
               레시피 달력
             </Link>
             <Link
-              href={guardedHref("/recurring")}
+              href={guardedHref("/dashboard/recurring")}
               className={[
                 "rounded-md px-2 py-1.5",
                 pathname === "/dashboard" || pathname?.startsWith("/recurring")
