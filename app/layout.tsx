@@ -35,6 +35,10 @@ export const metadata: Metadata = {
     canonical: SITE_URL,
   },
 
+  verification: {
+    google: "RAjkr0_ylgNzStxYF2VE4HNNWU9hVEaBqX6jHMaijiY",
+  },
+
   openGraph: {
     title: SITE_NAME,
     description:
