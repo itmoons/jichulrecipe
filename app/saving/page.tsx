@@ -318,11 +318,11 @@ export default function SavingPage() {
 
   return (
     <PageContainer>
-      <main className="mx-auto  py-8 space-y-8">
+      <main className="mx-auto  py-4 space-y-8">
         {/* 헤더 */}
         <section className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">
+            <h1 className="text-xl font-bold text-slate-900">
               💰 적금 · 목표 저축 관리
             </h1>
             <p className="mt-2 text-base text-slate-600">
