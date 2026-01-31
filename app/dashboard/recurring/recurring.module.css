@@ -1,324 +1,278 @@
-/* ===============================
-   지출레시피 · 정기 납부 관리
-   recurring.module.css (톤다운/미니멀)
-   - 배경: 종이색 + 미세 질감 (그라데이션 제거)
-   - 포인트: 오렌지 최소화
-   - 수정/삭제: 칩 버튼(중립/위험)로 정리
-   =============================== */
-
-:root {
-  --jr-orange: #ff8a3d;
-
-  /* 전체를 받치는 뉴트럴 팔레트 (촌스러움 방지) */
-  --jr-ink: #0f172a;          /* slate-900 */
-  --jr-muted: #64748b;        /* slate-500 */
-  --jr-line: rgba(15, 23, 42, 0.10);
-
-  /* 배경/카드: ‘종이’ 톤 */
-  --jr-bg: #fbfaf8;           /* 거의 화이트 */
-  --jr-card: rgba(255, 255, 255, 0.92);
-
-  /* 그림자: 색감 없이 부드럽게 */
-  --jr-shadow-sm: 0 10px 28px rgba(2, 6, 23, 0.06);
-
-  --jr-radius-lg: 22px;
-  --jr-radius-md: 16px;
-
-  /* 상태 색(톤다운) */
-  --jr-danger: #b42318;       /* 과한 빨강 대신 진한 붉은 갈색 */
-  --jr-danger-bg: rgba(180, 35, 24, 0.08);
-  --jr-danger-bd: rgba(180, 35, 24, 0.22);
-
-  --jr-focus: rgba(255, 138, 61, 0.22);
-}
+/* recurring.module.css */
 
 .page {
   min-height: 100vh;
-  color: var(--jr-ink);
-
-  /* ✅ 그라데이션 제거: 종이색 + 미세한 결만 */
-  background:
-    radial-gradient(1200px 700px at 10% 0%, rgba(255, 138, 61, 0.06), transparent 55%),
-    radial-gradient(900px 600px at 90% 10%, rgba(15, 23, 42, 0.03), transparent 60%),
-    repeating-linear-gradient(
-      135deg,
-      rgba(15, 23, 42, 0.018) 0px,
-      rgba(15, 23, 42, 0.018) 1px,
-      transparent 1px,
-      transparent 7px
-    ),
-    var(--jr-bg);
+  background: radial-gradient(circle at 1px 1px, #e5e7eb 1px, transparent 0);
+  background-size: 18px 18px;
+  padding: 28px 16px 40px;
+  color: #0f172a;
 }
 
 .container {
-  max-width: 960px;
+  width: 100%;
+  max-width: 1220px;
   margin: 0 auto;
-  padding: 26px 14px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
+/* Header */
 .header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 18px;
+  padding: 18px 18px;
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.05);
 }
 
 .title {
-  font-size: 20px;
-  font-weight: 900;
-  letter-spacing: -0.35px;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #0b1220;
 }
 
 .subtitle {
   margin-top: 6px;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.5;
-  color: var(--jr-muted);
+  color: #475569;
 }
 
-/* 배지는 오렌지를 ‘아주 약하게’만 */
 .badge {
   display: inline-flex;
   align-items: center;
-  padding: 6px 10px;
-  font-size: 12px;
-  font-weight: 900;
-  color: rgba(124, 45, 18, 0.92);
-  background: rgba(255, 138, 61, 0.10);
-  border: 1px solid rgba(255, 138, 61, 0.22);
-  border-radius: 999px;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #0b1220;
+  background: rgba(255, 138, 61, 0.12);
+  border: 1px solid rgba(255, 138, 61, 0.25);
   white-space: nowrap;
 }
 
-/* 카드: 유리감 과다 제거 + 종이카드 느낌 */
+/* Cards */
 .card {
-  border-radius: var(--jr-radius-lg);
-  border: 1px solid var(--jr-line);
-  background: var(--jr-card);
-  box-shadow: var(--jr-shadow-sm);
-  padding: 18px;
-}
-
-.card + .card {
-  margin-top: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 18px;
+  padding: 16px 16px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04);
 }
 
 .cardTitleRow {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
   flex-wrap: wrap;
   margin-bottom: 12px;
 }
 
 .cardTitle {
   font-size: 14px;
-  font-weight: 900;
-  letter-spacing: -0.2px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #0b1220;
 }
 
 .cardDesc {
-  margin-top: 6px;
-  font-size: 12.5px;
-  line-height: 1.55;
-  color: var(--jr-muted);
+  margin-top: 4px;
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.45;
 }
 
-/* ===== Form ===== */
-
+/* Form */
 .formGrid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
-@media (min-width: 768px) {
-  .formGrid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
 .label {
-  display: grid;
-  gap: 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .labelText {
-  font-size: 12px;
-  font-weight: 900;
-  color: rgba(71, 85, 105, 0.95);
+  font-size: 11px;
+  font-weight: 700;
+  color: #334155;
 }
 
+/* Inputs */
 .input,
 .select {
   width: 100%;
-  border-radius: var(--jr-radius-md);
-  border: 1px solid rgba(15, 23, 42, 0.12);
-  padding: 10px 12px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.96);
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(226, 232, 240, 1);
+  background: rgba(255, 255, 255, 0.95);
+  padding: 0 12px;
+  font-size: 13px;
+  color: #0f172a;
   outline: none;
-  transition: border-color 160ms ease, box-shadow 160ms ease;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
 }
 
-.input:hover,
-.select:hover {
-  border-color: rgba(15, 23, 42, 0.22);
+.input::placeholder {
+  color: #94a3b8;
 }
 
 .input:focus,
 .select:focus {
   border-color: rgba(255, 138, 61, 0.55);
-  box-shadow: 0 0 0 4px var(--jr-focus);
+  box-shadow: 0 0 0 4px rgba(255, 138, 61, 0.14);
+  background: #fff;
 }
 
-/* ✅ Primary 버튼: 오렌지 “단색” + 그림자 절제 (그라데이션 제거) */
+.select {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #94a3b8 50%),
+    linear-gradient(135deg, #94a3b8 50%, transparent 50%),
+    linear-gradient(to right, transparent, transparent);
+  background-position:
+    calc(100% - 18px) 16px,
+    calc(100% - 12px) 16px,
+    calc(100% - 2.6rem) 0.5rem;
+  background-size: 6px 6px, 6px 6px, 1px 1.8rem;
+  background-repeat: no-repeat;
+  padding-right: 38px;
+}
+
+/* Buttons */
 .btnPrimary {
-  border: 1px solid rgba(255, 138, 61, 0.35);
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 138, 61, 0.25);
   background: rgba(255, 138, 61, 0.92);
   color: #fff;
-  font-weight: 900;
-  font-size: 13px;
-  padding: 10px 14px;
-  border-radius: 14px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 0 14px;
   cursor: pointer;
-  box-shadow: 0 10px 22px rgba(2, 6, 23, 0.08);
-  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
+  box-shadow: 0 10px 18px rgba(255, 138, 61, 0.18);
+  transition: transform 120ms ease, filter 160ms ease, box-shadow 160ms ease;
   white-space: nowrap;
 }
 
 .btnPrimary:hover {
+  filter: brightness(0.98);
+  box-shadow: 0 12px 24px rgba(255, 138, 61, 0.22);
   transform: translateY(-1px);
-  filter: brightness(1.02);
-  box-shadow: 0 14px 26px rgba(2, 6, 23, 0.10);
+}
+
+.btnPrimary:active {
+  transform: translateY(0px);
 }
 
 .btnPrimary:disabled {
-  opacity: 0.55;
   cursor: not-allowed;
+  opacity: 0.55;
   transform: none;
   box-shadow: none;
 }
 
-/* ===== Table ===== */
-
+/* Table */
 .tableWrap {
+  width: 100%;
   overflow-x: auto;
-  border-radius: 16px;
-  border: 1px solid var(--jr-line);
-  background: rgba(255, 255, 255, 0.96);
+  border-radius: 14px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
 }
 
 .table {
   width: 100%;
-  table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0;
-  font-size: 13px;
+  min-width: 760px;
+  background: rgba(255, 255, 255, 0.98);
 }
 
 .thead th {
   position: sticky;
   top: 0;
-
-  /* ✅ 헤더도 그라데이션 과장 금지: 아주 은은한 틴트만 */
-  background: rgba(255, 138, 61, 0.06);
-  color: rgba(15, 23, 42, 0.88);
-
-  font-size: 12px;
+  background: rgba(248, 250, 252, 0.98);
+  backdrop-filter: blur(6px);
+  font-size: 11px;
   font-weight: 900;
+  color: #334155;
   text-align: left;
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  padding: 12px 12px;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
   white-space: nowrap;
 }
 
 .tbody td {
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  font-size: 12px;
+  color: #0f172a;
+  padding: 12px 12px;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.75);
   vertical-align: middle;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.tbody tr:nth-child(even) td {
-  background: rgba(15, 23, 42, 0.018);
 }
 
 .tbody tr:hover td {
   background: rgba(255, 138, 61, 0.05);
 }
 
-/* 이름 셀 */
 .cellDate {
-  font-weight: 900;
-  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  color: #0b1220;
+  white-space: nowrap;
 }
 
-/* 관리 버튼 줄이 inline-style flex라서, 버튼만 ‘칩’으로 정리 */
-.tbody td button {
-  padding: 8px 10px !important;
-  border-radius: 12px !important;
-  font-weight: 900 !important;
-  box-shadow: none !important;
-  transform: none !important;
-}
-
-/* 수정 버튼(중립): 오렌지 쓰지 말고 잉크 톤 */
-.tbody td button:first-child {
-  background: rgba(255, 255, 255, 0.96) !important;
-  color: rgba(15, 23, 42, 0.92) !important;
-  border: 1px solid rgba(15, 23, 42, 0.14) !important;
-}
-
-.tbody td button:first-child:hover {
-  background: rgba(15, 23, 42, 0.04) !important;
-  border-color: rgba(15, 23, 42, 0.22) !important;
-}
-
-/* 삭제 버튼(위험): ‘빨강 그라데이션’ 금지. 테두리+연한 배경 */
-.tbody td button:last-child {
-  background: var(--jr-danger-bg) !important;
-  color: var(--jr-danger) !important;
-  border: 1px solid var(--jr-danger-bd) !important;
-}
-
-.tbody td button:last-child:hover {
-  background: rgba(180, 35, 24, 0.12) !important;
-  border-color: rgba(180, 35, 24, 0.30) !important;
-}
-
-/* ===== Log ===== */
-
+/* Log box */
 .logBox {
   margin-top: 12px;
-  padding: 12px;
-  font-size: 12px;
-  line-height: 1.6;
-  color: rgba(15, 23, 42, 0.85);
-  background: rgba(15, 23, 42, 0.03);
-  border: 1px dashed rgba(15, 23, 42, 0.18);
   border-radius: 14px;
-  white-space: pre-wrap;
+  padding: 12px 14px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #0f172a;
+  background: rgba(255, 138, 61, 0.08);
+  border: 1px solid rgba(255, 138, 61, 0.22);
 }
 
-/* ===== 모바일에서 상단 우측 컨트롤이 자연스럽게 내려오도록 ===== */
-@media (max-width: 520px) {
-  .cardTitleRow {
+/* Small checkbox */
+.page input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: rgba(255, 138, 61, 0.92);
+}
+
+
+/* Responsive */
+@media (max-width: 860px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+  .header {
     flex-direction: column;
     align-items: stretch;
   }
-
-  /* inline style width:140이 있어도, 모바일에선 강제로 늘려줌 */
-  .cardTitleRow input.input {
-    width: 100% !important;
+  .badge {
+    align-self: flex-start;
   }
+}
 
-  .cardTitleRow button.btnPrimary {
+@media (max-width: 520px) {
+  .page {
+    padding: 18px 12px 28px;
+  }
+  .card {
+    padding: 14px 12px;
+  }
+  .btnPrimary {
     width: 100%;
+    justify-content: center;
   }
 }

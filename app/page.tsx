@@ -380,7 +380,7 @@ export default function HomePage() {
             transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
             className="relative"
           >
-            <div className="relative mx-auto max-w-xs sm:max-w-sm rounded-3xl border border-orange-100 bg-white/95 p-4 pb-5 shadow-lg shadow-orange-100">
+            <div className="relative  rounded-3xl border border-orange-100 bg-white/95 p-4 pb-5 shadow-lg shadow-orange-100">
               <div className="flex items-center justify-between gap-3">
                 <div className="space-y-1">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-orange-400">

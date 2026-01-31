@@ -2,12 +2,11 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { PageContainer } from "@/components/layout/PageContainer"; // 가정된 PageContainer
 import { supabase } from "@/lib/supabaseClient";
+import { PageContainer } from "@/components/layout/PageContainer";
 
-const BRAND_ORANGE = "#FF8A3D";
+const BRAND_ORANGE = "#ffbb3d";
 
-// 🔹 타입 정의 유지 및 추가 정보 반영
 type SavingPlan = {
   id: number;
   user_id: string;
@@ -15,29 +14,62 @@ type SavingPlan = {
   bank: string | null;
   monthly_amount: number;
   goal_amount: number | null;
-  start_month: string | null;
-  auto_transfer_day: number | null;
+  start_month: string | null; // YYYY-MM
+  auto_transfer_day: number | null; // 1~31
   memo: string | null;
-  current_amount: number | null; // 현재까지 납입 금액
-  start_date: string | null; // 신규일 (YYYY-MM-DD)
-  end_date: string | null; // 만기일 (YYYY-MM-DD)
+
+  current_amount: number | null;
+  start_date: string | null; // YYYY-MM-DD
+  end_date: string | null; // YYYY-MM-DD
+
   created_at: string;
   updated_at: string;
 };
+
+type SortKey = "created_at" | "name" | "monthly_amount" | "progress";
+type SortDir = "asc" | "desc";
 
 type FormState = {
   id: number | null;
   name: string;
   bank: string;
-  monthlyAmount: string;
-  goalAmount: string;
-  startMonth: string;
-  autoTransferDay: string;
+  monthlyAmount: string; // digits only
+  goalAmount: string; // digits only
+  startMonth: string; // YYYY-MM
+  autoTransferDay: string; // digits only
   memo: string;
-  currentAmount: string; // 현재까지 납입 금액
-  startDate: string; // 신규일
-  endDate: string; // 만기일
+
+  currentAmount: string; // digits only
+  startDate: string; // YYYY-MM-DD
+  endDate: string; // YYYY-MM-DD
 };
+
+function emptyForm(): FormState {
+  return {
+    id: null,
+    name: "",
+    bank: "",
+    monthlyAmount: "",
+    goalAmount: "",
+    startMonth: "",
+    autoTransferDay: "",
+    memo: "",
+    currentAmount: "",
+    startDate: "",
+    endDate: "",
+  };
+}
+
+function onlyDigits(s: string) {
+  return (s ?? "").replace(/[^0-9]/g, "");
+}
+
+function formatWonFromDigits(digits: string) {
+  if (!digits) return "";
+  const n = Number(digits);
+  if (!Number.isFinite(n)) return "";
+  return n.toLocaleString("ko-KR");
+}
 
 function formatNumber(n: number | null | undefined) {
   if (!Number.isFinite(Number(n))) return "-";
@@ -57,6 +89,25 @@ function getMonthsSince(startMonth: string | null | undefined) {
   return Math.max(total, 0);
 }
 
+function clampDay(d: string) {
+  const n = Number(d);
+  if (!Number.isFinite(n)) return "";
+  return String(Math.min(31, Math.max(1, n)));
+}
+
+function calcProgress(plan: SavingPlan) {
+  const months = getMonthsSince(plan.start_month);
+  const expectedByMonth = months * (plan.monthly_amount || 0);
+  const savedSoFar =
+    plan.current_amount != null ? plan.current_amount : expectedByMonth;
+
+  const goal = plan.goal_amount ?? 0;
+  const progress =
+    goal > 0 ? Math.min(100, Math.floor((savedSoFar / goal) * 100)) : 0;
+
+  return { months, savedSoFar, progress };
+}
+
 export default function SavingPage() {
   const router = useRouter();
 
@@ -66,21 +117,17 @@ export default function SavingPage() {
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const [form, setForm] = useState<FormState>({
-    id: null,
-    name: "",
-    bank: "",
-    monthlyAmount: "",
-    goalAmount: "",
-    startMonth: "",
-    autoTransferDay: "",
-    memo: "",
-    currentAmount: "", // 추가
-    startDate: "", // 추가
-    endDate: "", // 추가
-  });
+  const [sortKey, setSortKey] = useState<SortKey>("created_at");
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
 
-  // 로그인 / 데이터 로딩 (기존 로직 유지)
+  const [activeId, setActiveId] = useState<number | null>(null);
+
+  // ✅ 모달 상태
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [form, setForm] = useState<FormState>(emptyForm());
+
+  // 로그인/데이터 로딩
   useEffect(() => {
     const init = async () => {
       try {
@@ -92,9 +139,7 @@ export default function SavingPage() {
           error: userError,
         } = await supabase.auth.getUser();
 
-        if (userError) {
-          console.error(userError);
-        }
+        if (userError) console.error(userError);
 
         if (!user) {
           router.replace("/sign-in");
@@ -127,39 +172,73 @@ export default function SavingPage() {
     init();
   }, [router]);
 
-  // 총액 계산 (기존 로직 유지)
   const totalMonthlySaving = useMemo(
     () => plans.reduce((sum, p) => sum + (p.monthly_amount || 0), 0),
     [plans]
   );
 
-  const expectedOneYear = useMemo(
-    () => totalMonthlySaving * 12,
-    [totalMonthlySaving]
-  );
+  const expectedOneYear = useMemo(() => totalMonthlySaving * 12, [totalMonthlySaving]);
 
-  // 핸들러 함수 (기존 로직 유지 + 새 필드 반영)
-  const handleChange = (field: keyof FormState, value: string) => {
-    setForm((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+  const sortedPlans = useMemo(() => {
+    const arr = [...plans];
+    const dir = sortDir === "asc" ? 1 : -1;
+
+    arr.sort((a, b) => {
+      if (sortKey === "created_at") {
+        return (new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) * dir;
+      }
+      if (sortKey === "name") {
+        const av = (a.name ?? "").toLowerCase();
+        const bv = (b.name ?? "").toLowerCase();
+        if (av < bv) return -1 * dir;
+        if (av > bv) return 1 * dir;
+        return 0;
+      }
+      if (sortKey === "monthly_amount") {
+        return ((a.monthly_amount ?? 0) - (b.monthly_amount ?? 0)) * dir;
+      }
+      if (sortKey === "progress") {
+        return (calcProgress(a).progress - calcProgress(b).progress) * dir;
+      }
+      return 0;
+    });
+
+    return arr;
+  }, [plans, sortKey, sortDir]);
+
+  const openCreateModal = () => {
+    setActiveId(null);
+    setForm(emptyForm());
+    setIsModalOpen(true);
   };
 
-  const resetForm = () => {
+  const openEditModal = (p: SavingPlan) => {
+    setActiveId(p.id);
     setForm({
-      id: null,
-      name: "",
-      bank: "",
-      monthlyAmount: "",
-      goalAmount: "",
-      startMonth: "",
-      autoTransferDay: "",
-      memo: "",
-      currentAmount: "",
-      startDate: "",
-      endDate: "",
+      id: p.id,
+      name: p.name ?? "",
+      bank: p.bank ?? "",
+      monthlyAmount: String(p.monthly_amount ?? 0),
+      goalAmount: p.goal_amount != null ? String(p.goal_amount) : "",
+      startMonth: p.start_month ?? "",
+      autoTransferDay: p.auto_transfer_day != null ? String(p.auto_transfer_day) : "",
+      memo: p.memo ?? "",
+      currentAmount: p.current_amount != null ? String(p.current_amount) : "",
+      startDate: p.start_date ?? "",
+      endDate: p.end_date ?? "",
     });
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    // 닫을 때 선택 유지할지/해제할지 취향인데, 보통은 유지합니다.
+    // setActiveId(null);
+    // setForm(emptyForm());
+  };
+
+  const handleChange = (field: keyof FormState, value: string) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -169,16 +248,12 @@ export default function SavingPage() {
       return;
     }
 
-    const monthlyAmount = Number(form.monthlyAmount.replace(/[^0-9]/g, "")) || 0;
-    const goalAmountRaw = form.goalAmount
-      ? Number(form.goalAmount.replace(/[^0-9]/g, ""))
-      : null;
+    const monthlyAmount = Number(onlyDigits(form.monthlyAmount)) || 0;
+    const goalAmountRaw = form.goalAmount ? Number(onlyDigits(form.goalAmount)) : null;
     const autoTransferDayRaw = form.autoTransferDay
-      ? Number(form.autoTransferDay)
+      ? Number(clampDay(onlyDigits(form.autoTransferDay)))
       : null;
-    const currentAmountRaw = form.currentAmount
-      ? Number(form.currentAmount.replace(/[^0-9]/g, ""))
-      : null;
+    const currentAmountRaw = form.currentAmount ? Number(onlyDigits(form.currentAmount)) : null;
 
     if (!form.name.trim()) {
       alert("적금/목표 이름을 입력해 주세요.");
@@ -220,7 +295,8 @@ export default function SavingPage() {
         }
 
         setPlans((prev) => [...prev, data as SavingPlan]);
-        resetForm();
+        setIsModalOpen(false);
+        setForm(emptyForm());
       } else {
         // UPDATE
         const { data, error } = await supabase
@@ -249,10 +325,10 @@ export default function SavingPage() {
           return;
         }
 
-        setPlans((prev) =>
-          prev.map((p) => (p.id === form.id ? (data as SavingPlan) : p))
-        );
-        resetForm();
+        const updated = data as SavingPlan;
+        setPlans((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+        setActiveId(updated.id);
+        setIsModalOpen(false);
       }
     } catch (err) {
       console.error(err);
@@ -260,25 +336,6 @@ export default function SavingPage() {
     } finally {
       setSaving(false);
     }
-  };
-
-  const handleEdit = (p: SavingPlan) => {
-    setForm({
-      id: p.id,
-      name: p.name,
-      bank: p.bank ?? "",
-      monthlyAmount: (p.monthly_amount ?? 0).toString(),
-      goalAmount: p.goal_amount != null ? p.goal_amount.toString() : "",
-      startMonth: p.start_month ?? "",
-      autoTransferDay: p.auto_transfer_day
-        ? p.auto_transfer_day.toString()
-        : "",
-      memo: p.memo ?? "",
-      currentAmount:
-        p.current_amount != null ? p.current_amount.toString() : "",
-      startDate: p.start_date ?? "",
-      endDate: p.end_date ?? "",
-    });
   };
 
   const handleDelete = async (id: number) => {
@@ -305,8 +362,10 @@ export default function SavingPage() {
       }
 
       setPlans((prev) => prev.filter((p) => p.id !== id));
+      if (activeId === id) setActiveId(null);
       if (form.id === id) {
-        resetForm();
+        setIsModalOpen(false);
+        setForm(emptyForm());
       }
     } catch (err) {
       console.error(err);
@@ -318,522 +377,495 @@ export default function SavingPage() {
 
   return (
     <PageContainer>
-      <main className="mx-auto  py-4 space-y-8">
+      <main
+          className={[
+            "min-h-screen bg-slate-50",
+            "bg-[radial-gradient(circle_at_1px_1px,#e5e7eb_1px,transparent_0)]",
+            "[background-size:18px_18px]",
+          ].join(" ")}
+      >
+        <div className="mx-auto max-w-6xl px-4 py-6 space-y-6">
         {/* 헤더 */}
-        <section className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <section className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-xl font-bold text-slate-900">
-              💰 적금 · 목표 저축 관리
-            </h1>
-            <p className="mt-2 text-base text-slate-600">
-              월 불입 총액과 진행률을 한눈에 정리합니다.
+            <h1 className="text-xl font-bold text-slate-900">💰 적금 · 목표 저축</h1>
+            <p className="mt-1 text-sm text-slate-600">
+              항목은 목록에서 보고, 추가/수정은 팝업에서 처리합니다.
             </p>
           </div>
-          {loading && (
-            <div className="text-sm text-slate-400">
-              불러오는 중...
-            </div>
-          )}
+
+          <div className="flex items-center gap-2">
+            {loading && <div className="text-xs text-slate-400">불러오는 중…</div>}
+            <button
+              type="button"
+              onClick={openCreateModal}
+              className="rounded-full px-4 py-2 text-sm font-semibold shadow-sm"
+              style={{ backgroundColor: BRAND_ORANGE, color: "#fff" }}
+              disabled={saving}
+            >
+              새 항목 추가
+            </button>
+          </div>
         </section>
 
-        {/* 에러 메시지 */}
+        {/* 에러 */}
         {errorMsg && (
-          <section className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <section className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {errorMsg}
           </section>
         )}
 
-        {/* 요약 카드 */}
+        {/* 요약 */}
         <section className="grid gap-4 sm:grid-cols-3">
-          <div className="rounded-xl border border-orange-200 bg-white px-4 py-4 shadow-md">
-            <div className="text-sm font-medium text-slate-500">
-              등록된 적금/목표 수
-            </div>
-            <div className="mt-2 flex items-baseline gap-1">
-              <span className="text-3xl font-bold text-slate-900">
-                {plans.length}
-              </span>
-              <span className="text-sm text-slate-500">개</span>
-            </div>
-          </div>
-          <div className="rounded-xl border border-orange-200 bg-white px-4 py-4 shadow-md">
-            <div className="text-sm font-medium text-slate-500">
-              월 적금 총액
-            </div>
-            <div className="mt-2 flex items-baseline gap-1">
-              <span className="text-3xl font-bold text-slate-900">
-                {formatNumber(totalMonthlySaving)}
-              </span>
-              <span className="text-sm text-slate-500">
-                원 / 월
-              </span>
-            </div>
-          </div>
-          <div className="rounded-xl border border-orange-200 bg-white px-4 py-4 shadow-md">
-            <div className="text-sm font-medium text-slate-500">
-              1년 후 예상 적립액 (단순 합계)
-            </div>
-            <div className="mt-2 flex items-baseline gap-1">
-              <span className="text-3xl font-bold text-slate-900">
-                {formatNumber(expectedOneYear)}
-              </span>
-              <span className="text-sm text-slate-500">
-                원
-              </span>
-            </div>
-          </div>
+          <SummaryCard label="등록된 항목" value={`${plans.length}개`} />
+          <SummaryCard label="월 불입 총액" value={`${formatNumber(totalMonthlySaving)}원/월`} />
+          <SummaryCard label="1년 예상 적립액" value={`${formatNumber(expectedOneYear)}원`} />
         </section>
 
-        {/* 본문: 리스트 + 입력폼 */}
-        <section className="grid gap-6 lg:grid-cols-[minmax(0,1.8fr)_minmax(0,1.2fr)]">
-          {/* 리스트 영역 */}
-          <div className="rounded-xl border border-slate-200 bg-white shadow-lg">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
-              <h2 className="text-base font-semibold text-slate-900">
-                적금 목록
-              </h2>
-              <span className="text-xs text-slate-500">
-                항목 클릭 시 오른쪽 폼으로 불러옵니다.
-              </span>
+        {/* 목록만 남김 */}
+        <section className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+            <div>
+              <h2 className="text-sm font-semibold text-slate-900">적금 목록</h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                행을 클릭하면 수정 팝업이 뜹니다.
+              </p>
             </div>
 
-            {/* 데스크탑: 테이블 레이아웃 */}
-            <div className="hidden md:block overflow-x-auto">
-              {/* 테이블 헤더의 불필요한 공백/줄바꿈 제거 */}
-              <table className="min-w-full border-separate border-spacing-y-2 text-sm">
-                <thead className="text-xs text-slate-500 whitespace-nowrap">
-                  <tr className="align-middle">
-                    <th className="px-3 py-3 text-left w-48">상품/목표</th>
-                    <th className="px-3 py-3 text-left w-28">은행</th>
-                    <th className="px-3 py-3 text-right w-32">월 불입액</th>
-                    <th className="px-3 py-3 text-right w-36">목표 금액</th>
-                    <th className="px-3 py-3 text-center w-24">시작월/일</th>
-                    <th className="px-3 py-3 text-center w-20">이체일</th>
-                    <th className="px-3 py-3 text-left w-64">진행 상황</th>
-                    <th className="px-3 py-3 text-center w-20">관리</th>
+            <div className="flex items-center gap-2">
+              <select
+                className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700"
+                value={sortKey}
+                onChange={(e) => setSortKey(e.target.value as SortKey)}
+              >
+                <option value="created_at">생성순</option>
+                <option value="name">이름</option>
+                <option value="monthly_amount">월 불입액</option>
+                <option value="progress">진행률</option>
+              </select>
+              <select
+                className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700"
+                value={sortDir}
+                onChange={(e) => setSortDir(e.target.value as SortDir)}
+              >
+                <option value="asc">오름차순</option>
+                <option value="desc">내림차순</option>
+              </select>
+            </div>
+          </div>
+
+          {/* 데스크탑 테이블 */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="text-xs text-slate-500 bg-slate-50">
+                <tr className="whitespace-nowrap">
+                  <th className="px-3 py-3 text-center">상품/목표</th>
+                  <th className="px-3 py-3 text-center">은행</th>
+                  <th className="px-3 py-3 text-center">월 불입</th>
+                  <th className="px-3 py-3 text-center">목표</th>
+                  <th className="px-3 py-3 text-center">시작월</th>
+                  <th className="px-3 py-3 text-center">이체일</th>
+                  <th className="px-3 py-3 text-center">진행</th>
+                  <th className="px-3 py-3 text-center">관리</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {!loading && sortedPlans.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="px-3 py-10 text-center text-sm text-slate-400">
+                      아직 등록된 적금이 없습니다. “새 항목 추가”로 시작하세요.
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="align-middle">
-                  {!loading && plans.length === 0 && (
-                    <tr>
-                      <td colSpan={8} className="px-3 py-8 text-center text-sm text-slate-400 whitespace-nowrap">
-                        아직 등록된 적금이 없습니다. 오른쪽에서 첫 적금을 추가해 보세요.
-                      </td>
-                    </tr>
-                  )}
-                  {plans.map((p) => {
-                    const months = getMonthsSince(p.start_month);
-                    const expectedByMonth = months * (p.monthly_amount || 0);
-                    const savedSoFar =
-                      p.current_amount != null
-                        ? p.current_amount
-                        : expectedByMonth;
-                    const progress =
-                      p.goal_amount && p.goal_amount > 0
-                        ? Math.min(
-                            100,
-                            Math.floor(
-                              (savedSoFar / (p.goal_amount || 1)) * 100
-                            )
-                          )
-                        : 0;
+                )}
 
-                    return (
-                      // <tr> 태그 내부에 불필요한 공백 제거
-                      <tr key={p.id} className={`cursor-pointer transition hover:bg-orange-50/60 ${form.id === p.id ? 'bg-orange-100/50' : ''}`} onClick={() => handleEdit(p)}>
-                        <td className="px-3 py-3 align-top whitespace-nowrap">
-                          <div className="font-semibold text-slate-900 leading-snug">
-                            {p.name || "-"}
-                          </div>
-                          {(p.start_date || p.end_date) && (
-                            <div className="mt-1 text-[11px] text-slate-500 leading-snug">
-                              {p.start_date && (
-                                <span>신규일: {p.start_date}</span>
-                              )}
-                              {p.end_date && (
-                                <>
-                                  {p.start_date && (
-                                    <span className="mx-1">·</span>
-                                  )}
-                                  <span>만기일: {p.end_date}</span>
-                                </>
-                              )}
-                            </div>
-                          )}
-                          {p.memo && (
-                            <div className="mt-1 text-[11px] text-slate-500 leading-snug line-clamp-1 w-44">
-                              {p.memo}
-                            </div>
-                          )}
-                        </td>
-                        <td className="px-3 py-3 text-slate-800 leading-snug whitespace-nowrap">
-                          {p.bank || "-"}
-                        </td>
-                        <td className="px-3 py-3 text-right font-medium text-slate-900 leading-snug whitespace-nowrap">
-                          {formatNumber(p.monthly_amount)}
-                        </td>
-                        <td className="px-3 py-3 text-right text-slate-800 leading-snug whitespace-nowrap">
-                          {p.goal_amount ? formatNumber(p.goal_amount) : "-"}
-                        </td>
-                        <td className="px-3 py-3 text-center text-slate-800 leading-snug whitespace-nowrap">
-                          {p.start_month || "-"}
-                        </td>
-                        <td className="px-3 py-3 text-center text-slate-800 leading-snug whitespace-nowrap">
-                          {p.auto_transfer_day ?? "-"}
-                        </td>
-                        <td className="px-3 py-3 leading-snug">
-                          <div className="flex items-center gap-2">
-                            <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
-                              <div
-                                className="h-2 rounded-full transition-all duration-300"
-                                style={{
-                                  width: `${progress}%`,
-                                  backgroundColor: BRAND_ORANGE,
-                                }}
-                              />
-                            </div>
-                            <span className="w-12 text-right text-xs font-semibold text-slate-800">
-                              {progress}%
-                            </span>
-                          </div>
-                          <div className="mt-1 text-[11px] font-medium text-slate-700 leading-snug whitespace-nowrap">
-                            현재 {formatNumber(savedSoFar)}원
-                          </div>
-                          {months > 0 && (
-                            <div className="text-[11px] text-slate-500 leading-snug whitespace-nowrap">
-                              ({months}개월차)
-                            </div>
-                          )}
-                        </td>
-                        <td className="px-3 py-3 text-center align-middle">
-                          <button
-                            type="button"
-                            className="inline-flex items-center rounded-full border border-slate-200 px-3 py-1 text-xs text-slate-500 hover:border-red-300 hover:text-red-500 transition"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(p.id);
-                            }}
-                            disabled={saving}
-                          >
-                            삭제
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                {sortedPlans.map((p) => {
+                  const { savedSoFar, progress } = calcProgress(p);
+                  const active = activeId === p.id;
 
-            {/* 모바일: 카드 레이아웃 */}
-            <div className="md:hidden divide-y divide-slate-100">
-              {!loading && plans.length === 0 && (
-                <div className="px-4 py-6 text-center text-xs text-slate-400">
-                  아직 등록된 적금이 없습니다. 아래에서 첫 적금을 추가해
-                  보세요.
-                </div>
-              )}
-              {plans.map((p) => {
-                const months = getMonthsSince(p.start_month);
-                const expectedByMonth =
-                  months * (p.monthly_amount || 0);
-                const savedSoFar =
-                  p.current_amount != null
-                    ? p.current_amount
-                    : expectedByMonth;
-                const progress =
-                  p.goal_amount && p.goal_amount > 0
-                    ? Math.min(
-                        100,
-                        Math.floor(
-                          (savedSoFar / (p.goal_amount || 1)) * 100
-                        )
-                      )
-                    : 0;
-
-                return (
-                  <button
-                    key={p.id}
-                    type="button"
-                    className="w-full text-left px-4 py-4 transition hover:bg-orange-50/10 active:bg-orange-50/50"
-                    onClick={() => handleEdit(p)}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1 space-y-1">
-                        <div className="font-semibold text-slate-900 text-sm">
+                  return (
+                    <tr
+                      key={p.id}
+                      className={[
+                        "border-b border-slate-100 cursor-pointer",
+                        active ? "bg-orange-50/60" : "hover:bg-slate-50",
+                      ].join(" ")}
+                      onClick={() => openEditModal(p)}
+                    >
+                      <td className="px-3 py-3">
+                        <div
+                          className="font-semibold text-slate-900 truncate max-w-[320px]"
+                          title={p.name || ""}
+                        >
                           {p.name || "-"}
                         </div>
-
-                        {/* 상세 정보 */}
-                        <div className="text-[11px] text-slate-500 leading-snug">
-                          {p.bank && <span>{p.bank}</span>}
-                          {p.start_month && (
-                            <>
-                              {p.bank && <span className="mx-1">·</span>}
-                              <span>시작 {p.start_month}</span>
-                            </>
-                          )}
-                          {p.auto_transfer_day && (
-                            <>
-                              <span className="mx-1">·</span>
-                              <span>{p.auto_transfer_day}일 이체</span>
-                            </>
-                          )}
-                        </div>
-                        {(p.start_date || p.end_date) && (
-                          <div className="text-[11px] text-slate-500 leading-snug">
-                            {p.start_date && <span>신규일 {p.start_date}</span>}
-                            {p.end_date && (
-                              <>
-                                {p.start_date && <span className="mx-1">·</span>}
-                                <span>만기일 {p.end_date}</span>
-                              </>
-                            )}
-                          </div>
-                        )}
                         {p.memo && (
-                          <div className="text-[11px] text-slate-500 leading-snug line-clamp-1">
+                          <div className="mt-1 text-[11px] text-slate-500 truncate max-w-[320px]" title={p.memo}>
                             {p.memo}
                           </div>
                         )}
-                      </div>
-                      
-                      {/* 금액 정보 */}
-                      <div className="text-right text-sm text-slate-700 min-w-[100px] space-y-1">
-                        <div className="font-medium">월 {formatNumber(p.monthly_amount)}원</div>
-                        {p.goal_amount && (
-                          <div className="text-[11px] text-slate-500">
-                            목표 {formatNumber(p.goal_amount)}원
+                      </td>
+
+                      <td className="px-3 py-3 text-slate-800 text-center whitespace-nowrap">
+                        {p.bank || "-"}
+                      </td>
+
+                      <td className="px-3 py-3 text-slate-900 text-center whitespace-nowrap">
+                        {formatNumber(p.monthly_amount)}
+                      </td>
+
+                      <td className="px-3 py-3 text-slate-800 text-center whitespace-nowrap">
+                        {p.goal_amount ? formatNumber(p.goal_amount) : "-"}
+                      </td>
+
+                      <td className="px-3 py-3 text-slate-800 text-center whitespace-nowrap">
+                        {p.start_month || "-"}
+                      </td>
+
+                      <td className="px-3 py-3 text-slate-800 text-center whitespace-nowrap">
+                        {p.auto_transfer_day ?? "-"}
+                      </td>
+
+                      <td className="px-3 py-3">
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden min-w-[120px]">
+                            <div
+                              className="h-2 rounded-full transition-all"
+                              style={{ width: `${progress}%`, backgroundColor: BRAND_ORANGE }}
+                            />
                           </div>
-                        )}
-                        <div className="text-xs font-semibold text-slate-900 pt-1">
+                          <span className="text-xs font-semibold text-slate-700 w-12 text-right">
+                            {progress}%
+                          </span>
+                        </div>
+
+                        <div className="mt-1 text-[11px] text-slate-600 truncate">
                           현재 {formatNumber(savedSoFar)}원
                         </div>
-                      </div>
-                    </div>
-                    {/* 진행률 바 */}
-                    <div className="mt-3 space-y-1">
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
-                          <div
-                            className="h-2 rounded-full"
-                            style={{
-                              width: `${progress}%`,
-                              backgroundColor: BRAND_ORANGE,
-                            }}
-                          />
-                        </div>
-                        <span className="text-xs font-semibold text-slate-600">
-                          {progress}%
-                        </span>
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+                      </td>
+
+                      <td className="px-3 py-3 text-center">
+                        <button
+                          type="button"
+                          className="rounded-full border border-slate-200 px-3 py-1 text-[11px] text-slate-600 hover:border-red-200 hover:text-red-600 disabled:opacity-50"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(p.id);
+                          }}
+                          disabled={saving}
+                        >
+                          삭제
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
 
-          {/* 입력 폼 */}
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-lg h-fit">
-            <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold text-slate-900">
-                {form.id ? "✏️ 적금 항목 수정" : "➕ 새 적금 추가"}
-              </h2>
-              {form.id && (
-                <button
-                  type="button"
-                  className="text-xs text-slate-500 underline-offset-2 hover:underline"
-                  onClick={resetForm}
-                  disabled={saving}
+          {/* 모바일 카드 */}
+          <div className="md:hidden divide-y divide-slate-100">
+            {!loading && sortedPlans.length === 0 && (
+              <div className="px-4 py-8 text-center text-xs text-slate-400">
+                아직 등록된 적금이 없습니다. “새 항목 추가”로 시작하세요.
+              </div>
+            )}
+
+            {sortedPlans.map((p) => {
+              const { months, savedSoFar, progress } = calcProgress(p);
+              const active = activeId === p.id;
+
+              return (
+                <div
+                  key={p.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => openEditModal(p)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      openEditModal(p);
+                    }
+                  }}
+                  className={[
+                    "px-4 py-4 cursor-pointer select-none",
+                    active ? "bg-orange-50/60" : "hover:bg-slate-50",
+                  ].join(" ")}
                 >
-                  새로 입력
-                </button>
-              )}
-            </div>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-slate-900 text-sm truncate">
+                        {p.name || "-"}
+                      </div>
+                      <div className="mt-1 text-[11px] text-slate-500 truncate">
+                        {(p.bank || "-") + " · " + (p.start_month || "-") + " · " + (p.auto_transfer_day ?? "-") + "일"}
+                      </div>
+                      {p.memo && <div className="mt-2 text-[11px] text-slate-500 line-clamp-2">{p.memo}</div>}
+                    </div>
 
-            <form className="space-y-4 pt-4" onSubmit={handleSubmit}>
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-slate-700">
-                  상품/목표 이름 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 transition duration-150"
-                  placeholder="예: 청년도약계좌, 3년 뒤 전세 자금"
-                  value={form.name}
-                  onChange={(e) => handleChange("name", e.target.value)}
-                />
-              </div>
+                    <div className="text-right min-w-[108px]">
+                      <div className="text-xs text-slate-600">월 불입</div>
+                      <div className="font-semibold text-slate-900">
+                        {formatNumber(p.monthly_amount)}원
+                      </div>
+                      <div className="mt-1 text-[11px] text-slate-600">
+                        현재 {formatNumber(savedSoFar)}원
+                      </div>
+                      {months > 0 && <div className="text-[11px] text-slate-500">({months}개월차)</div>}
+                    </div>
+                  </div>
 
-              {/* 금액 및 은행 */}
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-slate-700">
-                    은행/상품사
-                  </label>
-                  <input
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
-                    placeholder="예: 카카오뱅크, 국민은행"
-                    value={form.bank}
-                    onChange={(e) => handleChange("bank", e.target.value)}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-slate-700">
-                    월 불입액(원) <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-right outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
-                    inputMode="numeric"
-                    placeholder="예: 700000"
-                    value={formatNumber(Number(form.monthlyAmount))} // 쉼표 표시
-                    onChange={(e) =>
-                      handleChange(
-                        "monthlyAmount",
-                        e.target.value.replace(/[^0-9]/g, "")
-                      )
-                    }
-                  />
-                </div>
-              </div>
+                  <div className="mt-3 flex items-center gap-2">
+                    <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+                      <div className="h-2 rounded-full" style={{ width: `${progress}%`, backgroundColor: BRAND_ORANGE }} />
+                    </div>
+                    <span className="text-xs font-semibold text-slate-700 w-12 text-right">{progress}%</span>
+                  </div>
 
-              {/* 목표 금액 및 시작 월 */}
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-slate-700">
-                    목표 금액(원)
-                  </label>
-                  <input
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-right outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
-                    inputMode="numeric"
-                    placeholder="예: 42700000"
-                    value={formatNumber(Number(form.goalAmount))} // 쉼표 표시
-                    onChange={(e) =>
-                      handleChange(
-                        "goalAmount",
-                        e.target.value.replace(/[^0-9]/g, "")
-                      )
-                    }
-                  />
+                  <div className="mt-3 flex justify-end">
+                    <button
+                      type="button"
+                      className="rounded-full border border-slate-200 px-3 py-1 text-[11px] text-slate-600 hover:border-red-200 hover:text-red-600 disabled:opacity-50"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(p.id);
+                      }}
+                      disabled={saving}
+                    >
+                      삭제
+                    </button>
+                  </div>
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-slate-700">
-                    시작월 (YYYY-MM)
-                  </label>
-                  <input
-                    type="month"
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none text-slate-800 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
-                    value={form.startMonth}
-                    onChange={(e) =>
-                      handleChange("startMonth", e.target.value)
-                    }
-                  />
-                </div>
-              </div>
-
-              {/* 현재 금액 및 이체일 */}
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-slate-700">
-                    현재까지 납입 금액(원)
-                  </label>
-                  <input
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-right outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
-                    inputMode="numeric"
-                    placeholder="예: 6300000"
-                    value={formatNumber(Number(form.currentAmount))} // 쉼표 표시
-                    onChange={(e) =>
-                      handleChange(
-                        "currentAmount",
-                        e.target.value.replace(/[^0-9]/g, "")
-                      )
-                    }
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-slate-700">
-                    자동이체일(일)
-                  </label>
-                  <input
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-right outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
-                    inputMode="numeric"
-                    placeholder="예: 27"
-                    value={form.autoTransferDay}
-                    onChange={(e) =>
-                      handleChange(
-                        "autoTransferDay",
-                        e.target.value.replace(/[^0-9]/g, "")
-                      )
-                    }
-                  />
-                </div>
-              </div>
-
-              {/* 신규일 / 만기일 */}
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-slate-700">
-                  신규일 / 만기일 (YYYY-MM-DD)
-                </label>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <input
-                    type="date"
-                    className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none text-slate-800 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
-                    value={form.startDate}
-                    onChange={(e) =>
-                      handleChange("startDate", e.target.value)
-                    }
-                  />
-                  <input
-                    type="date"
-                    className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none text-slate-800 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
-                    value={form.endDate}
-                    onChange={(e) => handleChange("endDate", e.target.value)}
-                  />
-                </div>
-              </div>
-
-              {/* 메모 */}
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-slate-700">
-                  메모 (선택)
-                </label>
-                <textarea
-                  className="w-full min-h-[80px] rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
-                  placeholder="예: 우대조건, 중도해지 이율, 특약사항 등"
-                  value={form.memo}
-                  onChange={(e) => handleChange("memo", e.target.value)}
-                />
-              </div>
-
-              {/* 버튼 */}
-              <div className="flex justify-end gap-3 pt-3">
-                {form.id && (
-                  <button
-                    type="button"
-                    className="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 transition duration-150"
-                    onClick={resetForm}
-                    disabled={saving}
-                  >
-                    취소
-                  </button>
-                )}
-                <button
-                  type="submit"
-                  className="rounded-full px-4 py-2 text-sm font-semibold shadow-md transition duration-150"
-                  style={{ backgroundColor: BRAND_ORANGE, color: "#fff" }}
-                  disabled={saving}
-                >
-                  {saving
-                    ? "저장 중..."
-                    : form.id
-                    ? "수정 완료"
-                    : "적금 추가"}
-                </button>
-              </div>
-            </form>
+              );
+            })}
           </div>
         </section>
+
+        {/* ✅ 모달 */}
+        <SavingPlanModal
+          open={isModalOpen}
+          title={form.id ? "항목 수정" : "새 항목 추가"}
+          saving={saving}
+          onClose={closeModal}
+          onSubmit={handleSubmit}
+        >
+          <div className="space-y-4">
+            <Field label="상품/목표 이름" required>
+              <input
+                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                placeholder="예: 청년도약계좌, 3년 뒤 전세자금"
+                value={form.name}
+                onChange={(e) => handleChange("name", e.target.value)}
+              />
+            </Field>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field label="은행/상품사">
+                <input
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                  placeholder="예: 국민은행, 카카오뱅크"
+                  value={form.bank}
+                  onChange={(e) => handleChange("bank", e.target.value)}
+                />
+              </Field>
+
+              <Field label="월 불입액(원)" required>
+                <input
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-right outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                  inputMode="numeric"
+                  placeholder="예: 700000"
+                  value={formatWonFromDigits(form.monthlyAmount)}
+                  onChange={(e) => handleChange("monthlyAmount", onlyDigits(e.target.value))}
+                />
+              </Field>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field label="목표 금액(원)">
+                <input
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-right outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                  inputMode="numeric"
+                  placeholder="예: 42700000"
+                  value={formatWonFromDigits(form.goalAmount)}
+                  onChange={(e) => handleChange("goalAmount", onlyDigits(e.target.value))}
+                />
+              </Field>
+
+              <Field label="시작월(YYYY-MM)">
+                <input
+                  type="month"
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none text-slate-800 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                  value={form.startMonth}
+                  onChange={(e) => handleChange("startMonth", e.target.value)}
+                />
+              </Field>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field label="현재까지 납입 금액(원)">
+                <input
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-right outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                  inputMode="numeric"
+                  placeholder="예: 6300000"
+                  value={formatWonFromDigits(form.currentAmount)}
+                  onChange={(e) => handleChange("currentAmount", onlyDigits(e.target.value))}
+                />
+              </Field>
+
+              <Field label="자동이체일(1~31)">
+                <input
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-right outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                  inputMode="numeric"
+                  placeholder="예: 27"
+                  value={form.autoTransferDay}
+                  onChange={(e) => handleChange("autoTransferDay", clampDay(onlyDigits(e.target.value)))}
+                />
+              </Field>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field label="신규일">
+                <input
+                  type="date"
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none text-slate-800 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                  value={form.startDate}
+                  onChange={(e) => handleChange("startDate", e.target.value)}
+                />
+              </Field>
+
+              <Field label="만기일">
+                <input
+                  type="date"
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none text-slate-800 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                  value={form.endDate}
+                  onChange={(e) => handleChange("endDate", e.target.value)}
+                />
+              </Field>
+            </div>
+
+            <Field label="메모(선택)">
+              <textarea
+                className="w-full min-h-[90px] rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                placeholder="예: 우대조건/중도해지/특약 등"
+                value={form.memo}
+                onChange={(e) => handleChange("memo", e.target.value)}
+              />
+            </Field>
+
+            <div className="flex justify-end gap-3 pt-1">
+              <button
+                type="button"
+                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                onClick={closeModal}
+                disabled={saving}
+              >
+                취소
+              </button>
+
+              <button
+                type="submit"
+                className="rounded-full px-4 py-2 text-sm font-semibold shadow-sm disabled:opacity-50"
+                style={{ backgroundColor: BRAND_ORANGE, color: "#fff" }}
+                disabled={saving}
+              >
+                {saving ? "저장 중..." : form.id ? "수정 완료" : "적금 추가"}
+              </button>
+            </div>
+
+            <p className="text-[11px] text-slate-500">
+              * 월 불입액은 필수입니다. 목표 금액을 입력하면 진행률(%) 계산이 가능합니다.
+            </p>
+          </div>
+        </SavingPlanModal>
+        </div>
       </main>
     </PageContainer>
+  );
+}
+
+/** 요약 카드 */
+function SummaryCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-orange-200 bg-white px-4 py-4 shadow-sm">
+      <div className="text-xs font-medium text-slate-500">{label}</div>
+      <div className="mt-2 text-xl font-bold text-slate-900">{value}</div>
+    </div>
+  );
+}
+
+/** 공통 필드 */
+function Field({
+  label,
+  required,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <label className="text-sm font-medium text-slate-700">
+        {label} {required && <span className="text-red-500">*</span>}
+      </label>
+      {children}
+    </div>
+  );
+}
+
+/** ✅ 아주 가벼운 모달(라이브러리 없이) */
+function SavingPlanModal({
+  open,
+  title,
+  saving,
+  onClose,
+  onSubmit,
+  children,
+}: {
+  open: boolean;
+  title: string;
+  saving: boolean;
+  onClose: () => void;
+  onSubmit: (e: React.FormEvent) => void;
+  children: React.ReactNode;
+}) {
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50">
+      {/* backdrop */}
+      <div
+        className="absolute inset-0 bg-black/40"
+        onClick={() => !saving && onClose()}
+      />
+
+      {/* modal */}
+      <div className="absolute inset-0 flex items-center justify-center p-4">
+        <div className="w-full max-w-[640px] rounded-2xl bg-white shadow-xl border border-slate-200 overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+            <div>
+              <div className="text-sm font-semibold text-slate-900">{title}</div>
+              <div className="mt-0.5 text-xs text-slate-500">
+                항목을 입력하고 저장하세요.
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+              onClick={onClose}
+              disabled={saving}
+            >
+              닫기
+            </button>
+          </div>
+
+          <form onSubmit={onSubmit} className="p-5">
+            {children}
+          </form>
+        </div>
+      </div>
+    </div>
   );
 }

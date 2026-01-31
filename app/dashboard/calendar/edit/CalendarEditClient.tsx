@@ -13,18 +13,10 @@ type MoneyItem = {
   id: string;
   label: string;
   amount: number;
-};
 
-/** 새로운 형식 (참고용) */
-type DailyRecipeNew = {
-  incomeItems: MoneyItem[];
-  expenseItems: MoneyItem[];
-  savingItems: MoneyItem[];
-  incomeTotal: number;
-  expenseTotal: number;
-  savingTotal: number;
-  createdAt?: string;
-  updatedAt?: string;
+  // ✅ 정기/수동 구분 메타 (jsonb에 같이 저장됨)
+  source?: "recurring" | "manual";
+  rule_id?: number;
 };
 
 type FormState = {
@@ -51,7 +43,68 @@ function createItem(defaultLabel = ""): MoneyItem {
     id: crypto.randomUUID(),
     label: defaultLabel,
     amount: 0,
+    source: "manual",
   };
+}
+
+function isRecurringItem(it: MoneyItem) {
+  return it?.source === "recurring" || typeof it?.rule_id === "number";
+}
+
+function normalizeLabel(s: any) {
+  return String(s ?? "")
+    .trim()
+    .replace(/\u00A0/g, " ")
+    .replace(/\s+/g, " ");
+}
+
+/* =========================
+   ✅ 정기/수동 중복 제거 유틸
+   - 정기 항목([R] 또는 source/rule_id)이 존재할 때,
+   - 같은 제목(접두어 제거 기준) + 같은 금액인 수동 항목만 제거
+   ========================= */
+
+// ✅ [R] 제거 + 괄호(연도/메모) 제거 + 공백 정규화
+function baseTitle(label: any) {
+  let s = normalizeLabel(label).replace(/^\[R\]\s*/i, "");
+
+  // 1) 괄호 안 내용 제거: (2026), （2026）, (재계약) 등
+  s = s.replace(/\([^)]*\)/g, " ");
+  s = s.replace(/（[^）]*）/g, " ");
+
+  // 2) 뒤에 붙는 연도/월 같은 숫자 꼬리표 제거(원하면 더 엄격/완화 가능)
+  //    예: "월급 2026", "월급-2026", "월급_2026" → "월급"
+  s = s.replace(/[\s\-_]*\d{4}(\d{2})?$/g, " ");
+
+  // 3) 최종 공백 정리
+  s = s.replace(/\s+/g, " ").trim();
+  return s;
+}
+
+function isSameRecurringAsManual(rec: MoneyItem, manual: MoneyItem) {
+  // ✅ 같은 '베이스 타이틀' + 같은 금액이면 중복으로 판단
+  return (
+    baseTitle(rec.label) === baseTitle(manual.label) &&
+    (Number(rec.amount) || 0) === (Number(manual.amount) || 0)
+  );
+}
+
+function dedupeManualSameAsRecurring(items: MoneyItem[]) {
+  const arr = Array.isArray(items) ? items : [];
+
+  const recurringList = arr.filter((it) => it && isRecurringItem(it)) as MoneyItem[];
+  if (recurringList.length === 0) return arr;
+
+  return arr.filter((it) => {
+    if (!it) return false;
+    if (isRecurringItem(it)) return true;
+
+    // ✅ 어떤 정기 항목과라도 (베이스 타이틀 + 금액) 동일이면 수동은 제거
+    for (const rec of recurringList) {
+      if (isSameRecurringAsManual(rec, it)) return false;
+    }
+    return true;
+  });
 }
 
 
@@ -74,114 +127,132 @@ export default function CalendarEditClient() {
     expenseItems: [createItem()],
     savingItems: [createItem()],
   });
+
   const [loading, setLoading] = useState(false);
 
   /** 1) dateParam이 바뀔 때마다 Supabase에서 해당 날짜 데이터 조회 */
-// 1) dateParam이 바뀔 때마다 Supabase에서 해당 날짜 데이터 조회
-useEffect(() => {
-  if (!dateParam) return;
-  const dateKey = dateParam as string;
+  useEffect(() => {
+    if (!dateParam) return;
+    const dateKey = dateParam as string;
 
-  let cancelled = false;
+    let cancelled = false;
 
-  async function fetchFromSupabase() {
-    try {
-      setLoading(true);
+    async function fetchFromSupabase() {
+      try {
+        setLoading(true);
 
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
 
-      if (authError) {
-        console.warn("Supabase auth error (daily_recipes load):", authError);
-        setLoading(false);
-        return;
-      }
-      if (!user) {
-        setLoading(false);
-        return;
-      }
+        if (authError) {
+          console.warn("Supabase auth error (daily_recipes load):", authError);
+          setLoading(false);
+          return;
+        }
+        if (!user) {
+          setLoading(false);
+          return;
+        }
 
-      const { data, error } = await supabase
-        .from("daily_recipes")
-        .select(
-          `
-            income_items,
-            expense_items,
-            saving_items,
-            income_total,
-            expense_total,
-            saving_total
-          `
-        )
-        .eq("user_id", user.id)
-        .eq("date", dateKey)
-        .maybeSingle();
+        const { data, error } = await supabase
+          .from("daily_recipes")
+          .select(
+            `
+              income_items,
+              expense_items,
+              saving_items,
+              income_total,
+              expense_total,
+              saving_total
+            `
+          )
+          .eq("user_id", user.id)
+          .eq("date", dateKey)
+          .maybeSingle();
 
-      if (error) {
-        console.warn("Supabase daily_recipes load error:", error);
-        setLoading(false);
-        return;
-      }
-      if (cancelled) {
-        setLoading(false);
-        return;
-      }
+        if (error) {
+          console.warn("Supabase daily_recipes load error:", error);
+          setLoading(false);
+          return;
+        }
+        if (cancelled) {
+          setLoading(false);
+          return;
+        }
 
-      if (!data) {
-        // 해당 날짜 데이터가 없으면 빈 폼
+        if (!data) {
+          // 해당 날짜 데이터가 없으면 빈 폼
+          setForm({
+            incomeItems: [createItem()],
+            expenseItems: [createItem()],
+            savingItems: [createItem()],
+          });
+          setLoading(false);
+          return;
+        }
+
+        // Supabase row -> 폼으로 (✅ source/rule_id 보존)
+        const normalizeItems = (arr: any[] | null, section: SectionKey): MoneyItem[] => {
+          const items = Array.isArray(arr) ? arr : [];
+          return items.map((it, idx) => {
+            const label = normalizeLabel(it?.label);
+            const amount = Number(it?.amount ?? 0) || 0;
+
+            // ✅ id가 없거나 비어 있으면 생성 (섹션/날짜/순번 기반)
+            const id =
+              typeof it?.id === "string" && it.id.trim()
+                ? it.id
+                : `legacy-${section}-${dateKey}-${idx}-${Math.random().toString(36).slice(2, 7)}`;
+
+            const source =
+              it?.source === "recurring"
+                ? "recurring"
+                : it?.source === "manual"
+                ? "manual"
+                : undefined;
+
+            const rule_id = typeof it?.rule_id === "number" ? it.rule_id : undefined;
+
+            return {
+              id,
+              label,
+              amount,
+              source: source ?? "manual",
+              rule_id,
+            };
+          });
+        };
+
+        // ✅ 원본 로드
+        const incomeItemsRaw = normalizeItems(data.income_items as any[] | null, "income");
+        const expenseItemsRaw = normalizeItems(data.expense_items as any[] | null, "expense");
+        const savingItemsRaw = normalizeItems(data.saving_items as any[] | null, "saving");
+
+        // ✅ 여기서 "정기+수동 중복" 제거 (화면 2줄 방지)
+        const incomeItems = dedupeManualSameAsRecurring(incomeItemsRaw);
+        const expenseItems = dedupeManualSameAsRecurring(expenseItemsRaw);
+        const savingItems = dedupeManualSameAsRecurring(savingItemsRaw);
+
         setForm({
-          incomeItems: [createItem()],
-          expenseItems: [createItem()],
-          savingItems: [createItem()],
+          incomeItems: incomeItems.length > 0 ? incomeItems : [createItem()],
+          expenseItems: expenseItems.length > 0 ? expenseItems : [createItem()],
+          savingItems: savingItems.length > 0 ? savingItems : [createItem()],
         });
+
         setLoading(false);
-        return;
+      } catch (err) {
+        console.error("Supabase daily_recipes load exception:", err);
+        setLoading(false);
       }
-
-      // Supabase row -> 폼으로
-const normalizeItems = (arr: any[] | null, section: SectionKey): MoneyItem[] => {
-  const items = Array.isArray(arr) ? arr : [];
-  return items.map((it, idx) => {
-    const label = typeof it?.label === "string" ? it.label : "";
-    const amount = Number(it?.amount ?? 0) || 0;
-
-    // ✅ id가 없거나 비어 있으면 생성 (섹션/날짜/순번 기반으로 안정성)
-    const id =
-      typeof it?.id === "string" && it.id.trim()
-        ? it.id
-        : `legacy-${section}-${dateKey}-${idx}-${Math.random().toString(36).slice(2, 7)}`;
-
-    return { id, label, amount };
-  });
-};
-
-const incomeItems = normalizeItems(data.income_items as any[] | null, "income");
-const expenseItems = normalizeItems(data.expense_items as any[] | null, "expense");
-const savingItems = normalizeItems(data.saving_items as any[] | null, "saving");
-
-
-      setForm({
-        incomeItems: incomeItems.length > 0 ? incomeItems : [createItem()],
-        expenseItems: expenseItems.length > 0 ? expenseItems : [createItem()],
-        savingItems: savingItems.length > 0 ? savingItems : [createItem()],
-      });
-
-      setLoading(false);
-    } catch (err) {
-      console.error("Supabase daily_recipes load exception:", err);
-      setLoading(false);
     }
-  }
 
-  fetchFromSupabase();
-
-  return () => {
-    cancelled = true;
-  };
-}, [dateParam]);
-
+    fetchFromSupabase();
+    return () => {
+      cancelled = true;
+    };
+  }, [dateParam]);
 
   /** 섹션별 아이템 접근용 유틸 */
   const getItems = (section: SectionKey) =>
@@ -227,16 +298,34 @@ const savingItems = normalizeItems(data.saving_items as any[] | null, "saving");
     value: string
   ) => {
     const items = getItems(section);
-    const next = items.map((item) =>
-      item.id === id
-        ? {
-            ...item,
-            [field]:
-              field === "amount" ? Number(value || 0) : (value as string),
-          }
-        : item
-    );
-    setItems(section, next);
+
+    const next = items.map((item) => {
+      if (item.id !== id) return item;
+
+      const recurring = isRecurringItem(item);
+
+      // ✅ 정기 항목은 label 변경 금지 (규칙 title과 정합성 유지)
+      if (field === "label" && recurring) return item;
+
+      // ✅ 정기 항목 amount 변경은 "이 날짜만" 예외(override) 성격 → UX 경고
+      if (field === "amount" && recurring) {
+        const ok = confirm(
+          "이 항목은 정기 규칙으로 생성된 항목입니다.\n" +
+            "여기서 금액을 바꾸면 '이 날짜만' 수정된 값으로 저장됩니다.\n" +
+            "정기 규칙(다음 달/다음 회차)의 금액은 바뀌지 않아요.\n\n" +
+            "계속할까요?"
+        );
+        if (!ok) return item;
+      }
+
+      return {
+        ...item,
+        [field]: field === "amount" ? Number(value || 0) : (value as string),
+      };
+    });
+
+    // ✅ 사용자가 편집한 뒤에도 화면에서 "정기+수동(완전 동일)"이 생기면 제거
+    setItems(section, dedupeManualSameAsRecurring(next));
   };
 
   const handleRemoveItem = (section: SectionKey, id: string) => {
@@ -251,81 +340,77 @@ const savingItems = normalizeItems(data.saving_items as any[] | null, "saving");
     );
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  if (!dateParam) {
-    alert("날짜 정보가 없어 저장할 수 없습니다.");
-    return;
-  }
-  const dateKey = dateParam as string;
-
-const ensureIds = (items: MoneyItem[]) =>
-  items.map((i) => ({ ...i, id: i.id?.trim() ? i.id : crypto.randomUUID() }));
-
-const cleanedIncome = ensureIds(form.incomeItems).filter((i) => i.label.trim() || i.amount);
-const cleanedExpense = ensureIds(form.expenseItems).filter((i) => i.label.trim() || i.amount);
-const cleanedSaving = ensureIds(form.savingItems).filter((i) => i.label.trim() || i.amount);
-
-
-  // 합계는 그대로 사용
-  const now = new Date().toISOString();
-
-  try {
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError) {
-      console.warn("Supabase auth error (daily_recipes save):", authError);
-      alert("로그인 정보를 불러오지 못했어요. 다시 로그인해 주세요.");
+    if (!dateParam) {
+      alert("날짜 정보가 없어 저장할 수 없습니다.");
       return;
     }
+    const dateKey = dateParam as string;
 
-    if (!user) {
-      alert("로그인 후에 레시피를 서버에 저장할 수 있어요.");
-      router.push("/sign-in");
-      return;
+    const ensureIds = (items: MoneyItem[]) =>
+      items.map((i) => ({ ...i, id: i.id?.trim() ? i.id : crypto.randomUUID() }));
+
+    // ✅ 저장 직전에도 "정기+수동 중복" 제거 (DB 중복 누적 방지)
+    const fixedIncome = dedupeManualSameAsRecurring(form.incomeItems);
+    const fixedExpense = dedupeManualSameAsRecurring(form.expenseItems);
+    const fixedSaving = dedupeManualSameAsRecurring(form.savingItems);
+
+    // ✅ label/amount 비었으면 제거
+    const cleanedIncome = ensureIds(fixedIncome).filter((i) => normalizeLabel(i.label) || i.amount);
+    const cleanedExpense = ensureIds(fixedExpense).filter((i) => normalizeLabel(i.label) || i.amount);
+    const cleanedSaving = ensureIds(fixedSaving).filter((i) => normalizeLabel(i.label) || i.amount);
+
+    try {
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+
+      if (authError) {
+        console.warn("Supabase auth error (daily_recipes save):", authError);
+        alert("로그인 정보를 불러오지 못했어요. 다시 로그인해 주세요.");
+        return;
+      }
+
+      if (!user) {
+        alert("로그인 후에 레시피를 서버에 저장할 수 있어요.");
+        router.push("/sign-in");
+        return;
+      }
+
+      // ✅ 정기 메타(source/rule_id)를 그대로 저장해야 정기 반영 로직이 안정적으로 동작
+      const { error: upsertError } = await supabase
+        .from("daily_recipes")
+        .upsert(
+          {
+            user_id: user.id,
+            date: dateKey,
+            income_items: cleanedIncome,
+            expense_items: cleanedExpense,
+            saving_items: cleanedSaving,
+            income_total: cleanedIncome.reduce((s, i) => s + (i.amount || 0), 0),
+            expense_total: cleanedExpense.reduce((s, i) => s + (i.amount || 0), 0),
+            saving_total: cleanedSaving.reduce((s, i) => s + (i.amount || 0), 0),
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "user_id,date" }
+        );
+
+      if (upsertError) {
+        console.error("daily_recipes upsert 실패:", upsertError.message);
+        alert("서버에 레시피 저장 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요.");
+        return;
+      }
+
+      alert("오늘 지출 레시피가 저장되었어요!");
+      router.push("/dashboard/calendar");
+    } catch (err) {
+      console.error("daily_recipes 저장 처리 중 오류:", err);
+      alert("서버에 레시피 저장 중 알 수 없는 오류가 발생했어요.");
     }
-
-    const { error: upsertError } = await supabase
-      .from("daily_recipes")
-      .upsert(
-        {
-          user_id: user.id,
-          date: dateKey,
-          // 새 구조만 저장
-          income_items: cleanedIncome,
-          expense_items: cleanedExpense,
-          saving_items: cleanedSaving,
-          income_total: incomeTotal,
-          expense_total: expenseTotal,
-          saving_total: savingTotal,
-          // created_at / updated_at 컬럼을 DB에서 따로 관리한다면
-          // 트리거/DEFAULT로 처리하고 여기서는 안 보낸다.
-        },
-        {
-          onConflict: "user_id,date",
-        }
-      );
-
-    if (upsertError) {
-      console.error("daily_recipes upsert 실패:", upsertError.message);
-      alert(
-        "서버에 레시피 저장 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요."
-      );
-      return;
-    }
-
-    alert("오늘 지출 레시피가 저장되었어요!");
-    router.push("/dashboard/calendar");
-  } catch (err) {
-    console.error("daily_recipes 저장 처리 중 오류:", err);
-    alert("서버에 레시피 저장 중 알 수 없는 오류가 발생했어요.");
-  }
-};
-
+  };
 
   return (
     <main
@@ -353,7 +438,7 @@ const cleanedSaving = ensureIds(form.savingItems).filter((i) => i.label.trim() |
                 </h1>
               </div>
               <p className="text-[11px] sm:text-xs text-neutral-500">
-                수입·지출·적금 항목을 나눠서 기록해요.
+                수입·지출·적금 항목을 나눠서 기록해요. (정기 항목은 규칙에서 관리)
               </p>
             </div>
           </div>
@@ -371,11 +456,7 @@ const cleanedSaving = ensureIds(form.savingItems).filter((i) => i.label.trim() |
 
         {/* 내용 */}
         <section className="w-full max-w-full lg:max-w-[65vw] mx-auto flex flex-col">
-          <form
-            id="daily-recipe-form"
-            onSubmit={handleSubmit}
-            className="w-full space-y-4"
-          >
+          <form id="daily-recipe-form" onSubmit={handleSubmit} className="w-full space-y-4">
             {/* 날짜 정보 + 이전/다음날 이동 */}
             <div className="rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3 shadow-sm">
               <div className="flex items-center justify-between">
@@ -399,12 +480,7 @@ const cleanedSaving = ensureIds(form.savingItems).filter((i) => i.label.trim() |
                   <button
                     type="button"
                     onClick={() =>
-                      router.push(
-                        `/dashboard/calendar/edit?date=${getAdjacentDate(
-                          dateParam,
-                          -1
-                        )}`
-                      )
+                      router.push(`/dashboard/calendar/edit?date=${getAdjacentDate(dateParam, -1)}`)
                     }
                     className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-white/70 px-3 py-1 hover:bg-amber-50"
                   >
@@ -414,12 +490,7 @@ const cleanedSaving = ensureIds(form.savingItems).filter((i) => i.label.trim() |
                   <button
                     type="button"
                     onClick={() =>
-                      router.push(
-                        `/dashboard/calendar/edit?date=${getAdjacentDate(
-                          dateParam,
-                          +1
-                        )}`
-                      )
+                      router.push(`/dashboard/calendar/edit?date=${getAdjacentDate(dateParam, +1)}`)
                     }
                     className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-white/70 px-3 py-1 hover:bg-amber-50"
                   >
@@ -440,9 +511,7 @@ const cleanedSaving = ensureIds(form.savingItems).filter((i) => i.label.trim() |
                 total={incomeTotal}
                 items={form.incomeItems}
                 onAdd={() => handleAddItem("income")}
-                onChange={(id, field, value) =>
-                  handleItemChange("income", id, field, value)
-                }
+                onChange={(id, field, value) => handleItemChange("income", id, field, value)}
                 onRemove={(id) => handleRemoveItem("income", id)}
                 placeholderLabel="예: 편의점 알바비"
                 placeholderAmount="120000"
@@ -456,9 +525,7 @@ const cleanedSaving = ensureIds(form.savingItems).filter((i) => i.label.trim() |
                 total={expenseTotal}
                 items={form.expenseItems}
                 onAdd={() => handleAddItem("expense")}
-                onChange={(id, field, value) =>
-                  handleItemChange("expense", id, field, value)
-                }
+                onChange={(id, field, value) => handleItemChange("expense", id, field, value)}
                 onRemove={(id) => handleRemoveItem("expense", id)}
                 placeholderLabel="예: 점심·카페·택시"
                 placeholderAmount="34500"
@@ -472,9 +539,7 @@ const cleanedSaving = ensureIds(form.savingItems).filter((i) => i.label.trim() |
                 total={savingTotal}
                 items={form.savingItems}
                 onAdd={() => handleAddItem("saving")}
-                onChange={(id, field, value) =>
-                  handleItemChange("saving", id, field, value)
-                }
+                onChange={(id, field, value) => handleItemChange("saving", id, field, value)}
                 onRemove={(id) => handleRemoveItem("saving", id)}
                 placeholderLabel="예: 청약·적금·투자"
                 placeholderAmount="50000"
@@ -550,9 +615,7 @@ function RecipeCard({
         </div>
         <div className="text-right">
           <span className="block text-[10px] text-neutral-400">오늘 합계</span>
-          <span
-            className={`text-sm font-semibold ${totalColor} whitespace-nowrap`}
-          >
+          <span className={`text-sm font-semibold ${totalColor} whitespace-nowrap`}>
             {total ? total.toLocaleString("ko-KR") : 0}원
           </span>
         </div>
@@ -561,40 +624,76 @@ function RecipeCard({
       <div className="h-[1px] w-full bg-white/70 my-1" />
 
       <div className="space-y-1.5">
-        {items.map((item) => (
-          <div
-            key={item.id}
-            className="flex items-center gap-1.5 rounded-xl bg-white/70 px-2 py-1.5"
-          >
-            <input
-              type="text"
-              className="flex-1 min-w-0 rounded-md border border-neutral-200 px-2 py-1 text-[11px] outline-none focus:border-neutral-400"
-              placeholder={placeholderLabel}
-              value={item.label}
-              onChange={(e) => onChange(item.id, "label", e.target.value)}
-            />
-            <div className="relative w-24">
-              <input
-                type="number"
-                min={0}
-                className="w-full rounded-md border border-neutral-200 px-2 py-1 pr-7 text-[11px] text-right outline-none focus:border-neutral-400"
-                placeholder={placeholderAmount}
-                value={item.amount || ""}
-                onChange={(e) => onChange(item.id, "amount", e.target.value)}
-              />
-              <span className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 text-[9px] text-neutral-400">
-                원
-              </span>
-            </div>
-            <button
-              type="button"
-              onClick={() => onRemove(item.id)}
-              className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-neutral-200 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700"
+        {items.map((item) => {
+          const recurring = isRecurringItem(item);
+
+          return (
+            <div
+              key={item.id}
+              className="flex items-center gap-1.5 rounded-xl bg-white/70 px-2 py-1.5"
             >
-              <X size={12} />
-            </button>
-          </div>
-        ))}
+              <div className="flex-1 min-w-0 flex items-center gap-1">
+                <input
+                  type="text"
+                  readOnly={recurring}
+                  className={[
+                    "flex-1 min-w-0 rounded-md border px-2 py-1 text-[11px] outline-none focus:border-neutral-400",
+                    recurring
+                      ? "border-neutral-200 bg-neutral-100 text-neutral-600 cursor-not-allowed"
+                      : "border-neutral-200 bg-white",
+                  ].join(" ")}
+                  placeholder={placeholderLabel}
+                  value={item.label}
+                  onChange={(e) => onChange(item.id, "label", e.target.value)}
+                />
+
+                {recurring && (
+                  <span className="shrink-0 rounded-full bg-neutral-200 px-1.5 py-0.5 text-[9px] text-neutral-700">
+                    정기
+                  </span>
+                )}
+              </div>
+
+              <div className="relative w-24">
+                <input
+                  type="number"
+                  min={0}
+                  className={[
+                    "w-full rounded-md border px-2 py-1 pr-7 text-[11px] text-right outline-none focus:border-neutral-400",
+                    "border-neutral-200 bg-white",
+                  ].join(" ")}
+                  placeholder={placeholderAmount}
+                  value={item.amount || ""}
+                  onChange={(e) => onChange(item.id, "amount", e.target.value)}
+                  title={
+                    recurring
+                      ? "정기 항목 금액을 바꾸면 '이 날짜만' 수정됩니다. 규칙 자체는 바뀌지 않아요."
+                      : "금액"
+                  }
+                />
+                <span className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 text-[9px] text-neutral-400">
+                  원
+                </span>
+              </div>
+
+              {/* ✅ 정기 항목 삭제 버튼 비활성화 */}
+              <button
+                type="button"
+                disabled={recurring}
+                onClick={() => !recurring && onRemove(item.id)}
+                className={[
+                  "inline-flex h-6 w-6 items-center justify-center rounded-full border",
+                  recurring
+                    ? "border-neutral-200 text-neutral-300 cursor-not-allowed"
+                    : "border-neutral-200 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700",
+                ].join(" ")}
+                title={recurring ? "정기 규칙에서 관리되는 항목이에요" : "삭제"}
+              >
+                <X size={12} />
+              </button>
+            </div>
+          );
+        })}
       </div>
 
       <button
@@ -603,7 +702,7 @@ function RecipeCard({
         className="mt-1 inline-flex items-center justify-center gap-1 rounded-full border border-dashed border-neutral-300 bg-white/70 px-2.5 py-1 text-[11px] font-medium text-neutral-600 hover:bg-neutral-50"
       >
         <Plus size={12} />
-        항목 추가
+        항목 추가 (수동)
       </button>
     </section>
   );
