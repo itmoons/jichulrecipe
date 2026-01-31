@@ -512,7 +512,7 @@ export default function HomePage() {
                   return (
                     <div
                       key={idx}
-                      className="rounded-2xl bg-orange-50/40 border border-dashed border-orange-100/70"
+                      className="rounded-sx bg-orange-50/40 border border-dashed border-orange-100/70"
                     />
                   );
                 }
@@ -533,7 +533,7 @@ export default function HomePage() {
                   <div
                     key={idx}
                     className={[
-                      "relative flex flex-col rounded-2xl border px-1.5 py-1.5 text-left text-[10px] sm:text-[11px]",
+                      "relative flex flex-col rounded-[6px] border px-1.5 py-1.5 text-left text-[10px] sm:text-[11px]",
                       "bg-white/90",
                       hasAny
                         ? "border-orange-200 shadow-[0_2px_6px_rgba(248,153,75,0.15)]"
