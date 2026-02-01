@@ -463,7 +463,7 @@ export default function HomePage() {
               <div className="mt-4 flex flex-col items-center justify-between gap-2 border-t border-dashed border-orange-100 pt-3 text-[11px] text-slate-500 sm:flex-row">
                 <span>기본 레시피는 언제든지 조정할 수 있어요.</span>
                 <span className="rounded-full bg-orange-50 px-2 py-1 font-medium text-orange-500">
-                  예시 불러오기
+                  메인 지출레시피
                 </span>
               </div>
             </div>
@@ -563,21 +563,12 @@ export default function HomePage() {
                       )}
                     </div>
                     {hasAny ? (
-                      <div className="mt-auto text-[9px] sm:text-[10px] text-neutral-500 leading-tight">
+                      <div className="mt-auto text-[6px] sm:text-[10px] text-neutral-500 leading-tight">
                         {expense > 0 && (
                           <div className="flex justify-between">
                             {/* <span>지출</span> */}
                             <span>
                               {expense.toLocaleString("ko-KR")}
-                              <span className="ml-0.5">원</span>
-                            </span>
-                          </div>
-                        )}
-                        {saving > 0 && (
-                          <div className="flex justify-between">
-                            {/* <span>적금</span> */}
-                            <span>
-                              {saving.toLocaleString("ko-KR")}
                               <span className="ml-0.5">원</span>
                             </span>
                           </div>

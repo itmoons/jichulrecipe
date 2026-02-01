@@ -32,11 +32,12 @@
 }
 
 .primaryBtn {
+  font-size: 12px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   border: none;
-  background: #111;
+  background: rgb(255, 187, 61);
   color: #fff;
   padding: 10px 12px;
   border-radius: 10px;
@@ -85,7 +86,7 @@
 }
 
 .danger {
-  color: #b91c1c;
+  color: rgb(255, 187, 61);
   border-color: #fee2e2;
 }
 
@@ -243,9 +244,9 @@
 }
 
 .out {
-  color: #b91c1c;
-  border-color: #fee2e2;
-  background: #fff7f7;
+  color: rgb(255, 187, 61);
+  border-color: #fef2e2;
+  background: #fffcf7;
 }
 
 .in {

@@ -79,7 +79,7 @@ export function SiteHeader() {
           <button
             type="button"
             onClick={toggleNav}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-orange-200 bg-white/90 text-slate-700 shadow-sm md:hidden"
+            className="flex h-8 w-8 items-center justify-center rounded-md border border-orange-200 bg-white/90 text-slate-700 shadow-sm md:hidden"
             aria-label="메뉴 열기"
             aria-expanded={isNavOpen}
           >
@@ -94,7 +94,7 @@ export function SiteHeader() {
             className="flex items-center gap-2"
             onClick={closeNav}
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white shadow-sm border border-orange-100">
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-white shadow-sm border border-orange-100">
               <Image
                 src="/logo/logo.png"
                 alt="지출레시피 로고"
@@ -187,7 +187,7 @@ export function SiteHeader() {
               ) : (
                 <Link
                   href="/sign-in"
-                  className="rounded-full bg-[color:var(--brand-orange)] px-3 py-1 text-[11px] font-semibold text-white shadow-sm transition hover:bg-[#f27422]"
+                  className="rounded-md bg-[color:var(--brand-orange)] px-3 py-1 text-[11px] font-semibold text-white shadow-sm transition hover:bg-[#f27422]"
                   style={{ ["--brand-orange" as any]: BRAND_ORANGE }}
                 >
                   로그인
@@ -213,7 +213,7 @@ export function SiteHeader() {
               ) : (
                 <Link
                   href="/sign-in"
-                  className="rounded-full bg-[color:var(--brand-orange)] px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm transition hover:bg-[#f27422]"
+                  className="rounded-md bg-[color:var(--brand-orange)] px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm transition hover:bg-[#f27422]"
                   style={{ ["--brand-orange" as any]: BRAND_ORANGE }}
                 >
                   로그인
