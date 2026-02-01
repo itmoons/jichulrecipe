@@ -820,38 +820,41 @@ export default function RecurringManagerPage() {
         </div>
 
         {/* Tabs */}
-        <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
-          <button
-            className={styles.btnPrimary}
-            style={{ background: tab === "rules" ? "#0b1220" : "rgba(255,138,61,0.92)" }}
-            onClick={() => setTab("rules")}
-            disabled={loading}
-          >
-            정기 규칙(목록 추가)
-          </button>
-          <button
-            className={styles.btnPrimary}
-            style={{ background: tab === "overrides" ? "#0b1220" : "rgba(255,138,61,0.92)" }}
-            onClick={() => setTab("overrides")}
-            disabled={loading}
-          >
-            이번 달 예외(금액 수정)
-          </button>
+        <div className={styles.topbar}>
+  <div className={styles.tabRow}>
+    <button
+      className={styles.btnPrimary}
+      data-active={tab === "rules"}
+      onClick={() => setTab("rules")}
+      disabled={loading}
+    >
+      정기 규칙
+    </button>
 
-          {/* Month picker & sync button (공통) */}
-          <div style={{ marginLeft: "auto", display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-            <input
-              className={styles.input}
-              style={{ width: 140 }}
-              value={ym}
-              onChange={(e) => setYm(e.target.value)}
-              placeholder="YYYY-MM"
-            />
-            <button className={styles.btnPrimary} disabled={loading} onClick={handleSyncThisMonth}>
-              {loading ? "처리 중..." : "선택 월에 적용(동기화)"}
-            </button>
-          </div>
-        </div>
+    <button
+      className={styles.btnPrimary}
+      data-active={tab === "overrides"}
+      onClick={() => setTab("overrides")}
+      disabled={loading}
+    >
+      이번 달 예외
+    </button>
+  </div>
+
+  <div className={styles.monthRow}>
+    <input
+      className={styles.input}
+      value={ym}
+      onChange={(e) => setYm(e.target.value)}
+      placeholder="YYYY-MM"
+      inputMode="numeric"
+    />
+    <button className={styles.btnPrimary} onClick={handleSyncThisMonth} disabled={loading}>
+      {loading ? "처리 중..." : "선택 월에 적용"}
+    </button>
+  </div>
+</div>
+
 
         {/* TAB: Rules */}
         {tab === "rules" && (
@@ -966,7 +969,7 @@ export default function RecurringManagerPage() {
                 )}
               </div>
 
-              <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
+              <div className={styles.btnPrimaryGroup} style={{ display: "flex",gap: 8,marginTop: 12,flexWrap: "wrap",justifyContent: "center",alignItems: "center",  }}>
                 <button className={styles.btnPrimary} disabled={loading} onClick={handleSaveRule}>
                   {editingId ? "규칙 수정 저장" : "규칙 저장"}
                 </button>

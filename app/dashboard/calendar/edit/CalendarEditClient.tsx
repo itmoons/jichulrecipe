@@ -8,11 +8,18 @@ import { supabase } from "@/lib/supabaseClient";
 
 const BRAND_ORANGE = "#FF8A3D";
 
-/** 항목 단위 (이름 + 금액) */
+/** 항목 단위 (메모 + 금액 + 카테고리) */
 type MoneyItem = {
   id: string;
+
+  // ✅ 상세 메모(자유입력) - 기존 label을 메모로 사용
   label: string;
+
   amount: number;
+
+  // ✅ 드롭다운 분류
+  category?: string; // 대분류
+  subcategory?: string; // 소분류
 
   // ✅ 정기/수동 구분 메타 (jsonb에 같이 저장됨)
   source?: "recurring" | "manual";
@@ -38,11 +45,13 @@ function getAdjacentDate(dateStr: string, delta: number) {
   return `${yy}-${mm}-${dd}`;
 }
 
-function createItem(defaultLabel = ""): MoneyItem {
+function createItem(): MoneyItem {
   return {
     id: crypto.randomUUID(),
-    label: defaultLabel,
+    label: "",
     amount: 0,
+    category: "",
+    subcategory: "",
     source: "manual",
   };
 }
@@ -59,32 +68,68 @@ function normalizeLabel(s: any) {
 }
 
 /* =========================
-   ✅ 정기/수동 중복 제거 유틸
-   - 정기 항목([R] 또는 source/rule_id)이 존재할 때,
-   - 같은 제목(접두어 제거 기준) + 같은 금액인 수동 항목만 제거
+   ✅ 카테고리(대/소) 옵션
    ========================= */
 
-// ✅ [R] 제거 + 괄호(연도/메모) 제거 + 공백 정규화
-function baseTitle(label: any) {
+type CategoryMap = Record<string, string[]>; // category -> subcategories
+
+const CATEGORY_OPTIONS: Record<SectionKey, CategoryMap> = {
+  expense: {
+    식사: ["외식", "배달", "카페", "야식"],
+    장보기: ["마트", "편의점", "온라인장보기"],
+    교통: ["대중교통", "택시", "주유", "주차/통행료"],
+    "주거/고정비": ["월세/관리비", "공과금", "통신비"],
+    생활: ["생필품", "미용", "의류"],
+    "의료/건강": ["병원", "약", "운동"],
+    "경조/부조금": ["결혼/장례", "선물"],
+    "교육/자기계발": ["학원", "도서", "구독/강의"],
+    "여가/취미": ["여행", "문화생활", "게임"],
+    금융: ["이자/수수료", "보험료"],
+    기타: [],
+  },
+  income: {
+    급여: ["월급", "상여"],
+    부수입: ["알바", "프리랜스"],
+    금융수입: ["이자", "배당"],
+    "환급/지원금": ["환급", "지원금"],
+    "용돈/선물": ["용돈", "선물"],
+    기타: [],
+  },
+  saving: {
+    예적금: ["적금", "예금", "청약"],
+    투자: ["주식", "ETF", "코인", "연금"],
+    비상금: [],
+    상환: ["대출상환", "카드정산"],
+    기타: [],
+  },
+};
+
+/* =========================
+   ✅ 정기/수동 중복 제거 유틸
+   - 같은 (대분류/소분류/메모 정규화) + 금액이 동일하면 수동 제거
+   ========================= */
+
+// ✅ 메모 비교용 정규화
+function baseMemo(label: any) {
   let s = normalizeLabel(label).replace(/^\[R\]\s*/i, "");
 
-  // 1) 괄호 안 내용 제거: (2026), （2026）, (재계약) 등
   s = s.replace(/\([^)]*\)/g, " ");
   s = s.replace(/（[^）]*）/g, " ");
 
-  // 2) 뒤에 붙는 연도/월 같은 숫자 꼬리표 제거(원하면 더 엄격/완화 가능)
-  //    예: "월급 2026", "월급-2026", "월급_2026" → "월급"
   s = s.replace(/[\s\-_]*\d{4}(\d{2})?$/g, " ");
+  return s.replace(/\s+/g, " ").trim();
+}
 
-  // 3) 최종 공백 정리
-  s = s.replace(/\s+/g, " ").trim();
-  return s;
+function fingerprint(it: MoneyItem) {
+  const cat = normalizeLabel(it?.category);
+  const sub = normalizeLabel(it?.subcategory);
+  const memo = baseMemo(it?.label);
+  return `${cat}||${sub}||${memo}`;
 }
 
 function isSameRecurringAsManual(rec: MoneyItem, manual: MoneyItem) {
-  // ✅ 같은 '베이스 타이틀' + 같은 금액이면 중복으로 판단
   return (
-    baseTitle(rec.label) === baseTitle(manual.label) &&
+    fingerprint(rec) === fingerprint(manual) &&
     (Number(rec.amount) || 0) === (Number(manual.amount) || 0)
   );
 }
@@ -99,14 +144,12 @@ function dedupeManualSameAsRecurring(items: MoneyItem[]) {
     if (!it) return false;
     if (isRecurringItem(it)) return true;
 
-    // ✅ 어떤 정기 항목과라도 (베이스 타이틀 + 금액) 동일이면 수동은 제거
     for (const rec of recurringList) {
       if (isSameRecurringAsManual(rec, it)) return false;
     }
     return true;
   });
 }
-
 
 export default function CalendarEditClient() {
   const router = useRouter();
@@ -183,7 +226,6 @@ export default function CalendarEditClient() {
         }
 
         if (!data) {
-          // 해당 날짜 데이터가 없으면 빈 폼
           setForm({
             incomeItems: [createItem()],
             expenseItems: [createItem()],
@@ -193,14 +235,13 @@ export default function CalendarEditClient() {
           return;
         }
 
-        // Supabase row -> 폼으로 (✅ source/rule_id 보존)
+        // Supabase row -> 폼으로 (✅ source/rule_id/category/subcategory 보존)
         const normalizeItems = (arr: any[] | null, section: SectionKey): MoneyItem[] => {
           const items = Array.isArray(arr) ? arr : [];
           return items.map((it, idx) => {
             const label = normalizeLabel(it?.label);
             const amount = Number(it?.amount ?? 0) || 0;
 
-            // ✅ id가 없거나 비어 있으면 생성 (섹션/날짜/순번 기반)
             const id =
               typeof it?.id === "string" && it.id.trim()
                 ? it.id
@@ -215,22 +256,25 @@ export default function CalendarEditClient() {
 
             const rule_id = typeof it?.rule_id === "number" ? it.rule_id : undefined;
 
+            const category = normalizeLabel(it?.category);
+            const subcategory = normalizeLabel(it?.subcategory);
+
             return {
               id,
               label,
               amount,
+              category: category || "",
+              subcategory: subcategory || "",
               source: source ?? "manual",
               rule_id,
             };
           });
         };
 
-        // ✅ 원본 로드
         const incomeItemsRaw = normalizeItems(data.income_items as any[] | null, "income");
         const expenseItemsRaw = normalizeItems(data.expense_items as any[] | null, "expense");
         const savingItemsRaw = normalizeItems(data.saving_items as any[] | null, "saving");
 
-        // ✅ 여기서 "정기+수동 중복" 제거 (화면 2줄 방지)
         const incomeItems = dedupeManualSameAsRecurring(incomeItemsRaw);
         const expenseItems = dedupeManualSameAsRecurring(expenseItemsRaw);
         const savingItems = dedupeManualSameAsRecurring(savingItemsRaw);
@@ -294,20 +338,23 @@ export default function CalendarEditClient() {
   const handleItemChange = (
     section: SectionKey,
     id: string,
-    field: "label" | "amount",
+    field: "label" | "amount" | "category" | "subcategory",
     value: string
   ) => {
     const items = getItems(section);
+    const optionMap = CATEGORY_OPTIONS[section];
 
     const next = items.map((item) => {
       if (item.id !== id) return item;
 
       const recurring = isRecurringItem(item);
 
-      // ✅ 정기 항목은 label 변경 금지 (규칙 title과 정합성 유지)
-      if (field === "label" && recurring) return item;
+      // ✅ 정기 항목은 분류/메모 수정 금지
+      if (recurring && (field === "label" || field === "category" || field === "subcategory")) {
+        return item;
+      }
 
-      // ✅ 정기 항목 amount 변경은 "이 날짜만" 예외(override) 성격 → UX 경고
+      // ✅ 정기 항목 amount 변경은 "이 날짜만" override
       if (field === "amount" && recurring) {
         const ok = confirm(
           "이 항목은 정기 규칙으로 생성된 항목입니다.\n" +
@@ -318,13 +365,23 @@ export default function CalendarEditClient() {
         if (!ok) return item;
       }
 
+      // ✅ category 바꾸면 subcategory 리셋
+      if (field === "category") {
+        const cat = value;
+        const subs = optionMap[cat] ?? [];
+        return {
+          ...item,
+          category: cat,
+          subcategory: subs.length ? "" : "",
+        };
+      }
+
       return {
         ...item,
-        [field]: field === "amount" ? Number(value || 0) : (value as string),
+        [field]: field === "amount" ? Number(value || 0) : value,
       };
     });
 
-    // ✅ 사용자가 편집한 뒤에도 화면에서 "정기+수동(완전 동일)"이 생기면 제거
     setItems(section, dedupeManualSameAsRecurring(next));
   };
 
@@ -352,15 +409,27 @@ export default function CalendarEditClient() {
     const ensureIds = (items: MoneyItem[]) =>
       items.map((i) => ({ ...i, id: i.id?.trim() ? i.id : crypto.randomUUID() }));
 
-    // ✅ 저장 직전에도 "정기+수동 중복" 제거 (DB 중복 누적 방지)
+    // ✅ 저장 직전에도 중복 제거
     const fixedIncome = dedupeManualSameAsRecurring(form.incomeItems);
     const fixedExpense = dedupeManualSameAsRecurring(form.expenseItems);
     const fixedSaving = dedupeManualSameAsRecurring(form.savingItems);
 
-    // ✅ label/amount 비었으면 제거
-    const cleanedIncome = ensureIds(fixedIncome).filter((i) => normalizeLabel(i.label) || i.amount);
-    const cleanedExpense = ensureIds(fixedExpense).filter((i) => normalizeLabel(i.label) || i.amount);
-    const cleanedSaving = ensureIds(fixedSaving).filter((i) => normalizeLabel(i.label) || i.amount);
+    // ✅ 정리
+    const clean = (items: MoneyItem[]) =>
+      ensureIds(items)
+        .map((i) => ({
+          ...i,
+          label: normalizeLabel(i.label),
+          category: normalizeLabel(i.category),
+          subcategory: normalizeLabel(i.subcategory),
+          amount: Number(i.amount || 0) || 0,
+        }))
+        // 완전 빈 행 제거
+        .filter((i) => i.category || i.label || i.amount);
+
+    const cleanedIncome = clean(fixedIncome);
+    const cleanedExpense = clean(fixedExpense);
+    const cleanedSaving = clean(fixedSaving);
 
     try {
       const {
@@ -380,7 +449,6 @@ export default function CalendarEditClient() {
         return;
       }
 
-      // ✅ 정기 메타(source/rule_id)를 그대로 저장해야 정기 반영 로직이 안정적으로 동작
       const { error: upsertError } = await supabase
         .from("daily_recipes")
         .upsert(
@@ -420,9 +488,7 @@ export default function CalendarEditClient() {
         "[background-size:18px_18px]",
       ].join(" ")}
     >
-      {/* 가운데 65% 폭 컨테이너 */}
-      <div className="w-full max-w-full lg:max-w-[65vw] mx-auto flex flex-col">
-        {/* 상단 바 */}
+      <div className="w-full max-w-full lg:max-w-[90vw] mx-auto flex flex-col">
         <header className="flex items-center justify-between px-4 sm:px-8 lg:px-0 py-4 bg-white/90">
           <div className="flex items-center gap-3">
             <button
@@ -438,7 +504,7 @@ export default function CalendarEditClient() {
                 </h1>
               </div>
               <p className="text-[11px] sm:text-xs text-neutral-500">
-                수입·지출·적금 항목을 나눠서 기록해요. (정기 항목은 규칙에서 관리)
+                구분/세부는 드롭다운으로 정리하고, 메모는 선택으로 남겨요.
               </p>
             </div>
           </div>
@@ -454,10 +520,8 @@ export default function CalendarEditClient() {
           </button>
         </header>
 
-        {/* 내용 */}
-        <section className="w-full max-w-full lg:max-w-[65vw] mx-auto flex flex-col">
+        <section className="w-full max-w-full lg:max-w-[90vw] mx-auto flex flex-col">
           <form id="daily-recipe-form" onSubmit={handleSubmit} className="w-full space-y-4">
-            {/* 날짜 정보 + 이전/다음날 이동 */}
             <div className="rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="flex flex-col">
@@ -501,10 +565,9 @@ export default function CalendarEditClient() {
               )}
             </div>
 
-            {/* 3칸 레이아웃 */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* 수입 */}
               <RecipeCard
+                sectionKey="income"
                 title="들어온 재료 (수입)"
                 subtitle="월급, 용돈, 알바비 등"
                 tone="income"
@@ -513,12 +576,12 @@ export default function CalendarEditClient() {
                 onAdd={() => handleAddItem("income")}
                 onChange={(id, field, value) => handleItemChange("income", id, field, value)}
                 onRemove={(id) => handleRemoveItem("income", id)}
-                placeholderLabel="예: 편의점 알바비"
+                placeholderMemo="메모(선택): 예) 1월 월급"
                 placeholderAmount="120000"
               />
 
-              {/* 지출 */}
               <RecipeCard
+                sectionKey="expense"
                 title="사용한 재료 (지출)"
                 subtitle="식비, 교통, 공과금 등"
                 tone="expense"
@@ -527,12 +590,12 @@ export default function CalendarEditClient() {
                 onAdd={() => handleAddItem("expense")}
                 onChange={(id, field, value) => handleItemChange("expense", id, field, value)}
                 onRemove={(id) => handleRemoveItem("expense", id)}
-                placeholderLabel="예: 점심·카페·택시"
+                placeholderMemo="메모(선택): 예) 점심/카페"
                 placeholderAmount="34500"
               />
 
-              {/* 적금/저축 */}
               <RecipeCard
+                sectionKey="saving"
                 title="따로 덜어둔 재료 (적금·저축)"
                 subtitle="자동이체, CMA, 투자 등"
                 tone="saving"
@@ -541,7 +604,7 @@ export default function CalendarEditClient() {
                 onAdd={() => handleAddItem("saving")}
                 onChange={(id, field, value) => handleItemChange("saving", id, field, value)}
                 onRemove={(id) => handleRemoveItem("saving", id)}
-                placeholderLabel="예: 청약·적금·투자"
+                placeholderMemo="메모(선택): 예) 청약"
                 placeholderAmount="50000"
               />
             </div>
@@ -563,19 +626,25 @@ export default function CalendarEditClient() {
  * ============================ */
 
 type RecipeCardProps = {
+  sectionKey: SectionKey;
   title: string;
   subtitle: string;
   tone: "income" | "expense" | "saving";
   total: number;
   items: MoneyItem[];
   onAdd: () => void;
-  onChange: (id: string, field: "label" | "amount", value: string) => void;
+  onChange: (
+    id: string,
+    field: "label" | "amount" | "category" | "subcategory",
+    value: string
+  ) => void;
   onRemove: (id: string) => void;
-  placeholderLabel: string;
+  placeholderMemo: string;
   placeholderAmount: string;
 };
 
 function RecipeCard({
+  sectionKey,
   title,
   subtitle,
   tone,
@@ -584,7 +653,7 @@ function RecipeCard({
   onAdd,
   onChange,
   onRemove,
-  placeholderLabel,
+  placeholderMemo,
   placeholderAmount,
 }: RecipeCardProps) {
   const toneStyle =
@@ -600,6 +669,8 @@ function RecipeCard({
       : tone === "expense"
       ? "text-orange-700"
       : "text-emerald-700";
+
+  const optionMap = CATEGORY_OPTIONS[sectionKey];
 
   return (
     <section
@@ -626,23 +697,77 @@ function RecipeCard({
       <div className="space-y-1.5">
         {items.map((item) => {
           const recurring = isRecurringItem(item);
+          const cat = item.category || "";
+          const subOptions = cat ? optionMap[cat] ?? [] : [];
 
           return (
             <div
               key={item.id}
-              className="flex items-center gap-1.5 rounded-xl bg-white/70 px-2 py-1.5"
+              className={[
+                // ✅ 깨짐 해결 핵심: wrap + min-w + shrink-0 조합
+                "flex flex-wrap items-center gap-1.5 rounded-xl bg-white/70 px-2 py-1.5",
+              ].join(" ")}
             >
-              <div className="flex-1 min-w-0 flex items-center gap-1">
+              {/* ✅ 대분류 */}
+              <select
+                disabled={recurring}
+                className={[
+                  "w-20 sm:w-24 shrink-0 rounded-md border px-2 py-1 text-[11px] outline-none",
+                  recurring
+                    ? "border-neutral-200 bg-neutral-100 text-neutral-600 cursor-not-allowed"
+                    : "border-neutral-200 bg-white",
+                ].join(" ")}
+                value={item.category || ""}
+                onChange={(e) => onChange(item.id, "category", e.target.value)}
+                title={recurring ? "정기 항목은 규칙에서 관리돼요" : "대분류"}
+              >
+                <option value="">구분</option>
+                {Object.keys(optionMap).map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+
+              {/* ✅ 소분류 */}
+              <select
+                disabled={recurring || !item.category}
+                className={[
+                  "w-20 sm:w-24 shrink-0 rounded-md border px-2 py-1 text-[11px] outline-none",
+                  recurring || !item.category
+                    ? "border-neutral-200 bg-neutral-100 text-neutral-500 cursor-not-allowed"
+                    : "border-neutral-200 bg-white",
+                ].join(" ")}
+                value={item.subcategory || ""}
+                onChange={(e) => onChange(item.id, "subcategory", e.target.value)}
+                title={
+                  recurring
+                    ? "정기 항목은 규칙에서 관리돼요"
+                    : item.category
+                    ? "소분류"
+                    : "먼저 구분을 선택하세요"
+                }
+              >
+                <option value="">{item.category ? "세부" : "먼저 구분"}</option>
+                {subOptions.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
+
+              {/* ✅ 메모(label) */}
+              <div className="flex-1 min-w-[140px] flex items-center gap-1">
                 <input
                   type="text"
                   readOnly={recurring}
                   className={[
-                    "flex-1 min-w-0 rounded-md border px-2 py-1 text-[11px] outline-none focus:border-neutral-400",
+                    "w-full min-w-0 rounded-md border px-2 py-1 text-[11px] outline-none focus:border-neutral-400",
                     recurring
                       ? "border-neutral-200 bg-neutral-100 text-neutral-600 cursor-not-allowed"
                       : "border-neutral-200 bg-white",
                   ].join(" ")}
-                  placeholder={placeholderLabel}
+                  placeholder={placeholderMemo}
                   value={item.label}
                   onChange={(e) => onChange(item.id, "label", e.target.value)}
                 />
@@ -654,7 +779,8 @@ function RecipeCard({
                 )}
               </div>
 
-              <div className="relative w-24">
+              {/* 금액 */}
+              <div className="relative w-24 shrink-0">
                 <input
                   type="number"
                   min={0}
@@ -676,13 +802,13 @@ function RecipeCard({
                 </span>
               </div>
 
-              {/* ✅ 정기 항목 삭제 버튼 비활성화 */}
+              {/* 삭제 */}
               <button
                 type="button"
                 disabled={recurring}
                 onClick={() => !recurring && onRemove(item.id)}
                 className={[
-                  "inline-flex h-6 w-6 items-center justify-center rounded-full border",
+                  "inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border",
                   recurring
                     ? "border-neutral-200 text-neutral-300 cursor-not-allowed"
                     : "border-neutral-200 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700",

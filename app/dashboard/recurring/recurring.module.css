@@ -249,6 +249,34 @@
   accent-color: rgba(255, 138, 61, 0.92);
 }
 
+.topbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* 탭 2개 묶음 */
+.tabRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+/* 월 입력 + 적용 버튼 묶음 */
+.monthRow {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+/* 탭 active 표시 (기존 inline style 제거용) */
+.btnPrimary[data-active="true"] {
+  background: #0b1220;
+}
+
 
 /* Responsive */
 @media (max-width: 860px) {
@@ -265,6 +293,9 @@
 }
 
 @media (max-width: 520px) {
+  .header{
+    display: none;
+  }
   .page {
     padding: 18px 12px 28px;
   }
@@ -272,7 +303,52 @@
     padding: 14px 12px;
   }
   .btnPrimary {
-    width: 100%;
+    width: 50%;
+    display: block;
     justify-content: center;
+  }
+  .btnTop{
+    margin: 0 auto;
+  }.topbar {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  /* 탭은 2열로 딱 고정 */
+  .tabRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .tabRow .btnPrimary {
+    width: 100%;
+    height: 40px;
+    border-radius: 12px;
+    font-size: 12px;
+    padding: 0 12px;
+  }
+
+  /* 월 입력 + 적용은 세로로 쌓기(가장 안정적) */
+  .monthRow {
+    margin-left: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .monthRow .input {
+    width: 100% !important;
+    height: 42px;
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .monthRow .btnPrimary {
+    width: 100%;
+    height: 42px;
+    border-radius: 12px;
+    font-size: 12px;
   }
 }
