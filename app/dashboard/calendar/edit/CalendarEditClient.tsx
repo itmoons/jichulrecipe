@@ -697,8 +697,6 @@ function RecipeCard({
       <div className="space-y-1.5">
         {items.map((item) => {
           const recurring = isRecurringItem(item);
-          const cat = item.category || "";
-          const subOptions = cat ? optionMap[cat] ?? [] : [];
 
           return (
             <div
@@ -708,61 +706,23 @@ function RecipeCard({
                 "flex flex-wrap items-center gap-1.5 rounded-xl bg-white/70 px-2 py-1.5",
               ].join(" ")}
             >
-              {/* ✅ 대분류 */}
-              <select
+              {/* ✅ 구분/세부: 1개 드롭다운(단계형) */}
+              <CategoryCascadeSelect
                 disabled={recurring}
-                className={[
-                  "w-20 sm:w-24 shrink-0 rounded-md border px-2 py-1 text-[11px] outline-none",
-                  recurring
-                    ? "border-neutral-200 bg-neutral-100 text-neutral-600 cursor-not-allowed"
-                    : "border-neutral-200 bg-white",
-                ].join(" ")}
-                value={item.category || ""}
-                onChange={(e) => onChange(item.id, "category", e.target.value)}
-                title={recurring ? "정기 항목은 규칙에서 관리돼요" : "대분류"}
-              >
-                <option value="">구분</option>
-                {Object.keys(optionMap).map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-
-              {/* ✅ 소분류 */}
-              <select
-                disabled={recurring || !item.category}
-                className={[
-                  "w-20 sm:w-24 shrink-0 rounded-md border px-2 py-1 text-[11px] outline-none",
-                  recurring || !item.category
-                    ? "border-neutral-200 bg-neutral-100 text-neutral-500 cursor-not-allowed"
-                    : "border-neutral-200 bg-white",
-                ].join(" ")}
-                value={item.subcategory || ""}
-                onChange={(e) => onChange(item.id, "subcategory", e.target.value)}
-                title={
-                  recurring
-                    ? "정기 항목은 규칙에서 관리돼요"
-                    : item.category
-                    ? "소분류"
-                    : "먼저 구분을 선택하세요"
-                }
-              >
-                <option value="">{item.category ? "세부" : "먼저 구분"}</option>
-                {subOptions.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
+                category={item.category || ""}
+                subcategory={item.subcategory || ""}
+                optionMap={optionMap}
+                onChangeCategory={(v) => onChange(item.id, "category", v)}
+                onChangeSubcategory={(v) => onChange(item.id, "subcategory", v)}
+              />
 
               {/* ✅ 메모(label) */}
-              <div className="flex-1 min-w-[140px] flex items-center gap-1">
+              <div className="flex-1 flex items-center gap-1">
                 <input
                   type="text"
                   readOnly={recurring}
                   className={[
-                    "w-full min-w-0 rounded-md border px-2 py-1 text-[11px] outline-none focus:border-neutral-400",
+                    "w-full min-w-0 rounded-md border px-2 py-1  text-[10px] outline-none focus:border-neutral-400",
                     recurring
                       ? "border-neutral-200 bg-neutral-100 text-neutral-600 cursor-not-allowed"
                       : "border-neutral-200 bg-white",
@@ -831,5 +791,218 @@ function RecipeCard({
         항목 추가 (수동)
       </button>
     </section>
+  );
+}
+
+/* ============================
+ * ✅ 구분/세부 1개짜리 단계형 드롭다운
+ * ============================ */
+
+type CategoryCascadeSelectProps = {
+  disabled?: boolean;
+  category: string;
+  subcategory: string;
+  optionMap: CategoryMap; // category -> subcategories
+  onChangeCategory: (v: string) => void;
+  onChangeSubcategory: (v: string) => void;
+  className?: string;
+};
+
+function CategoryCascadeSelect({
+  disabled,
+  category,
+  subcategory,
+  optionMap,
+  onChangeCategory,
+  onChangeSubcategory,
+}: CategoryCascadeSelectProps) {
+  const [open, setOpen] = React.useState(false);
+  const [step, setStep] = React.useState<1 | 2>(1);
+
+  // ✅ 드롭다운 내부에서 즉시 반영되는 임시 category (부모 state 반영 전에도 사용)
+  const [activeCategory, setActiveCategory] = React.useState<string>(category || "");
+
+  // ✅ 부모값이 바뀌면 동기화 (외부에서 로딩/초기화/저장 후 반영 등)
+  React.useEffect(() => {
+    setActiveCategory(category || "");
+  }, [category]);
+
+  const cats = Object.keys(optionMap);
+  const subs = activeCategory ? optionMap[activeCategory] ?? [] : [];
+
+  const label = (() => {
+    const c = (category || "").trim();
+    const s = (subcategory || "").trim();
+    if (!c) return "구분";
+    if (!s) return `${c} · 세부`;
+    return `${c} · ${s}`;
+  })();
+
+  // 바깥 클릭 닫기
+  React.useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      const t = e.target as HTMLElement;
+      if (!t.closest?.("[data-cascade-root='1']")) setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open]);
+
+  const selectCategory = (c: string) => {
+    // ✅ 즉시 2단계 목록을 채우기 위해 내부 상태 먼저 갱신
+    setActiveCategory(c);
+
+    // ✅ 실제 저장값(부모 state) 갱신
+    onChangeCategory(c);
+    onChangeSubcategory(""); // 구분 바꾸면 세부 초기화
+
+    const nextSubs = optionMap[c] ?? [];
+    if (!nextSubs.length) {
+      // 세부가 없는 구분이면 바로 닫아도 되고, 원하면 step2에서 "세부 없음"만 보여도 됨
+      setOpen(false);
+      setStep(1);
+      return;
+    }
+    setStep(2);
+  };
+
+  const selectSubcategory = (s: string) => {
+    onChangeSubcategory(s);
+    setOpen(false);
+    setStep(1);
+  };
+
+  return (
+    <div className="relative shrink-0" data-cascade-root="1">
+      <button
+        type="button"
+        disabled={!!disabled}
+        onClick={() => {
+          if (disabled) return;
+          setOpen((v) => !v);
+          setStep(1);
+          setActiveCategory(category || ""); // ✅ 열 때 현재 값 기준으로 시작
+        }}
+        className={[
+          "h-[30px] w-[6rem] rounded-md border px-2",   // ✅ w-full
+          "text-[11px] flex items-center justify-between gap-2",
+          "outline-none focus:border-neutral-400",
+          disabled
+            ? "border-neutral-200 bg-neutral-100 text-neutral-600 cursor-not-allowed"
+            : "border-neutral-200 bg-white hover:bg-neutral-50",
+        ].join(" ")}
+        title={disabled ? "정기 항목은 규칙에서 관리돼요" : "구분/세부 선택"}
+      >
+        <span className="min-w-0 truncate">{label}</span>
+        <span className="text-neutral-400">▾</span>
+      </button>
+
+      {open && !disabled && (
+        <div className="absolute z-50 mt-1 w-[240px] rounded-xl border border-neutral-200 bg-white shadow-lg overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center justify-between px-3 py-2 border-b border-neutral-100">
+            <div className="text-[10px] text-neutral-500">
+              {step === 1 ? "1) 구분 선택" : "2) 세부 선택"}
+            </div>
+            <div className="flex items-center gap-1">
+              {step === 2 && (
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  className="text-[10px] px-2 py-0.5 rounded-md border border-neutral-200 hover:bg-neutral-50"
+                >
+                  ← 뒤로
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="text-[10px] px-2 py-0.5 rounded-md border border-neutral-200 hover:bg-neutral-50"
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+
+          {/* List */}
+          <div className="max-h-[260px] overflow-auto py-1">
+            {step === 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveCategory("");
+                    onChangeCategory("");
+                    onChangeSubcategory("");
+                    setOpen(false);
+                    setStep(1);
+                  }}
+                  className="w-full text-left px-3 py-2 text-[11px] hover:bg-neutral-50 text-neutral-500"
+                >
+                  구분 없음(초기화)
+                </button>
+
+                {cats.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => selectCategory(c)}
+                    className={[
+                      "w-full text-left px-3 py-2 text-[11px] hover:bg-neutral-50",
+                      c === category ? "bg-amber-50/60" : "",
+                    ].join(" ")}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="truncate">{c}</span>
+                      <span className="text-neutral-300">›</span>
+                    </div>
+                  </button>
+                ))}
+              </>
+            )}
+
+            {step === 2 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => selectSubcategory("")}
+                  className="w-full text-left px-3 py-2 text-[11px] hover:bg-neutral-50 text-neutral-500"
+                >
+                  세부 없음
+                </button>
+
+                {subs.length === 0 ? (
+                  <div className="px-3 py-2 text-[11px] text-neutral-400">
+                    세부 항목이 없습니다.
+                  </div>
+                ) : (
+                  subs.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => selectSubcategory(s)}
+                      className={[
+                        "w-full text-left px-3 py-2 text-[11px] hover:bg-neutral-50",
+                        s === subcategory ? "bg-amber-50/60" : "",
+                      ].join(" ")}
+                    >
+                      {s}
+                    </button>
+                  ))
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="px-3 py-2 border-t border-neutral-100 bg-neutral-50 text-[10px] text-neutral-600">
+            선택:{" "}
+            <span className="font-medium">{activeCategory ? activeCategory : "구분"}</span>
+            {subcategory ? <span className="font-medium"> · {subcategory}</span> : null}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
