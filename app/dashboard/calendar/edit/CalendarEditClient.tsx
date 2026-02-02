@@ -816,56 +816,59 @@ function CategoryCascadeSelect({
   onChangeCategory,
   onChangeSubcategory,
 }: CategoryCascadeSelectProps) {
+  const rootRef = React.useRef<HTMLDivElement | null>(null);
+
   const [open, setOpen] = React.useState(false);
   const [step, setStep] = React.useState<1 | 2>(1);
 
-  // ✅ 드롭다운 내부에서 즉시 반영되는 임시 category (부모 state 반영 전에도 사용)
+  // 드롭다운 내부에서 즉시 보여줄 임시 category
   const [activeCategory, setActiveCategory] = React.useState<string>(category || "");
 
-  // ✅ 부모값이 바뀌면 동기화 (외부에서 로딩/초기화/저장 후 반영 등)
   React.useEffect(() => {
     setActiveCategory(category || "");
   }, [category]);
 
-  const cats = Object.keys(optionMap);
+  const cats = React.useMemo(() => Object.keys(optionMap), [optionMap]);
   const subs = activeCategory ? optionMap[activeCategory] ?? [] : [];
 
-  const label = (() => {
+  const label = React.useMemo(() => {
     const c = (category || "").trim();
     const s = (subcategory || "").trim();
     if (!c) return "구분";
     if (!s) return `${c} · 세부`;
     return `${c} · ${s}`;
-  })();
+  }, [category, subcategory]);
 
-  // 바깥 클릭 닫기
+  // ✅ 바깥 클릭 닫기 (ref.contains로 안정화)
   React.useEffect(() => {
     if (!open) return;
-    const onDoc = (e: MouseEvent) => {
-      const t = e.target as HTMLElement;
-      if (!t.closest?.("[data-cascade-root='1']")) setOpen(false);
+
+    const onDocPointerDown = (e: PointerEvent) => {
+      const el = rootRef.current;
+      const target = e.target as Node | null;
+      if (!el || !target) return;
+      if (!el.contains(target)) setOpen(false);
     };
-    document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
+
+    // pointerdown이 click보다 먼저라서 안정적
+    document.addEventListener("pointerdown", onDocPointerDown);
+    return () => document.removeEventListener("pointerdown", onDocPointerDown);
   }, [open]);
 
   const selectCategory = (c: string) => {
-    // ✅ 즉시 2단계 목록을 채우기 위해 내부 상태 먼저 갱신
-    setActiveCategory(c);
+  setActiveCategory(c);
 
-    // ✅ 실제 저장값(부모 state) 갱신
-    onChangeCategory(c);
-    onChangeSubcategory(""); // 구분 바꾸면 세부 초기화
+  // ✅ 여기서 subcategory를 따로 호출하지 말 것!
+  onChangeCategory(c);
 
-    const nextSubs = optionMap[c] ?? [];
-    if (!nextSubs.length) {
-      // 세부가 없는 구분이면 바로 닫아도 되고, 원하면 step2에서 "세부 없음"만 보여도 됨
-      setOpen(false);
-      setStep(1);
-      return;
-    }
-    setStep(2);
-  };
+  const nextSubs = optionMap[c] ?? [];
+  if (!nextSubs.length) {
+    setOpen(false);
+    setStep(1);
+    return;
+  }
+  setStep(2);
+};
 
   const selectSubcategory = (s: string) => {
     onChangeSubcategory(s);
@@ -874,7 +877,7 @@ function CategoryCascadeSelect({
   };
 
   return (
-    <div className="relative shrink-0" data-cascade-root="1">
+    <div ref={rootRef} className="relative shrink-0" data-cascade-root="1">
       <button
         type="button"
         disabled={!!disabled}
@@ -882,10 +885,10 @@ function CategoryCascadeSelect({
           if (disabled) return;
           setOpen((v) => !v);
           setStep(1);
-          setActiveCategory(category || ""); // ✅ 열 때 현재 값 기준으로 시작
+          setActiveCategory(category || "");
         }}
         className={[
-          "h-[30px] w-[6rem] rounded-md border px-2",   // ✅ w-full
+          "h-[30px] w-[6rem] rounded-md border px-2",
           "text-[11px] flex items-center justify-between gap-2",
           "outline-none focus:border-neutral-400",
           disabled
@@ -933,8 +936,7 @@ function CategoryCascadeSelect({
                   type="button"
                   onClick={() => {
                     setActiveCategory("");
-                    onChangeCategory("");
-                    onChangeSubcategory("");
+                    onChangeCategory("");   // ✅ 이것만 호출
                     setOpen(false);
                     setStep(1);
                   }}
