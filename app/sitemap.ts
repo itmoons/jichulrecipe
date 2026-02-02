@@ -2,7 +2,7 @@
 import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = "https://jichulrecipe.vercel.app";
+  const base = "https://www.jiculrecipe.com";
 
   return [
     {

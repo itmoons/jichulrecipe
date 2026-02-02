@@ -8,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
       }
     ],
-    sitemap: "https://jichulrecipe.vercel.app/sitemap.xml",
+    sitemap: "https://www.jiculrecipe.com/sitemap.xml",
   };
 }

@@ -4,7 +4,7 @@ import "./globals.css";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 
 const SITE_NAME = "지출레시피";
-const SITE_URL = "https://jichulrecipe.vercel.app";
+const SITE_URL = "https://www.jiculrecipe.com";
 const OG_IMAGE = `${SITE_URL}/og-image.png`; // optional, 있으면 더 좋음
 
 export const metadata: Metadata = {

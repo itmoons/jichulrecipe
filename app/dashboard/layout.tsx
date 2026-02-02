@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 
 const SITE_NAME = "지출레시피";
-const SITE_URL = "https://jichulrecipe.vercel.app";
+const SITE_URL = "https://www.jiculrecipe.com";
 const PAGE_URL = `${SITE_URL}/dashboard`;
 const OG_IMAGE = `${SITE_URL}/og-image.png`; // 있으면 사용
 
