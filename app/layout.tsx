@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const SITE_NAME = "지출레시피";
 const SITE_URL = "https://www.jiculrecipe.com";
@@ -122,6 +123,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="ko">
+      <GoogleAnalytics gaId="G-762XP39BW8" />
       <head>
         {/* ✅ JSON-LD (구조화 데이터) */}
         <Script
@@ -149,6 +151,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             `,
           }}
         />
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-762XP39BW8"></script>
+        
       </head>
 
       <body className="min-h-screen bg-slate-50 text-slate-900">
