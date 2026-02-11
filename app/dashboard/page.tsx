@@ -700,7 +700,7 @@ function DashboardInner() {
           {summaryChips.map((chip) => (
             <div
               key={chip.label}
-              className="rounded-2xl border border-amber-100 bg-white/95 px-3.5 py-3 shadow-sm shadow-amber-100/60 flex flex-col justify-between"
+              className="rounded-2xl border border-amber-100 bg-white/95 px-3.5 py-3 shadow-sm shadow-amber-100/60 flex flex-col justify-between w-auto "
             >
               <span className="text-[11px] text-slate-500">{chip.label}</span>
               <span className="mt-1 text-base font-semibold text-slate-900">{chip.value}</span>
@@ -710,11 +710,11 @@ function DashboardInner() {
         </section>
 
         {/* 메인 2컬럼 */}
-        <section className="grid gap-4 lg:grid-cols-[minmax(280px,340px)_minmax(0,1fr)]">
+        <section className="grid gap-4 lg:grid-cols-[minmax(280px,340px)_minmax(0,1fr)] ">
           {/* 좌측: 파이 + 카테고리 */}
-          <div className="flex flex-col gap-3 rounded-3xl bg-white/95 border border-amber-100 p-3.5 shadow-sm shadow-amber-100/70">
+          <div className="flex flex-col gap-3 rounded-3xl bg-white/95 border border-amber-100 p-3.5 shadow-sm shadow-amber-100/70  w-fit sm:w-auto">
             {/* 건강도 + 요약 */}
-            <div className="flex items-start justify-between gap-2">
+            <div className="flex items-start justify-between gap-2 ">
               <div>
                 <div className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[10px] text-amber-800 border border-amber-100 mb-1">
                   <span>{health.emoji}</span>
@@ -758,7 +758,7 @@ function DashboardInner() {
 
                   return (
                     <div
-                      key={item.label}
+                      key={`${item.label}-${idx}`}
                       className="flex items-center justify-between gap-2 rounded-xl bg-white/80 px-2 py-1 hover:bg-amber-50"
                     >
                       <div className="flex items-center gap-2 min-w-0">
@@ -781,7 +781,7 @@ function DashboardInner() {
           {/* 우측: 그래프 + 테이블 + 분석 */}
           <div className="flex flex-col gap-4">
             {/* ✅ 지출 전체 “선 그래프” */}
-            <div className="rounded-3xl bg-white/95 border border-slate-200 p-3.5 shadow-sm shadow-slate-100">
+            <div className="rounded-3xl bg-white/95 border border-slate-200 p-3.5 shadow-sm shadow-slate-100 w-fit sm:w-auto">
               <div className="mb-2 flex items-center justify-between">
                 <span className="text-xs font-semibold text-slate-900">지출 전체 추이</span>
                 <span className="text-[10px] text-slate-500">일자별 지출 합계 (원)</span>
@@ -804,7 +804,7 @@ function DashboardInner() {
             {/* 하단: 테이블 + 분석 카드 */}
             <div className="grid gap-4 lg:grid-cols-[1.3fr_0.7fr]">
               {/* 일자별 요약 테이블 */}
-              <div className="rounded-3xl bg-white/95 border border-slate-200 p-3.5 shadow-sm shadow-slate-100">
+              <div className="rounded-3xl bg-white/95 border border-slate-200 p-3.5 shadow-sm shadow-slate-100 w-fit sm:w-auto">
                 <div className="mb-2 flex items-center justify-between">
                   <span className="text-xs font-semibold text-slate-900">일자별 레시피 요약</span>
                   <span className="text-[10px] text-slate-500">수입·지출·저축을 한 줄로 정리했습니다</span>
@@ -860,7 +860,7 @@ function DashboardInner() {
 
               {/* 셰프 분석 카드 */}
               <div className="space-y-3">
-                <div className="rounded-3xl bg-white/95 border border-slate-200 p-3.5 shadow-sm shadow-slate-100">
+                <div className="rounded-3xl bg-white/95 border border-slate-200 p-3.5 shadow-sm shadow-slate-100 w-fit sm:w-auto">
                   <div className="mb-2 flex items-center gap-2">
                     <span className="text-lg">👨‍🍳</span>
                     <h2 className="text-xs font-semibold text-slate-900">이번 달 셰프 노트</h2>
@@ -905,7 +905,7 @@ function DashboardInner() {
                   </ul>
                 </div>
 
-                <div className="rounded-3xl bg-gradient-to-r from-[#FFF7EB] to-[#FFEFD9] p-3.5 text-[11px] leading-relaxed text-slate-800 shadow-sm shadow-amber-100/80">
+                <div className="rounded-3xl bg-gradient-to-r from-[#FFF7EB] to-[#FFEFD9] p-3.5 text-[11px] leading-relaxed text-slate-800 shadow-sm shadow-amber-100/80 w-auto">
                   <p className="mb-2">
                     🧂 <strong>셰프 TIP.</strong> 이번 달 데이터를 바탕으로 <span className="font-semibold">“줄이고 싶은 구분(카테고리)”</span>를 1~2개만 고른 뒤,
                     다음 달 달력에서 그 구분의 지출을 상한선으로 관리해 보세요.
@@ -992,7 +992,7 @@ function LineChartCard({ series }: { series: LinePoint[] }) {
   return (
     <div className="mt-1 w-full rounded-2xl bg-slate-50 border border-slate-200 px-3 py-3">
       <div className="w-full overflow-x-auto">
-        <svg viewBox={`0 0 ${W} ${H}`} className="w-full min-w-[680px]" onMouseLeave={() => setHoverIdx(null)}>
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full " onMouseLeave={() => setHoverIdx(null)}>
           {ticks.map((t, idx) => (
             <g key={idx}>
               <line x1={padding.l} x2={W - padding.r} y1={t.y} y2={t.y} stroke="#E5E7EB" strokeDasharray="4 4" />
@@ -1104,7 +1104,7 @@ function PieChartCard({ items, total }: PieChartProps) {
 
           return (
             <circle
-              key={item.label}
+              key={`${item.label}-${idx}`}
               cx="80"
               cy="80"
               r={radius}
