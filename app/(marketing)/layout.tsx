@@ -1,3 +1,5 @@
+// app/(marketing)/layout.tsx
+import React from "react";
 import Script from "next/script";
 
 const ADSENSE_CLIENT = "ca-pub-5176453529569105";
@@ -13,7 +15,7 @@ export default function MarketingLayout({
         <Script
           id="adsbygoogle-init"
           async
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
           crossOrigin="anonymous"
         />
