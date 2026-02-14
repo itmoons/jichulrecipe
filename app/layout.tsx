@@ -10,19 +10,21 @@ const SITE_URL = "https://www.jiculrecipe.com";
 const OG_IMAGE = `${SITE_URL}/og-image.png`;
 
 const GTM_ID = "GTM-KP9QNXS6";
-const ADSENSE_CLIENT = "ca-pub-5176453529569105";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
 
+  // ✅ 검색 의도형 타이틀: "가계부" + "무료" + 핵심 베네핏(분석)
   title: {
     default: "지출레시피 | 무료 가계부 · 지출분석 · 소비습관 진단",
     template: `%s | ${SITE_NAME}`,
   },
 
+  // ✅ SERP(검색 결과)에서 클릭을 부르는 설명: 기능 나열보다 "문제 해결" 중심
   description:
     "무료 가계부 지출레시피로 지출/수입을 기록하고, 카테고리·월별 통계와 소비습관 분석까지 한 번에. 자동 분류와 대시보드로 예산 관리가 쉬워집니다.",
 
+  // ✅ 핵심 키워드: 브랜드 + 헤드키워드(가계부) + 의도 키워드(지출분석/예산관리)
   keywords: [
     "가계부",
     "무료 가계부",
@@ -42,10 +44,12 @@ export const metadata: Metadata = {
     canonical: SITE_URL,
   },
 
+  // ✅ GSC HTML태그 인증을 쓰는 경우(이미 사용 중)
   verification: {
     google: "RAjkr0_ylgNzStxYF2VE4HNNWU9hVEaBqX6jHMaijiY",
   },
 
+  // ✅ 크롤링/표시 확장(필수급): index 허용 + 스니펫/프리뷰 확대
   robots: {
     index: true,
     follow: true,
@@ -58,6 +62,7 @@ export const metadata: Metadata = {
     },
   },
 
+  // ✅ 브랜드 노출 보강
   applicationName: SITE_NAME,
   category: "finance",
 
@@ -87,10 +92,12 @@ export const metadata: Metadata = {
     images: [OG_IMAGE],
   },
 
+  // ✅ 작성자 표기는 SEO 영향은 작지만 신뢰 신호로 무난
   authors: [{ name: SITE_NAME }],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // ✅ 구조화 데이터(JSON-LD): 검색엔진이 "이 사이트가 무엇인지" 더 잘 이해하게 만듦
   const jsonLdWebSite = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -116,9 +123,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="ko">
-      {/* ✅ GA (Next 권장 방식) */}
       <GoogleAnalytics gaId="G-762XP39BW8" />
-
       <head>
         {/* ✅ JSON-LD (구조화 데이터) */}
         <Script
@@ -146,15 +151,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             `,
           }}
         />
-
-        {/* ✅ Adsense (Head) - 전체 페이지 공통 1회 로드 */}
-        <Script
-          id="adsbygoogle-init"
-          async
-          strategy="afterInteractive"
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
-          crossOrigin="anonymous"
-        />
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-762XP39BW8"></script>
+        
       </head>
 
       <body className="min-h-screen bg-slate-50 text-slate-900">
