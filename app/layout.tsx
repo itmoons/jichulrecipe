@@ -4,6 +4,8 @@ import Script from "next/script";
 import "./globals.css";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { ToasterHost } from "@/components/ui/toaster-host";
+
 
 const SITE_NAME = "지출레시피";
 const SITE_URL = "https://www.jiculrecipe.com";
@@ -168,6 +170,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <SiteHeader />
         {children}
+        <ToasterHost />
       </body>
     </html>
   );

@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ArrowLeft, Check, Plus, X } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import { toast } from "sonner";
 
 const BRAND_ORANGE = "#FF8A3D";
 
@@ -472,11 +473,23 @@ export default function CalendarEditClient() {
         return;
       }
 
-      alert("오늘 지출 레시피가 저장되었어요!");
+      toast.success("오늘 지출 레시피가 저장되었어요!", {
+        style: {
+          background: "#FEF9C3", // tailwind: yellow-100
+          color: "#713F12",      // tailwind: yellow-900
+          border: "1px solid #FDE68A", // tailwind: amber-200
+        },
+      });
       router.push("/dashboard/calendar");
     } catch (err) {
       console.error("daily_recipes 저장 처리 중 오류:", err);
-      alert("서버에 레시피 저장 중 알 수 없는 오류가 발생했어요.");
+      toast.error("저장에 실패했어요. 잠시 후 다시 시도해주세요.", {
+        style: {
+          background: "#FEE2E2", // red-100
+          color: "#7F1D1D",      // red-900
+          border: "1px solid #FCA5A5", // red-300
+        },
+      });
     }
   };
 
