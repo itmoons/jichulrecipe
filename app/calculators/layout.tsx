@@ -172,94 +172,10 @@ export default function CalculatorsLayout({ children }: { children: React.ReactN
         </header>
 
         {/* Main grid */}
-        <div className="mx-auto grid max-w-6xl gap-4 px-4 py-6 lg:grid-cols-[1fr_320px] lg:gap-6">
+        <div className="mx-auto grid max-w-6xl gap-4 px-4  lg:gap-6">
           {/* Content */}
           <main className={cn("min-w-0", "pb-24 lg:pb-6")}>{children}</main>
 
-          {/* Right rail (desktop) */}
-          <aside className="hidden lg:block">
-            <div className={cn("rounded-3xl border p-5 shadow-sm", UI.card)}>
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className={cn("text-sm font-semibold", UI.ink)}>다음 단계</div>
-                  <div className={cn("mt-1 text-xs leading-relaxed", UI.inkSoft)}>
-                    계산 결과를 실행으로 바꾸는 “점검 루틴”으로 연결합니다.
-                  </div>
-                </div>
-                <span className="rounded-full bg-[#FFE4C7] px-2.5 py-1 text-xs font-semibold text-[#F97316] whitespace-nowrap">
-                  Recipe
-                </span>
-              </div>
-
-              <a
-                href={jiculChecklist}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={cn(
-                  "mt-4 block rounded-2xl px-4 py-3 text-center text-sm font-semibold text-white shadow-sm",
-                  "hover:bg-[#EA580C]",
-                  UI.accentBg
-                )}
-              >
-                지출레시피에서 체크리스트 받기 →
-              </a>
-
-              <div className={cn("mt-4 text-xs", UI.inkSoft)}>
-                * 계산기는 “추정”입니다. 최종 의사결정은 본인 상황(계약·요금·수수료)을 재확인하세요.
-              </div>
-
-              <div className={cn("mt-6 border-t pt-4", UI.line)}>
-                <div className={cn("text-sm font-semibold", UI.ink)}>같은 묶음 추천</div>
-                <div className="mt-3 grid gap-2">
-                  {related.map((r) => (
-                    <Link
-                      key={r.slug}
-                      href={`/calculators/${r.slug}`}
-                      className={cn(
-                        "rounded-xl border bg-white px-3 py-2 text-sm font-semibold hover:border-[#FB923C]",
-                        UI.line,
-                        UI.ink
-                      )}
-                    >
-                      {r.title}
-                    </Link>
-                  ))}
-                </div>
-
-                <div className="mt-3">
-                  <Link
-                    href="/calculators"
-                    className="text-xs font-semibold text-[#6B5642] hover:underline"
-                  >
-                    30개 계산기 모음 보기 →
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick nav */}
-            <div className={cn("mt-4 rounded-3xl border p-5 shadow-sm", UI.card)}>
-              <div className={cn("text-sm font-semibold", UI.ink)}>빠른 이동</div>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                {(["A", "B", "C", "D"] as const).map((g) => (
-                  <a
-                    key={g}
-                    href={`/calculators#${g}`}
-                    className={cn(
-                      "rounded-xl border bg-white px-3 py-2 text-center text-sm font-semibold hover:border-[#FB923C]",
-                      UI.line,
-                      UI.ink
-                    )}
-                  >
-                    {g} 구간
-                  </a>
-                ))}
-              </div>
-              <div className={cn("mt-3 text-xs", UI.inkSoft)}>
-                A: 고정비/구독 · B: 예산/현금흐름 · C: 부채/대출 · D: 세금/보험
-              </div>
-            </div>
-          </aside>
         </div>
 
         {/* Mobile sticky CTA */}
