@@ -171,6 +171,17 @@ export function SiteHeader() {
           >
             경조사비
           </Link>
+          <Link
+            href={guardedHref("/calculators")}
+            className={[
+              "rounded-full px-3 py-1 transition",
+              isDashboard || isYearly
+                ? "bg-white text-slate-900 shadow-sm border border-orange-100"
+                : "text-slate-700 hover:bg-white/70 hover:text-slate-900 border border-transparent",
+            ].join(" ")}
+          >
+            계산기
+          </Link>
 
           {/* 로그인 / 로그아웃 버튼 */}
           {!checking && (
@@ -287,6 +298,18 @@ export function SiteHeader() {
               onClick={closeNav}
             >
               경조사비
+            </Link>
+            <Link
+              href={guardedHref("/calculators")}
+              className={[
+                "rounded-md px-2 py-1.5",
+                pathname === "/dashboard" || pathname?.startsWith("/saving")
+                  ? "bg-orange-50 text-slate-900"
+                  : "hover:bg-orange-50",
+              ].join(" ")}
+              onClick={closeNav}
+            >
+              계산기
             </Link>
 
 
