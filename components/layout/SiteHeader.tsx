@@ -9,6 +9,13 @@ import { supabase } from "@/lib/supabaseClient";
 
 const BRAND_ORANGE = "#FF8A3D";
 
+// ✅ 공개 라우트(로그인 없이 접근 가능) - 하위 경로까지 포함
+const PUBLIC_ROUTES = ["/", "/calculators"];
+
+function isPublicRoute(target: string) {
+  return PUBLIC_ROUTES.some((p) => target === p || target.startsWith(p + "/"));
+}
+
 export function SiteHeader() {
   const router = useRouter();
   const pathname = usePathname();
@@ -59,9 +66,11 @@ export function SiteHeader() {
   const isDashboard = pathname === "/dashboard";
   const isYearly = pathname?.startsWith("/dashboard/yearly");
 
-  // 로그인 가드용 링크 헬퍼
-  const guardedHref = (target: string) =>
-    isLoggedIn ? target : "/sign-in";
+  // ✅ 로그인 가드용 링크 헬퍼 (public 라우트는 예외)
+  const guardedHref = (target: string) => {
+    if (isPublicRoute(target)) return target;
+    return isLoggedIn ? target : "/sign-in";
+  };
 
   return (
     <header
@@ -83,17 +92,11 @@ export function SiteHeader() {
             aria-label="메뉴 열기"
             aria-expanded={isNavOpen}
           >
-            <span className="inline-block text-lg">
-              {isNavOpen ? "✕" : "☰"}
-            </span>
+            <span className="inline-block text-lg">{isNavOpen ? "✕" : "☰"}</span>
           </button>
 
           {/* 로고 + 서비스명 */}
-          <Link
-            href="/"
-            className="flex items-center gap-2"
-            onClick={closeNav}
-          >
+          <Link href="/" className="flex items-center gap-2" onClick={closeNav}>
             <div className="flex h-9 w-9 items-center justify-center rounded-md bg-white shadow-sm border border-orange-100">
               <Image
                 src="/logo/logo.png"
@@ -104,12 +107,8 @@ export function SiteHeader() {
               />
             </div>
             <div className="flex flex-col leading-tight">
-              <span className="text-sm font-semibold text-slate-900">
-                지출레시피
-              </span>
-              <span className="text-[11px] text-slate-500">
-                사회초년생을 위한 예산 레스토랑
-              </span>
+              <span className="text-sm font-semibold text-slate-900">지출레시피</span>
+              <span className="text-[11px] text-slate-500">사회초년생을 위한 예산 레스토랑</span>
             </div>
           </Link>
         </div>
@@ -142,7 +141,7 @@ export function SiteHeader() {
             href={guardedHref("/dashboard/recurring")}
             className={[
               "rounded-full px-3 py-1 transition",
-              isCalendar
+              pathname?.startsWith("/dashboard/recurring")
                 ? "bg-white text-slate-900 shadow-sm border border-orange-100"
                 : "text-slate-700 hover:bg-white/70 hover:text-slate-900 border border-transparent",
             ].join(" ")}
@@ -153,7 +152,7 @@ export function SiteHeader() {
             href={guardedHref("/saving")}
             className={[
               "rounded-full px-3 py-1 transition",
-              isDashboard || isYearly
+              pathname?.startsWith("/saving")
                 ? "bg-white text-slate-900 shadow-sm border border-orange-100"
                 : "text-slate-700 hover:bg-white/70 hover:text-slate-900 border border-transparent",
             ].join(" ")}
@@ -164,18 +163,20 @@ export function SiteHeader() {
             href={guardedHref("/dashboard/gifts")}
             className={[
               "rounded-full px-3 py-1 transition",
-              isDashboard || isYearly
+              pathname?.startsWith("/dashboard/gifts")
                 ? "bg-white text-slate-900 shadow-sm border border-orange-100"
                 : "text-slate-700 hover:bg-white/70 hover:text-slate-900 border border-transparent",
             ].join(" ")}
           >
             경조사비
           </Link>
+
+          {/* ✅ calculators는 PUBLIC_ROUTES에 포함되어 있어 비로그인도 그대로 이동 */}
           <Link
             href={guardedHref("/calculators")}
             className={[
               "rounded-full px-3 py-1 transition",
-              isDashboard || isYearly
+              pathname?.startsWith("/calculators")
                 ? "bg-white text-slate-900 shadow-sm border border-orange-100"
                 : "text-slate-700 hover:bg-white/70 hover:text-slate-900 border border-transparent",
             ].join(" ")}
@@ -251,6 +252,7 @@ export function SiteHeader() {
             >
               레시피 달력
             </Link>
+
             <Link
               href={guardedHref("/dashboard")}
               className={[
@@ -263,11 +265,12 @@ export function SiteHeader() {
             >
               레시피 분석
             </Link>
+
             <Link
               href={guardedHref("/dashboard/recurring")}
               className={[
                 "rounded-md px-2 py-1.5",
-                pathname === "/dashboard" || pathname?.startsWith("/recurring")
+                pathname?.startsWith("/dashboard/recurring")
                   ? "bg-orange-50 text-slate-900"
                   : "hover:bg-orange-50",
               ].join(" ")}
@@ -275,11 +278,12 @@ export function SiteHeader() {
             >
               정기레시피 등록
             </Link>
+
             <Link
               href={guardedHref("/saving")}
               className={[
                 "rounded-md px-2 py-1.5",
-                pathname === "/dashboard" || pathname?.startsWith("/saving")
+                pathname?.startsWith("/saving")
                   ? "bg-orange-50 text-slate-900"
                   : "hover:bg-orange-50",
               ].join(" ")}
@@ -287,11 +291,12 @@ export function SiteHeader() {
             >
               재료 저장(적금)
             </Link>
+
             <Link
               href={guardedHref("/dashboard/gifts")}
               className={[
                 "rounded-md px-2 py-1.5",
-                pathname === "/dashboard" || pathname?.startsWith("/saving")
+                pathname?.startsWith("/dashboard/gifts")
                   ? "bg-orange-50 text-slate-900"
                   : "hover:bg-orange-50",
               ].join(" ")}
@@ -299,11 +304,13 @@ export function SiteHeader() {
             >
               경조사비
             </Link>
+
+            {/* ✅ calculators는 PUBLIC_ROUTES에 포함되어 있어 비로그인도 그대로 이동 */}
             <Link
               href={guardedHref("/calculators")}
               className={[
                 "rounded-md px-2 py-1.5",
-                pathname === "/dashboard" || pathname?.startsWith("/saving")
+                pathname?.startsWith("/calculators")
                   ? "bg-orange-50 text-slate-900"
                   : "hover:bg-orange-50",
               ].join(" ")}
@@ -311,7 +318,6 @@ export function SiteHeader() {
             >
               계산기
             </Link>
-
 
             <span
               className="mt-3 inline-flex items-center justify-center gap-1 rounded-full border border-orange-200 bg-[#FFF7EB] px-3 py-1 text-[11px] text-[color:var(--brand-orange)] shadow-sm"
