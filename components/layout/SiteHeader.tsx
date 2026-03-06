@@ -3,13 +3,14 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import NotificationsPanel from "@/components/NotificationsPanel";
 
 const BRAND_ORANGE = "#FF8A3D";
 
-// ✅ 공개 라우트(로그인 없이 접근 가능) - 하위 경로까지 포함
+// 공개 라우트
 const PUBLIC_ROUTES = ["/", "/calculators"];
 
 function isPublicRoute(target: string) {
@@ -19,11 +20,16 @@ function isPublicRoute(target: string) {
 export function SiteHeader() {
   const router = useRouter();
   const pathname = usePathname();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [checking, setChecking] = useState(true); // 초기 깜빡임 방지용
-  const [isNavOpen, setIsNavOpen] = useState(false); // 모바일 메뉴 열림 여부
 
-  // Supabase 세션 기반 로그인 상태 체크
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [checking, setChecking] = useState(true);
+  const [isNavOpen, setIsNavOpen] = useState(false);
+
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const notifWrapRef = useRef<HTMLDivElement | null>(null);
+
+  const [unreadCount, setUnreadCount] = useState(0);
+
   useEffect(() => {
     let mounted = true;
 
@@ -39,12 +45,16 @@ export function SiteHeader() {
 
     init();
 
-    // 로그인/로그아웃 상태 변화 구독
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!mounted) return;
       setIsLoggedIn(!!session);
+
+      if (!session) {
+        setUnreadCount(0);
+        setIsNotifOpen(false);
+      }
     });
 
     return () => {
@@ -53,20 +63,110 @@ export function SiteHeader() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!isLoggedIn) return;
+
+    let mounted = true;
+    let channel: any = null;
+
+    const loadUnread = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user?.id) return;
+
+      const { count, error } = await supabase
+        .from("notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("to_user_id", user.id)
+        .is("read_at", null);
+
+      if (!mounted) return;
+      if (!error) setUnreadCount(count ?? 0);
+    };
+
+    const subscribeUnread = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user?.id) return;
+
+      channel = supabase
+        .channel(`notif-unread:${user.id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "notifications",
+            filter: `to_user_id=eq.${user.id}`,
+          },
+          () => {
+            setUnreadCount((c) => c + 1);
+          }
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "notifications",
+            filter: `to_user_id=eq.${user.id}`,
+          },
+          async () => {
+            await loadUnread();
+          }
+        )
+        .subscribe();
+    };
+
+    loadUnread();
+    subscribeUnread();
+
+    return () => {
+      mounted = false;
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    const onDown = (e: MouseEvent) => {
+      if (!isNotifOpen) return;
+      const el = notifWrapRef.current;
+      if (!el) return;
+      if (!el.contains(e.target as Node)) setIsNotifOpen(false);
+    };
+
+    window.addEventListener("mousedown", onDown);
+    return () => window.removeEventListener("mousedown", onDown);
+  }, [isNotifOpen]);
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setIsNavOpen(false);
+    setIsNotifOpen(false);
     router.push("/");
   };
 
-  const toggleNav = () => setIsNavOpen((prev) => !prev);
+  const toggleNav = () => {
+    setIsNotifOpen(false);
+    setIsNavOpen((prev) => !prev);
+  };
+
   const closeNav = () => setIsNavOpen(false);
+
+  const toggleNotif = () => {
+    setIsNavOpen(false);
+    setIsNotifOpen((prev) => !prev);
+  };
+
+  const closeNotif = () => setIsNotifOpen(false);
 
   const isCalendar = pathname?.startsWith("/dashboard/calendar");
   const isDashboard = pathname === "/dashboard";
   const isYearly = pathname?.startsWith("/dashboard/yearly");
+  const isCouple = pathname?.startsWith("/couple-ledger");
 
-  // ✅ 로그인 가드용 링크 헬퍼 (public 라우트는 예외)
   const guardedHref = (target: string) => {
     if (isPublicRoute(target)) return target;
     return isLoggedIn ? target : "/sign-in";
@@ -80,11 +180,8 @@ export function SiteHeader() {
         "backdrop-blur shadow-[0_2px_8px_rgba(248,153,75,0.12)]",
       ].join(" ")}
     >
-      {/* 상단 바 (PC에서 65% 폭만 사용) */}
-      <div className="mx-auto flex w-full max-w-full md:max-w-[100%] items-center justify-between px-4 py-3">
-        {/* 좌측: 햄버거 + 로고 */}
+      <div className="mx-auto flex w-full max-w-full items-center justify-between px-4 py-3">
         <div className="flex items-center gap-2">
-          {/* 햄버거 버튼 - 모바일 전용, 왼쪽 배치 */}
           <button
             type="button"
             onClick={toggleNav}
@@ -95,16 +192,16 @@ export function SiteHeader() {
             <span className="inline-block text-lg">{isNavOpen ? "✕" : "☰"}</span>
           </button>
 
-          {/* 로고 + 서비스명 */}
-          <Link href="/" className="flex items-center gap-2" onClick={closeNav}>
-            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-white shadow-sm border border-orange-100">
-              <Image
-                src="/logo/logo.png"
-                alt="지출레시피 로고"
-                width={26}
-                height={26}
-                priority
-              />
+          <Link
+            href="/"
+            className="flex items-center gap-2"
+            onClick={() => {
+              closeNav();
+              closeNotif();
+            }}
+          >
+            <div className="flex h-9 w-9 items-center justify-center rounded-md border border-orange-100 bg-white shadow-sm">
+              <Image src="/logo/logo.png" alt="지출레시피 로고" width={26} height={26} priority />
             </div>
             <div className="flex flex-col leading-tight">
               <span className="text-sm font-semibold text-slate-900">지출레시피</span>
@@ -113,78 +210,141 @@ export function SiteHeader() {
           </Link>
         </div>
 
-        {/* 데스크톱 내비게이션 */}
         <nav className="hidden items-center gap-4 text-xs font-medium text-slate-700 md:flex">
           <Link
             href={guardedHref("/dashboard/calendar")}
             className={[
               "rounded-full px-3 py-1 transition",
               isCalendar
-                ? "bg-white text-slate-900 shadow-sm border border-orange-100"
-                : "text-slate-700 hover:bg-white/70 hover:text-slate-900 border border-transparent",
+                ? "border border-orange-100 bg-white text-slate-900 shadow-sm"
+                : "border border-transparent text-slate-700 hover:bg-white/70 hover:text-slate-900",
             ].join(" ")}
+            onClick={closeNotif}
           >
             레시피 달력
           </Link>
+
           <Link
             href={guardedHref("/dashboard")}
             className={[
               "rounded-full px-3 py-1 transition",
               isDashboard || isYearly
-                ? "bg-white text-slate-900 shadow-sm border border-orange-100"
-                : "text-slate-700 hover:bg-white/70 hover:text-slate-900 border border-transparent",
+                ? "border border-orange-100 bg-white text-slate-900 shadow-sm"
+                : "border border-transparent text-slate-700 hover:bg-white/70 hover:text-slate-900",
             ].join(" ")}
+            onClick={closeNotif}
           >
             레시피 분석
           </Link>
+
           <Link
             href={guardedHref("/dashboard/recurring")}
             className={[
               "rounded-full px-3 py-1 transition",
               pathname?.startsWith("/dashboard/recurring")
-                ? "bg-white text-slate-900 shadow-sm border border-orange-100"
-                : "text-slate-700 hover:bg-white/70 hover:text-slate-900 border border-transparent",
+                ? "border border-orange-100 bg-white text-slate-900 shadow-sm"
+                : "border border-transparent text-slate-700 hover:bg-white/70 hover:text-slate-900",
             ].join(" ")}
+            onClick={closeNotif}
           >
             정기레시피 등록
           </Link>
+
           <Link
             href={guardedHref("/saving")}
             className={[
               "rounded-full px-3 py-1 transition",
               pathname?.startsWith("/saving")
-                ? "bg-white text-slate-900 shadow-sm border border-orange-100"
-                : "text-slate-700 hover:bg-white/70 hover:text-slate-900 border border-transparent",
+                ? "border border-orange-100 bg-white text-slate-900 shadow-sm"
+                : "border border-transparent text-slate-700 hover:bg-white/70 hover:text-slate-900",
             ].join(" ")}
+            onClick={closeNotif}
           >
             재료 저장(적금)
           </Link>
+
           <Link
             href={guardedHref("/dashboard/gifts")}
             className={[
               "rounded-full px-3 py-1 transition",
               pathname?.startsWith("/dashboard/gifts")
-                ? "bg-white text-slate-900 shadow-sm border border-orange-100"
-                : "text-slate-700 hover:bg-white/70 hover:text-slate-900 border border-transparent",
+                ? "border border-orange-100 bg-white text-slate-900 shadow-sm"
+                : "border border-transparent text-slate-700 hover:bg-white/70 hover:text-slate-900",
             ].join(" ")}
+            onClick={closeNotif}
           >
             경조사비
           </Link>
 
-          {/* ✅ calculators는 PUBLIC_ROUTES에 포함되어 있어 비로그인도 그대로 이동 */}
           <Link
             href={guardedHref("/calculators")}
             className={[
               "rounded-full px-3 py-1 transition",
               pathname?.startsWith("/calculators")
-                ? "bg-white text-slate-900 shadow-sm border border-orange-100"
-                : "text-slate-700 hover:bg-white/70 hover:text-slate-900 border border-transparent",
+                ? "border border-orange-100 bg-white text-slate-900 shadow-sm"
+                : "border border-transparent text-slate-700 hover:bg-white/70 hover:text-slate-900",
             ].join(" ")}
+            onClick={closeNotif}
           >
             계산기
           </Link>
 
-          {/* 로그인 / 로그아웃 버튼 */}
+          <Link
+            href={guardedHref("/couple-ledger")}
+            className={[
+              "rounded-full px-3 py-1 transition",
+              isCouple
+                ? "border border-orange-100 bg-white text-slate-900 shadow-sm"
+                : "border border-transparent text-slate-700 hover:bg-white/70 hover:text-slate-900",
+            ].join(" ")}
+            onClick={closeNotif}
+          >
+            커플 장부
+          </Link>
+
+          {!checking && isLoggedIn && (
+            <div className="relative" ref={notifWrapRef}>
+              <button
+                type="button"
+                onClick={toggleNotif}
+                className="relative rounded-full border border-orange-200 bg-white px-3 py-1 text-[11px] font-semibold text-slate-800 shadow-sm transition hover:bg-orange-50"
+                aria-label="알림"
+                aria-expanded={isNotifOpen}
+              >
+                <span className="mr-1">🔔</span>
+                알림
+                {unreadCount > 0 && (
+                  <span
+                    className="ml-2 inline-flex min-w-[18px] items-center justify-center rounded-full bg-[color:var(--brand-orange)] px-1.5 py-0.5 text-[10px] font-bold text-white"
+                    style={{ ["--brand-orange" as any]: BRAND_ORANGE }}
+                  >
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {isNotifOpen && (
+                <div className="absolute right-0 mt-2 w-[560px] max-w-[92vw]">
+                  <div className="rounded-2xl border border-orange-100 bg-white/95 shadow-xl backdrop-blur">
+                    <div className="flex items-center justify-between border-b border-orange-100 px-3 py-2">
+                      <div className="text-xs font-extrabold text-slate-900">알림 센터</div>
+                      <button
+                        type="button"
+                        onClick={closeNotif}
+                        className="rounded-full border border-orange-200 bg-white px-2 py-1 text-[11px] font-semibold text-slate-700 hover:bg-orange-50"
+                      >
+                        닫기
+                      </button>
+                    </div>
+                    <div className="p-3">
+                      <NotificationsPanel onClose={closeNotif} />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {!checking && (
             <>
               {isLoggedIn ? (
@@ -209,8 +369,49 @@ export function SiteHeader() {
           )}
         </nav>
 
-        {/* 모바일 우측: 로그인 / 로그아웃만 */}
         <div className="flex items-center gap-2 md:hidden">
+          {!checking && isLoggedIn && (
+            <div className="relative" ref={notifWrapRef}>
+              <button
+                type="button"
+                onClick={toggleNotif}
+                className="relative rounded-full border border-orange-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-800 shadow-sm transition hover:bg-orange-50"
+                aria-label="알림"
+                aria-expanded={isNotifOpen}
+              >
+                🔔
+                {unreadCount > 0 && (
+                  <span
+                    className="absolute -right-1 -top-1 inline-flex min-w-[18px] items-center justify-center rounded-full bg-[color:var(--brand-orange)] px-1.5 py-0.5 text-[10px] font-bold text-white"
+                    style={{ ["--brand-orange" as any]: BRAND_ORANGE }}
+                  >
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {isNotifOpen && (
+                <div className="absolute right-0 mt-2 w-[92vw] max-w-[560px]">
+                  <div className="rounded-2xl border border-orange-100 bg-white/95 shadow-xl backdrop-blur">
+                    <div className="flex items-center justify-between border-b border-orange-100 px-3 py-2">
+                      <div className="text-xs font-extrabold text-slate-900">알림 센터</div>
+                      <button
+                        type="button"
+                        onClick={closeNotif}
+                        className="rounded-full border border-orange-200 bg-white px-2 py-1 text-[11px] font-semibold text-slate-700 hover:bg-orange-50"
+                      >
+                        닫기
+                      </button>
+                    </div>
+                    <div className="p-3">
+                      <NotificationsPanel onClose={closeNotif} />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {!checking && (
             <>
               {isLoggedIn ? (
@@ -236,10 +437,9 @@ export function SiteHeader() {
         </div>
       </div>
 
-      {/* 모바일 드롭다운 메뉴 */}
       {isNavOpen && (
         <div className="border-t border-orange-100 bg-white/95 md:hidden">
-          <nav className="mx-auto flex w-full max-w-full md:max-w-[65%] flex-col gap-1 px-4 py-3 text-sm font-medium text-slate-700">
+          <nav className="mx-auto flex w-full max-w-full flex-col gap-1 px-4 py-3 text-sm font-medium text-slate-700">
             <Link
               href={guardedHref("/dashboard/calendar")}
               className={[
@@ -248,7 +448,10 @@ export function SiteHeader() {
                   ? "bg-orange-50 text-slate-900"
                   : "hover:bg-orange-50",
               ].join(" ")}
-              onClick={closeNav}
+              onClick={() => {
+                closeNav();
+                closeNotif();
+              }}
             >
               레시피 달력
             </Link>
@@ -261,7 +464,10 @@ export function SiteHeader() {
                   ? "bg-orange-50 text-slate-900"
                   : "hover:bg-orange-50",
               ].join(" ")}
-              onClick={closeNav}
+              onClick={() => {
+                closeNav();
+                closeNotif();
+              }}
             >
               레시피 분석
             </Link>
@@ -274,7 +480,10 @@ export function SiteHeader() {
                   ? "bg-orange-50 text-slate-900"
                   : "hover:bg-orange-50",
               ].join(" ")}
-              onClick={closeNav}
+              onClick={() => {
+                closeNav();
+                closeNotif();
+              }}
             >
               정기레시피 등록
             </Link>
@@ -287,7 +496,10 @@ export function SiteHeader() {
                   ? "bg-orange-50 text-slate-900"
                   : "hover:bg-orange-50",
               ].join(" ")}
-              onClick={closeNav}
+              onClick={() => {
+                closeNav();
+                closeNotif();
+              }}
             >
               재료 저장(적금)
             </Link>
@@ -300,12 +512,14 @@ export function SiteHeader() {
                   ? "bg-orange-50 text-slate-900"
                   : "hover:bg-orange-50",
               ].join(" ")}
-              onClick={closeNav}
+              onClick={() => {
+                closeNav();
+                closeNotif();
+              }}
             >
               경조사비
             </Link>
 
-            {/* ✅ calculators는 PUBLIC_ROUTES에 포함되어 있어 비로그인도 그대로 이동 */}
             <Link
               href={guardedHref("/calculators")}
               className={[
@@ -314,9 +528,28 @@ export function SiteHeader() {
                   ? "bg-orange-50 text-slate-900"
                   : "hover:bg-orange-50",
               ].join(" ")}
-              onClick={closeNav}
+              onClick={() => {
+                closeNav();
+                closeNotif();
+              }}
             >
               계산기
+            </Link>
+
+            <Link
+              href={guardedHref("/couple-ledger")}
+              className={[
+                "rounded-md px-2 py-1.5",
+                pathname?.startsWith("/couple-ledger")
+                  ? "bg-orange-50 text-slate-900"
+                  : "hover:bg-orange-50",
+              ].join(" ")}
+              onClick={() => {
+                closeNav();
+                closeNotif();
+              }}
+            >
+              커플 장부
             </Link>
 
             <span

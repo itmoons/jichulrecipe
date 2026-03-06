@@ -398,7 +398,9 @@ export default function HomePage() {
                   alt="지출레시피 로고"
                   width={52}
                   height={52}
-                  className="drop-shadow-sm"
+                  className="drop-shadow-sm"            
+  priority
+  style={{ width: "auto", height: "auto" }}
                 />
               </div>
 

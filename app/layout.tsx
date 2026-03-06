@@ -1,11 +1,18 @@
 // src/app/layout.tsx
 import type { Metadata } from "next";
 import Script from "next/script";
+import localFont from "next/font/local";
 import "./globals.css";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { ToasterHost } from "@/components/ui/toaster-host";
 
+const pretendard = localFont({
+  src: "./fonts/SCDream6.otf",
+  variable: "--font-pretendard",
+  weight: "45 920",
+  display: "swap",
+});
 
 const SITE_NAME = "지출레시피";
 const SITE_URL = "https://www.jiculrecipe.com";
@@ -15,18 +22,12 @@ const GTM_ID = "GTM-KP9QNXS6";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-
-  // ✅ 검색 의도형 타이틀: "가계부" + "무료" + 핵심 베네핏(분석)
   title: {
     default: "지출레시피 | 무료 가계부 · 지출분석 · 소비습관 진단",
     template: `%s | ${SITE_NAME}`,
   },
-
-  // ✅ SERP(검색 결과)에서 클릭을 부르는 설명: 기능 나열보다 "문제 해결" 중심
   description:
     "무료 가계부 지출레시피로 지출/수입을 기록하고, 카테고리·월별 통계와 소비습관 분석까지 한 번에. 자동 분류와 대시보드로 예산 관리가 쉬워집니다.",
-
-  // ✅ 핵심 키워드: 브랜드 + 헤드키워드(가계부) + 의도 키워드(지출분석/예산관리)
   keywords: [
     "가계부",
     "무료 가계부",
@@ -41,17 +42,12 @@ export const metadata: Metadata = {
     "정기결제 관리",
     "지출레시피",
   ],
-
   alternates: {
     canonical: SITE_URL,
   },
-
-  // ✅ GSC HTML태그 인증을 쓰는 경우(이미 사용 중)
   verification: {
     google: "RAjkr0_ylgNzStxYF2VE4HNNWU9hVEaBqX6jHMaijiY",
   },
-
-  // ✅ 크롤링/표시 확장(필수급): index 허용 + 스니펫/프리뷰 확대
   robots: {
     index: true,
     follow: true,
@@ -63,11 +59,8 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
-
-  // ✅ 브랜드 노출 보강
   applicationName: SITE_NAME,
   category: "finance",
-
   openGraph: {
     title: "지출레시피 | 무료 가계부 · 지출분석 · 소비습관 진단",
     description:
@@ -85,7 +78,6 @@ export const metadata: Metadata = {
       },
     ],
   },
-
   twitter: {
     card: "summary_large_image",
     title: "지출레시피 | 무료 가계부 · 지출분석 · 소비습관 진단",
@@ -93,13 +85,10 @@ export const metadata: Metadata = {
       "무료 가계부로 지출/수입을 기록하고 월별·카테고리별 통계와 소비습관 분석까지 한 번에.",
     images: [OG_IMAGE],
   },
-
-  // ✅ 작성자 표기는 SEO 영향은 작지만 신뢰 신호로 무난
   authors: [{ name: SITE_NAME }],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  // ✅ 구조화 데이터(JSON-LD): 검색엔진이 "이 사이트가 무엇인지" 더 잘 이해하게 만듦
   const jsonLdWebSite = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -124,10 +113,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   };
 
   return (
-    <html lang="ko">
+    <html lang="ko" className={pretendard.variable}>
       <GoogleAnalytics gaId="G-762XP39BW8" />
       <head>
-        {/* ✅ JSON-LD (구조화 데이터) */}
         <Script
           id="jsonld-website"
           type="application/ld+json"
@@ -139,7 +127,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrganization) }}
         />
 
-        {/* ✅ GTM (Head) */}
         <Script
           id="gtm-head"
           strategy="afterInteractive"
@@ -154,11 +141,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-762XP39BW8"></script>
-        
       </head>
 
-      <body className="min-h-screen bg-slate-50 text-slate-900">
-        {/* ✅ GTM (noscript) - body 바로 아래 */}
+      <body className="min-h-screen bg-slate-50 text-slate-900 font-sans">
         <noscript>
           <iframe
             src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
