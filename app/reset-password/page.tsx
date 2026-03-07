@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabaseClient";
 
-const BRAND_ORANGE = "#FF8A3D";
+const BRAND_blue = "#5bbbf3";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -88,7 +88,7 @@ export default function ResetPasswordPage() {
     // 세션이 없다면: 잘못된/만료된 링크
     return (
       <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#FFF8EC] via-[#FFFDFC] to-[#F7FAFF] px-4">
-        <div className="w-full max-w-md rounded-3xl bg-white/95 p-6 text-center shadow-lg shadow-orange-100">
+        <div className="w-full max-w-md rounded-3xl bg-white/95 p-6 text-center shadow-lg shadow-blue-100">
           <h1 className="mb-2 text-base font-semibold text-slate-900">
             유효하지 않은 비밀번호 재설정 링크입니다
           </h1>
@@ -100,8 +100,8 @@ export default function ResetPasswordPage() {
           <button
             type="button"
             onClick={() => router.push("/sign-in")}
-            className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-orange)] px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-orange-200 hover:bg-[#f27422]"
-            style={{ ["--brand-orange" as any]: BRAND_ORANGE }}
+            className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-white shadow-md shadow-blue-200 hover:bg-[#f27422]"
+            style={{ ["--brand-blue" as any]: BRAND_blue }}
           >
             로그인 페이지로 이동
           </button>
@@ -118,12 +118,12 @@ export default function ResetPasswordPage() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: "easeOut" }}
-        className="w-full max-w-md rounded-3xl bg-white/95 p-6 shadow-lg shadow-orange-100"
+        className="w-full max-w-md rounded-3xl bg-white/95 p-6 shadow-lg shadow-blue-100"
       >
         <div className="mb-4 flex flex-col gap-1">
           <div className="inline-flex items-center gap-2">
             <span className="text-xl">🥕</span>
-            <span className="text-sm font-semibold tracking-tight text-slate-900">
+            <span className="text-[12px] font-semibold tracking-tight text-slate-900">
               지출레시피
             </span>
           </div>
@@ -136,7 +136,7 @@ export default function ResetPasswordPage() {
         </div>
 
         {successMsg && (
-          <div className="mb-3 rounded-xl border border-orange-200 bg-[#FFF7EB] px-3 py-2 text-[11px] text-orange-700">
+          <div className="mb-3 rounded-xl border border-blue-200 bg-[#FFF7EB] px-3 py-2 text-[11px] text-blue-700">
             {successMsg}
           </div>
         )}
@@ -151,7 +151,7 @@ export default function ResetPasswordPage() {
             </label>
             <input
               type="password"
-              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-[12px] outline-none focus:border-slate-400"
               placeholder="6자 이상 입력해 주세요"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -163,7 +163,7 @@ export default function ResetPasswordPage() {
             </label>
             <input
               type="password"
-              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-[12px] outline-none focus:border-slate-400"
               placeholder="한 번 더 입력해 주세요"
               value={passwordCheck}
               onChange={(e) => setPasswordCheck(e.target.value)}
@@ -173,8 +173,8 @@ export default function ResetPasswordPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="mt-2 flex w-full items-center justify-center rounded-xl bg-[color:var(--brand-orange)] px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-orange-200 transition hover:bg-[#f27422] disabled:cursor-not-allowed disabled:opacity-70"
-            style={{ ["--brand-orange" as any]: BRAND_ORANGE }}
+            className="mt-2 flex w-full items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-white shadow-md shadow-blue-200 transition hover:bg-[#f27422] disabled:cursor-not-allowed disabled:opacity-70"
+            style={{ ["--brand-blue" as any]: BRAND_blue }}
           >
             {isSubmitting ? "변경 중..." : "비밀번호 변경하기"}
           </button>

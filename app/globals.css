@@ -1,7 +1,7 @@
 /* @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #5bbbf3;
   --foreground: #171717;
 }
 
@@ -30,7 +30,7 @@ body {
 /* @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #5bbbf3;
   --foreground: #171717;
 }
 
@@ -69,15 +69,15 @@ body {
 
 /* 지출레시피 Theme (네가 추가했던 오렌지 변수/배경은 그대로 유지 가능) */
 :root {
-  --background: #fff7f0;
+  --background: #f0fcff;
   --foreground: #171717;
 
-  --recipe-orange: #ff8a3d;
-  --recipe-orange-strong: #ff6f1f;
-  --recipe-orange-soft: #fff1e8;
+  --recipe-blue: #3dd8ff;
+  --recipe-blue-strong: #5bbbf3;
+  --recipe-blue-soft: #f2fbff;
 
-  --recipe-border: #fde2cf;
-  --recipe-card: #ffffff;
+  --recipe-border: #cfe4fd;
+  --recipe-card: #5bbbf3;
 
   --recipe-muted: #6b7280;
 }
@@ -93,8 +93,8 @@ body {
 }
 
 .bg-recipe {
-  background:white;
+  background:rgb(255, 255, 255);
     /* radial-gradient(800px 320px at 10% 0%, rgba(255, 138, 61, 0.18), transparent 60%), */
     /* radial-gradient(800px 320px at 90% 20%, rgba(255, 138, 61, 0.10), transparent 60%), */
-    /* linear-gradient(to bottom, #fff7f0, #ffffff); */
+    /* linear-gradient(to bottom, #fff7f0, #5bbbf3); */
 }

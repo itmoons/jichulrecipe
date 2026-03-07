@@ -1,9 +1,9 @@
 .page {
-  max-width: 1080px;
+  max-width: 1240px;
   margin: 0 auto;
   padding: 20px 16px 80px;
   color: #111;
-  background: #fff;
+  background: #5bbbf300;
 }
 
 .header {
@@ -37,7 +37,7 @@
   align-items: center;
   gap: 8px;
   border: none;
-  background: rgb(255, 187, 61);
+  background: rgb(61, 194, 255);
   color: #fff;
   padding: 10px 12px;
   border-radius: 10px;
@@ -86,7 +86,7 @@
 }
 
 .danger {
-  color: rgb(255, 187, 61);
+  color: rgb(61, 161, 255);
   border-color: #fee2e2;
 }
 
@@ -244,9 +244,9 @@
 }
 
 .out {
-  color: rgb(255, 187, 61);
-  border-color: #fef2e2;
-  background: #fffcf7;
+  color: rgb(61, 122, 255);
+  border-color: #e2effe;
+  background: #f7fbff;
 }
 
 .in {

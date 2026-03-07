@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 export function RecipePage({ children }: { children: React.ReactNode }) {
   return (
     <div className="bg-recipe min-h-screen">
-      <div className="mx-auto max-w-6xl px-4 py-6">{children}</div>
+      <div className="mx-auto w-[1240px] px-4 py-6">{children}</div>
     </div>
   );
 }
@@ -30,13 +30,13 @@ export function RecipeCard({
     <div
       className={cn(
         "rounded-2xl border bg-white shadow-sm",
-        "border-orange-100/70",
+        "border-blue-100/70",
         "backdrop-blur supports-[backdrop-filter]:bg-white/80",
         className
       )}
     >
       {(title || description || right) && (
-        <div className="flex items-start justify-between gap-3 border-b border-orange-100/70 px-4 py-3">
+        <div className="flex items-start justify-between gap-3 border-b border-blue-100/70 px-4 py-3">
           <div>
             {title && <div className="text-base font-extrabold text-zinc-900">{title}</div>}
             {description && <div className="text-xs text-zinc-500 mt-0.5">{description}</div>}
@@ -53,12 +53,12 @@ export function RecipeBadge({
   variant = "neutral",
   children,
 }: {
-  variant?: "neutral" | "orange" | "danger" | "success";
+  variant?: "neutral" | "blue" | "danger" | "success";
   children: React.ReactNode;
 }) {
   const cls =
-    variant === "orange"
-      ? "bg-orange-50 text-orange-700 border-orange-200"
+    variant === "blue"
+      ? "bg-blue-50 text-blue-700 border-blue-200"
       : variant === "danger"
       ? "bg-red-50 text-red-700 border-red-200"
       : variant === "success"
@@ -76,16 +76,16 @@ export function RecipeButton({
   variant?: "primary" | "ghost" | "outline" | "danger";
 }) {
   const base =
-    "inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-semibold transition active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed";
+    "inline-flex items-center justify-center rounded-xl px-3 py-2 text-[12px] font-semibold transition active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed";
 
   const v =
     variant === "primary"
-      ? "bg-orange-500 text-white hover:bg-orange-600 shadow-sm"
+      ? "bg-blue-500 text-white hover:bg-blue-600 shadow-sm"
       : variant === "danger"
       ? "bg-red-500 text-white hover:bg-red-600"
       : variant === "outline"
-      ? "border border-orange-200 bg-white hover:bg-orange-50 text-zinc-900"
-      : "bg-transparent hover:bg-orange-50 text-zinc-900";
+      ? "border border-blue-200 bg-white hover:bg-blue-50 text-zinc-900"
+      : "bg-transparent hover:bg-blue-50 text-zinc-900";
 
   return <button className={cn(base, v, className)} {...props} />;
 }
@@ -95,8 +95,8 @@ export function RecipeInput(props: React.InputHTMLAttributes<HTMLInputElement>) 
     <input
       {...props}
       className={cn(
-        "w-full rounded-xl border border-orange-200 bg-white px-3 py-2 text-sm",
-        "outline-none focus:ring-2 focus:ring-orange-200"
+        "w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-[12px]",
+        "outline-none focus:ring-2 focus:ring-blue-200"
       )}
     />
   );
@@ -107,8 +107,8 @@ export function RecipeTextarea(props: React.TextareaHTMLAttributes<HTMLTextAreaE
     <textarea
       {...props}
       className={cn(
-        "w-full rounded-xl border border-orange-200 bg-white px-3 py-2 text-sm",
-        "outline-none focus:ring-2 focus:ring-orange-200"
+        "w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-[12px]",
+        "outline-none focus:ring-2 focus:ring-blue-200"
       )}
     />
   );
@@ -119,8 +119,8 @@ export function RecipeSelect(props: React.SelectHTMLAttributes<HTMLSelectElement
     <select
       {...props}
       className={cn(
-        "w-full rounded-xl border border-orange-200 bg-white px-3 py-2 text-sm",
-        "outline-none focus:ring-2 focus:ring-orange-200"
+        "w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-[12px]",
+        "outline-none focus:ring-2 focus:ring-blue-200"
       )}
     />
   );

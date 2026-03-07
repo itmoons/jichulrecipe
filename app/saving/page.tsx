@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { PageContainer } from "@/components/layout/PageContainer";
 
-const BRAND_ORANGE = "#ffbb3d";
+const BRAND_blue = "#4c2cff";
 
 type SavingPlan = {
   id: number;
@@ -384,12 +384,12 @@ export default function SavingPage() {
             "[background-size:18px_18px]",
           ].join(" ")}
       >
-        <div className="mx-auto max-w-6xl px-4 py-6 space-y-6">
+        <div className="mx-auto w-[1240px] px-4 py-6 space-y-6">
         {/* 헤더 */}
         <section className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="text-xl font-bold text-slate-900">💰 적금 · 목표 저축</h1>
-            <p className="mt-1 text-sm text-slate-600">
+            <p className="mt-1 text-[12px] text-slate-600">
               항목은 목록에서 보고, 추가/수정은 팝업에서 처리합니다.
             </p>
           </div>
@@ -399,8 +399,8 @@ export default function SavingPage() {
             <button
               type="button"
               onClick={openCreateModal}
-              className="rounded-full px-4 py-2 text-sm font-semibold shadow-sm"
-              style={{ backgroundColor: BRAND_ORANGE, color: "#fff" }}
+              className="rounded-full px-4 py-2 text-[12px] font-semibold shadow-sm"
+              style={{ backgroundColor: BRAND_blue, color: "#fff" }}
               disabled={saving}
             >
               새 항목 추가
@@ -410,7 +410,7 @@ export default function SavingPage() {
 
         {/* 에러 */}
         {errorMsg && (
-          <section className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <section className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-[12px] text-red-700">
             {errorMsg}
           </section>
         )}
@@ -426,7 +426,7 @@ export default function SavingPage() {
         <section className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
             <div>
-              <h2 className="text-sm font-semibold text-slate-900">적금 목록</h2>
+              <h2 className="text-[12px] font-semibold text-slate-900">적금 목록</h2>
               <p className="text-xs text-slate-500 mt-0.5">
                 행을 클릭하면 수정 팝업이 뜹니다.
               </p>
@@ -456,7 +456,7 @@ export default function SavingPage() {
 
           {/* 데스크탑 테이블 */}
           <div className="hidden md:block overflow-x-auto">
-            <table className="min-w-full text-sm">
+            <table className="min-w-full text-[12px]">
               <thead className="text-xs text-slate-500 bg-slate-50">
                 <tr className="whitespace-nowrap">
                   <th className="px-3 py-3 text-center">상품/목표</th>
@@ -473,7 +473,7 @@ export default function SavingPage() {
               <tbody>
                 {!loading && sortedPlans.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="px-3 py-10 text-center text-sm text-slate-400">
+                    <td colSpan={8} className="px-3 py-10 text-center text-[12px] text-slate-400">
                       아직 등록된 적금이 없습니다. “새 항목 추가”로 시작하세요.
                     </td>
                   </tr>
@@ -488,7 +488,7 @@ export default function SavingPage() {
                       key={p.id}
                       className={[
                         "border-b border-slate-100 cursor-pointer",
-                        active ? "bg-orange-50/60" : "hover:bg-slate-50",
+                        active ? "bg-blue-50/60" : "hover:bg-slate-50",
                       ].join(" ")}
                       onClick={() => openEditModal(p)}
                     >
@@ -531,7 +531,7 @@ export default function SavingPage() {
                           <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden min-w-[120px]">
                             <div
                               className="h-2 rounded-full transition-all"
-                              style={{ width: `${progress}%`, backgroundColor: BRAND_ORANGE }}
+                              style={{ width: `${progress}%`, backgroundColor: BRAND_blue }}
                             />
                           </div>
                           <span className="text-xs font-semibold text-slate-700 w-12 text-right">
@@ -590,12 +590,12 @@ export default function SavingPage() {
                   }}
                   className={[
                     "px-4 py-4 cursor-pointer select-none",
-                    active ? "bg-orange-50/60" : "hover:bg-slate-50",
+                    active ? "bg-blue-50/60" : "hover:bg-slate-50",
                   ].join(" ")}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-slate-900 text-sm truncate">
+                      <div className="font-semibold text-slate-900 text-[12px] truncate">
                         {p.name || "-"}
                       </div>
                       <div className="mt-1 text-[11px] text-slate-500 truncate">
@@ -618,7 +618,7 @@ export default function SavingPage() {
 
                   <div className="mt-3 flex items-center gap-2">
                     <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
-                      <div className="h-2 rounded-full" style={{ width: `${progress}%`, backgroundColor: BRAND_ORANGE }} />
+                      <div className="h-2 rounded-full" style={{ width: `${progress}%`, backgroundColor: BRAND_blue }} />
                     </div>
                     <span className="text-xs font-semibold text-slate-700 w-12 text-right">{progress}%</span>
                   </div>
@@ -653,7 +653,7 @@ export default function SavingPage() {
           <div className="space-y-4">
             <Field label="상품/목표 이름" required>
               <input
-                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-[12px] outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 placeholder="예: 청년도약계좌, 3년 뒤 전세자금"
                 value={form.name}
                 onChange={(e) => handleChange("name", e.target.value)}
@@ -663,7 +663,7 @@ export default function SavingPage() {
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label="은행/상품사">
                 <input
-                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-[12px] outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   placeholder="예: 국민은행, 카카오뱅크"
                   value={form.bank}
                   onChange={(e) => handleChange("bank", e.target.value)}
@@ -672,7 +672,7 @@ export default function SavingPage() {
 
               <Field label="월 불입액(원)" required>
                 <input
-                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-right outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-[12px] text-right outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   inputMode="numeric"
                   placeholder="예: 700000"
                   value={formatWonFromDigits(form.monthlyAmount)}
@@ -684,7 +684,7 @@ export default function SavingPage() {
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label="목표 금액(원)">
                 <input
-                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-right outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-[12px] text-right outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   inputMode="numeric"
                   placeholder="예: 42700000"
                   value={formatWonFromDigits(form.goalAmount)}
@@ -695,7 +695,7 @@ export default function SavingPage() {
               <Field label="시작월(YYYY-MM)">
                 <input
                   type="month"
-                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none text-slate-800 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-[12px] outline-none text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   value={form.startMonth}
                   onChange={(e) => handleChange("startMonth", e.target.value)}
                 />
@@ -705,7 +705,7 @@ export default function SavingPage() {
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label="현재까지 납입 금액(원)">
                 <input
-                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-right outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-[12px] text-right outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   inputMode="numeric"
                   placeholder="예: 6300000"
                   value={formatWonFromDigits(form.currentAmount)}
@@ -715,7 +715,7 @@ export default function SavingPage() {
 
               <Field label="자동이체일(1~31)">
                 <input
-                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-right outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-[12px] text-right outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   inputMode="numeric"
                   placeholder="예: 27"
                   value={form.autoTransferDay}
@@ -728,7 +728,7 @@ export default function SavingPage() {
               <Field label="신규일">
                 <input
                   type="date"
-                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none text-slate-800 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-[12px] outline-none text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   value={form.startDate}
                   onChange={(e) => handleChange("startDate", e.target.value)}
                 />
@@ -737,7 +737,7 @@ export default function SavingPage() {
               <Field label="만기일">
                 <input
                   type="date"
-                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none text-slate-800 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-[12px] outline-none text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   value={form.endDate}
                   onChange={(e) => handleChange("endDate", e.target.value)}
                 />
@@ -746,7 +746,7 @@ export default function SavingPage() {
 
             <Field label="메모(선택)">
               <textarea
-                className="w-full min-h-[90px] rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                className="w-full min-h-[90px] rounded-xl border border-slate-300 px-3 py-2 text-[12px] outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 placeholder="예: 우대조건/중도해지/특약 등"
                 value={form.memo}
                 onChange={(e) => handleChange("memo", e.target.value)}
@@ -756,7 +756,7 @@ export default function SavingPage() {
             <div className="flex justify-end gap-3 pt-1">
               <button
                 type="button"
-                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-[12px] font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
                 onClick={closeModal}
                 disabled={saving}
               >
@@ -765,8 +765,8 @@ export default function SavingPage() {
 
               <button
                 type="submit"
-                className="rounded-full px-4 py-2 text-sm font-semibold shadow-sm disabled:opacity-50"
-                style={{ backgroundColor: BRAND_ORANGE, color: "#fff" }}
+                className="rounded-full px-4 py-2 text-[12px] font-semibold shadow-sm disabled:opacity-50"
+                style={{ backgroundColor: BRAND_blue, color: "#fff" }}
                 disabled={saving}
               >
                 {saving ? "저장 중..." : form.id ? "수정 완료" : "적금 추가"}
@@ -787,7 +787,7 @@ export default function SavingPage() {
 /** 요약 카드 */
 function SummaryCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-orange-200 bg-white px-4 py-4 shadow-sm">
+    <div className="rounded-2xl border border-blue-200 bg-white px-4 py-4 shadow-sm">
       <div className="text-xs font-medium text-slate-500">{label}</div>
       <div className="mt-2 text-xl font-bold text-slate-900">{value}</div>
     </div>
@@ -806,7 +806,7 @@ function Field({
 }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-sm font-medium text-slate-700">
+      <label className="text-[12px] font-medium text-slate-700">
         {label} {required && <span className="text-red-500">*</span>}
       </label>
       {children}
@@ -845,7 +845,7 @@ function SavingPlanModal({
         <div className="w-full max-w-[640px] rounded-2xl bg-white shadow-xl border border-slate-200 overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
             <div>
-              <div className="text-sm font-semibold text-slate-900">{title}</div>
+              <div className="text-[12px] font-semibold text-slate-900">{title}</div>
               <div className="mt-0.5 text-xs text-slate-500">
                 항목을 입력하고 저장하세요.
               </div>

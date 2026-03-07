@@ -41,7 +41,7 @@ type MonthlyStore = {
 
 const LS_KEY_MONTHLY = "jichulrecipe_setup_monthly_v1";
 
-const BRAND_ORANGE = "#FF8A3D";
+const BRAND_blue = "#5bbbf3";
 const BRAND_GREEN = "#4CAF50";
 
 const DETAIL_LABELS: Record<
@@ -413,9 +413,9 @@ export default function YearlyDashboardClient() {
         <div className="pointer-events-none fixed left-[-80px] top-[40%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,184,108,0.25)] blur-3xl" />
         <div className="pointer-events-none fixed right-[-60px] bottom-[8%] -z-10 h-52 w-52 rounded-full bg-[rgba(86,115,231,0.18)] blur-3xl" />
 
-        <div className="mx-auto max-w-xl rounded-2xl bg-white/95 p-6 text-center shadow-sm shadow-orange-50">
+        <div className="mx-auto max-w-xl rounded-2xl bg-white/95 p-6 text-center shadow-sm shadow-blue-50">
           {/* 연도 네비 */}
-          <div className="mb-3 flex items-center justify-center gap-3 text-sm font-semibold text-slate-900">
+          <div className="mb-3 flex items-center justify-center gap-3 text-[12px] font-semibold text-slate-900">
             <button
               type="button"
               onClick={() => handleChangeYear(-1)}
@@ -436,7 +436,7 @@ export default function YearlyDashboardClient() {
           <h2 className="mb-2 text-base font-semibold text-slate-900">
             {currentYear}년에는 저장된 월별 레시피가 아직 없어요
           </h2>
-          <p className="mb-4 text-sm text-slate-600">
+          <p className="mb-4 text-[12px] text-slate-600">
             먼저 기본 레시피에서 월별 예산을 몇 개만이라도 입력해 두면,
             <br />
             이 화면에서 연간 합계와 평균, 적금 비율 등을 한 번에 볼 수 있습니다.
@@ -444,8 +444,8 @@ export default function YearlyDashboardClient() {
           <button
             type="button"
             onClick={handleGoSetup}
-            className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-orange)] px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-orange-200 hover:bg-[#f27422] transition"
-            style={{ ["--brand-orange" as any]: BRAND_ORANGE }}
+            className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-white shadow-md shadow-blue-200 hover:bg-[#f27422] transition"
+            style={{ ["--brand-blue" as any]: BRAND_blue }}
           >
             🍽 기본 레시피 입력하러 가기
           </button>
@@ -484,15 +484,15 @@ export default function YearlyDashboardClient() {
           <div className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-[11px] font-medium text-slate-600 shadow-sm">
             <span
               className="h-2 w-2 rounded-full"
-              style={{ backgroundColor: BRAND_ORANGE }}
+              style={{ backgroundColor: BRAND_blue }}
             />
             <span>{currentYear}년 · 1년치 지출 레시피 분석</span>
           </div>
           <h2 className="mt-2 text-xl font-semibold text-slate-900 md:text-2xl">
             {currentYear}년{" "}
             <span
-              className="text-[color:var(--brand-orange)]"
-              style={{ ["--brand-orange" as any]: BRAND_ORANGE }}
+              className="text-[color:var(--brand-blue)]"
+              style={{ ["--brand-blue" as any]: BRAND_blue }}
             >
               연간 예산 레시피
             </span>{" "}
@@ -541,7 +541,7 @@ export default function YearlyDashboardClient() {
         className="mb-4 grid gap-4 md:grid-cols-3"
       >
         {/* 연간 세후 소득 합계 & 평균 */}
-        <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-orange-50">
+        <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-blue-50">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-700">
               연간 세후 소득 합계
@@ -563,7 +563,7 @@ export default function YearlyDashboardClient() {
         </div>
 
         {/* 연간 계획 지출 합계 & 평균 */}
-        <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-orange-50">
+        <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-blue-50">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-700">
               연간 계획 지출 합계
@@ -587,7 +587,7 @@ export default function YearlyDashboardClient() {
         </div>
 
         {/* 연간 저축(적금) & 비율 */}
-        <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-orange-50">
+        <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-blue-50">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-700">
               연간 적금(저축) 합계
@@ -622,9 +622,9 @@ export default function YearlyDashboardClient() {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.08 }}
-        className="mb-4 rounded-2xl bg-white/95 p-4 shadow-sm shadow-orange-50"
+        className="mb-4 rounded-2xl bg-white/95 p-4 shadow-sm shadow-blue-50"
       >
-        <h3 className="mb-2 text-sm font-semibold text-slate-900">
+        <h3 className="mb-2 text-[12px] font-semibold text-slate-900">
           연간 지출 비율 한 눈에 보기
         </h3>
         <p className="mb-3 text-[11px] text-slate-600">
@@ -647,9 +647,9 @@ export default function YearlyDashboardClient() {
           </div>
           <div className="h-3 w-full overflow-hidden rounded-full bg-slate-100">
             <div
-              className="h-3 rounded-full bg-[color:var(--brand-orange)]"
+              className="h-3 rounded-full bg-[color:var(--brand-blue)]"
               style={{
-                ["--brand-orange" as any]: BRAND_ORANGE,
+                ["--brand-blue" as any]: BRAND_blue,
                 width: `${Math.min(fixedRatio, 100)}%`,
               }}
             />
@@ -679,9 +679,9 @@ export default function YearlyDashboardClient() {
         className="grid gap-4 md:grid-cols-[1.3fr_0.7fr]"
       >
         {/* 카테고리 테이블 */}
-        <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-orange-50">
+        <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-blue-50">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-slate-900">
+            <h3 className="text-[12px] font-semibold text-slate-900">
               카테고리별 연간 지출 레시피
             </h3>
             <span className="text-[11px] text-slate-500">
@@ -722,8 +722,8 @@ export default function YearlyDashboardClient() {
 
         {/* 해석/코멘트 카드 */}
         <div className="space-y-4">
-          <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-orange-50">
-            <h3 className="mb-2 text-sm font-semibold text-slate-900">
+          <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-blue-50">
+            <h3 className="mb-2 text-[12px] font-semibold text-slate-900">
               {currentYear}년 레시피 한 줄 정리
             </h3>
             <ul className="space-y-1.5 text-[11px] leading-relaxed text-slate-700">
@@ -765,7 +765,7 @@ export default function YearlyDashboardClient() {
             </ul>
           </div>
 
-          <div className="rounded-2xl bg-gradient-to-r from-[#FFF7EB] to-[#FFF4E5] p-4 text-[11px] leading-relaxed text-slate-700 shadow-sm shadow-orange-50">
+          <div className="rounded-2xl bg-gradient-to-r from-[#FFF7EB] to-[#FFF4E5] p-4 text-[11px] leading-relaxed text-slate-700 shadow-sm shadow-blue-50">
             <p className="mb-2">
               👨‍🍳 <strong>TIP.</strong> 연간 레벨에서 보면 월별로 조금씩 조정한
               결과가 얼마나 누적되는지 보입니다.

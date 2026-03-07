@@ -82,8 +82,8 @@ export default function CashflowCalendarPage() {
       dangerDays.length === 0
         ? { label: "안정", badge: "bg-[#34D399] text-white", msg: "위험일(적자/버퍼하회)이 없습니다." }
         : firstDeficit
-        ? { label: "위험", badge: "bg-[#F97316] text-white", msg: `첫 적자 발생일: ${firstDeficit}일` }
-        : { label: "경고", badge: "bg-[#FBBF24] text-[#3B2F1E]", msg: "버퍼 이하 위험일이 있습니다." };
+        ? { label: "위험", badge: "bg-[#5bbbf3] text-white", msg: `첫 적자 발생일: ${firstDeficit}일` }
+        : { label: "경고", badge: "bg-[#52a9ff] text-[#ffffff]", msg: "버퍼 이하 위험일이 있습니다." };
 
     return {
       dim,
@@ -112,7 +112,7 @@ export default function CashflowCalendarPage() {
       title="현금흐름 캘린더 계산기"
       subtitle={
         <>
-          급여일·결제일을 입력하면 <span className="font-semibold text-[#F97316]">위험일</span>을 표시합니다.
+          급여일·결제일을 입력하면 <span className="font-semibold text-[#ffffff]">위험일</span>을 표시합니다.
         </>
       }
     >
@@ -122,11 +122,11 @@ export default function CashflowCalendarPage() {
           <div className="flex items-start justify-between gap-3">
             <div>
               <h2 className={cn("text-lg font-semibold", UI.ink)}>입력</h2>
-              <p className={cn("mt-1 text-sm", UI.inkSoft)}>
+              <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>
                 큰 덩어리(급여/카드/고정비)만 넣어도 위험 구간은 잡힙니다.
               </p>
             </div>
-            <span className={cn("rounded-full px-3 py-1 text-sm font-semibold", calc.status.badge)}>
+            <span className={cn("rounded-full px-3 py-1 text-[12px] font-semibold", calc.status.badge)}>
               {calc.status.label}
             </span>
           </div>
@@ -144,12 +144,12 @@ export default function CashflowCalendarPage() {
               />
             </div>
 
-            <div className="rounded-2xl border border-[#F2E4B6] bg-white p-4">
+            <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
               <div className="flex items-center justify-between">
-                <div className="text-sm font-semibold text-[#3B2F1E]">급여/유입</div>
+                <div className="text-[12px] font-semibold text-[#3B2F1E]">급여/유입</div>
                 <button
                   onClick={addPayday}
-                  className="rounded-full border border-[#F2E4B6] bg-white px-3 py-1 text-xs font-semibold text-[#6B5642] hover:border-[#FB923C]"
+                  className="rounded-full border border-[#e8f8ff] bg-white px-3 py-1 text-xs font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
                 >
                   + 추가
                 </button>
@@ -172,12 +172,12 @@ export default function CashflowCalendarPage() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-[#F2E4B6] bg-white p-4">
+            <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
               <div className="flex items-center justify-between">
-                <div className="text-sm font-semibold text-[#3B2F1E]">결제/유출</div>
+                <div className="text-[12px] font-semibold text-[#3B2F1E]">결제/유출</div>
                 <button
                   onClick={addBilling}
-                  className="rounded-full border border-[#F2E4B6] bg-white px-3 py-1 text-xs font-semibold text-[#6B5642] hover:border-[#FB923C]"
+                  className="rounded-full border border-[#e8f8ff] bg-white px-3 py-1 text-xs font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
                 >
                   + 추가
                 </button>
@@ -205,7 +205,7 @@ export default function CashflowCalendarPage() {
         {/* 결과 */}
         <section className={cn("rounded-3xl border p-4 sm:p-6 shadow-sm", UI.card)}>
           <h2 className={cn("text-lg font-semibold", UI.ink)}>결과</h2>
-          <p className={cn("mt-1 text-sm", UI.inkSoft)}>{calc.status.msg}</p>
+          <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>{calc.status.msg}</p>
 
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <MetricCard title="총 유입" value={`${formatKRW(calc.totalInflow)}원`} />
@@ -214,9 +214,9 @@ export default function CashflowCalendarPage() {
             <MetricCard title="위험일" value={`${calc.dangerDays.length}일`} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
+          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
             <div className="flex items-center justify-between gap-2">
-              <div className={cn("text-sm font-semibold", UI.ink)}>월 캘린더</div>
+              <div className={cn("text-[12px] font-semibold", UI.ink)}>월 캘린더</div>
               <div className="flex items-center gap-2">
                 <LegendChip label="버퍼하회" tone="low" />
                 <LegendChip label="적자" tone="def" />
@@ -231,14 +231,14 @@ export default function CashflowCalendarPage() {
                   const isLow = t.flags.includes("버퍼하회") && !isDef;
 
                   const bg = isDef
-                    ? "bg-[#F97316] text-white border-[#F97316]"
+                    ? "bg-[#5bbbf3] text-white border-[#5bbbf3]"
                     : isLow
-                    ? "bg-[#FFE4C7] text-[#3B2F1E] border-[#FB923C]"
-                    : "bg-[#FFFFFF] text-[#3B2F1E] border-[#F2E4B6]";
+                    ? "bg-[#5bbbf3] text-[#3B2F1E] border-[#5bbbf3]"
+                    : "bg-[#5bbbf3] text-[#3B2F1E] border-[#e8f8ff]";
 
                   return (
                     <div key={d} className={cn("rounded-2xl border p-2", bg)}>
-                      <div className="text-sm font-extrabold">{d}</div>
+                      <div className="text-[12px] font-extrabold">{d}</div>
                       <div className="mt-1 text-[11px] font-semibold opacity-90">
                         {formatKRW(t.endBal)}원
                       </div>
@@ -254,20 +254,20 @@ export default function CashflowCalendarPage() {
                     className={cn(
                       "rounded-2xl border px-3 py-2",
                       t.flags.includes("적자")
-                        ? "border-[#F97316] bg-[#FFF1EA]"
+                        ? "border-[#5bbbf3] bg-[#FFF1EA]"
                         : t.flags.includes("버퍼하회")
-                        ? "border-[#FB923C] bg-[#FFFFFF]"
-                        : "border-[#F2E4B6] bg-[#FFF9F2]"
+                        ? "border-[#5bbbf3] bg-[#5bbbf3]"
+                        : "border-[#e8f8ff] bg-[#f2fbff]"
                     )}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="text-sm font-extrabold text-[#3B2F1E]">{t.day}일</div>
-                      <div className="text-sm font-bold text-[#F97316]">{formatKRW(t.endBal)}원</div>
+                      <div className="text-[12px] font-extrabold text-[#3B2F1E]">{t.day}일</div>
+                      <div className="text-[12px] font-bold text-[#ffffff]">{formatKRW(t.endBal)}원</div>
                     </div>
-                    <div className="mt-1 text-xs text-[#6B5642]">
+                    <div className="mt-1 text-xs text-[#7f7f7f]">
                       유입 {formatKRW(t.inflow)}원 · 유출 {formatKRW(t.outflow)}원
                       {t.flags.length > 0 && (
-                        <span className="ml-2 font-semibold text-[#F97316]">[{t.flags.join(", ")}]</span>
+                        <span className="ml-2 font-semibold text-[#ffffff]">[{t.flags.join(", ")}]</span>
                       )}
                     </div>
                   </div>
@@ -279,13 +279,13 @@ export default function CashflowCalendarPage() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/calculators/card-billing-date-shift"
-              className="rounded-2xl bg-[#F97316] px-4 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+              className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
             >
               다음: 카드 결제일 변경 효과 →
             </Link>
             <Link
               href="/calculators"
-              className="rounded-2xl border border-[#F2E4B6] bg-white px-4 py-2 text-center text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+              className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
             >
               계산기 모음으로
             </Link>
@@ -312,12 +312,12 @@ function EventRow({
   type: "in" | "out";
 }) {
   return (
-    <div className="rounded-xl border border-[#F2E4B6] bg-[#FFFFFF] p-3">
+    <div className="rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] p-3">
       <div className="flex items-center justify-between gap-2">
-        <div className="text-xs font-extrabold text-[#6B5642]">{title}</div>
+        <div className="text-xs font-extrabold text-[#7f7f7f]">{title}</div>
         <button
           onClick={onRemove}
-          className="rounded-full border border-[#F2E4B6] bg-white px-3 py-1 text-xs font-semibold text-[#6B5642] hover:border-[#FB923C]"
+          className="rounded-full border border-[#e8f8ff] bg-white px-3 py-1 text-xs font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
         >
           삭제
         </button>

@@ -56,7 +56,7 @@ export default function RateSensitivityPage() {
       title="금리 인상 민감도 계산기"
       subtitle={
         <>
-          금리가 <span className="font-semibold text-[#F97316]">+0.5%p / +1.0%p</span> 오를 때 월 부담이 얼마나 늘어나는지 봅니다.
+          금리가 <span className="font-semibold text-[#ffffff]">+0.5%p / +1.0%p</span> 오를 때 월 부담이 얼마나 늘어나는지 봅니다.
         </>
       }
     >
@@ -65,7 +65,7 @@ export default function RateSensitivityPage() {
         <section className={cn("rounded-3xl border p-4 sm:p-6 shadow-sm", UI.card)}>
           <div>
             <h2 className={cn("text-lg font-semibold", UI.ink)}>입력</h2>
-            <p className={cn("mt-1 text-sm", UI.inkSoft)}>원리금균등(고정 상환) 기준으로 민감도를 계산합니다.</p>
+            <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>원리금균등(고정 상환) 기준으로 민감도를 계산합니다.</p>
           </div>
 
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -86,15 +86,15 @@ export default function RateSensitivityPage() {
             <MetricCard title="기간(개월)" value={`${calc.n}개월`} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-            <div className={cn("text-sm font-semibold", UI.ink)}>증가분</div>
+          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+            <div className={cn("text-[12px] font-semibold", UI.ink)}>증가분</div>
             <div className="mt-3 grid gap-2">
               <Row label="+0.5%p 월 증가" value={`${formatKRW(calc.diff05)}원`} tone={calc.diff05 > 0 ? "danger" : "ok"} />
               <Row label="+1.0%p 월 증가" value={`${formatKRW(calc.diff10)}원`} tone={calc.diff10 > 0 ? "danger" : "ok"} />
               <Row label="+0.5%p 총이자 증가" value={`${formatKRW(calc.intDiff05)}원`} tone={calc.intDiff05 > 0 ? "danger" : "ok"} />
               <Row label="+1.0%p 총이자 증가" value={`${formatKRW(calc.intDiff10)}원`} tone={calc.intDiff10 > 0 ? "danger" : "ok"} />
             </div>
-            <p className="mt-3 text-xs font-semibold text-[#6B5642]">
+            <p className="mt-3 text-xs font-semibold text-[#7f7f7f]">
               ※ 변동금리/중도상환/거치기간 등 조건에 따라 실제와 차이가 날 수 있어요.
             </p>
           </div>
@@ -102,13 +102,13 @@ export default function RateSensitivityPage() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/calculators/prepayment-fee-breakeven"
-              className="rounded-2xl bg-[#F97316] px-4 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+              className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
             >
               다음: 중도상환수수료 손익 →
             </Link>
             <Link
               href="/calculators"
-              className="rounded-2xl border border-[#F2E4B6] bg-white px-4 py-2 text-center text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+              className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
             >
               계산기 모음으로
             </Link>

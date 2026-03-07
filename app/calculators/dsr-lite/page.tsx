@@ -23,12 +23,12 @@ export default function DsrLitePage() {
     // 단순 구간 (정책기준/규제판단 아님)
     const grade =
       income <= 0
-        ? { label: "입력 필요", badge: "bg-[#FBBF24] text-[#3B2F1E]" }
+        ? { label: "입력 필요", badge: "bg-[#52a9ff] text-[#ffffff]" }
         : dsr < 20
         ? { label: "여유", badge: "bg-[#34D399] text-white" }
         : dsr < 40
-        ? { label: "보통", badge: "bg-[#FBBF24] text-[#3B2F1E]" }
-        : { label: "부담", badge: "bg-[#F97316] text-white" };
+        ? { label: "보통", badge: "bg-[#52a9ff] text-[#ffffff]" }
+        : { label: "부담", badge: "bg-[#5bbbf3] text-white" };
 
     return { income, debt, dsr, monthlyIncome, monthlyDebt, grade };
   }, [annualIncome, annualDebtService]);
@@ -40,7 +40,7 @@ export default function DsrLitePage() {
       subtitle={
         <>
           연소득 대비 연간 원리금 상환액 비율을 확인합니다.{" "}
-          <span className="font-semibold text-[#F97316]">규제판단이 아닌 점검용</span>입니다.
+          <span className="font-semibold text-[#ffffff]">규제판단이 아닌 점검용</span>입니다.
         </>
       }
     >
@@ -50,9 +50,9 @@ export default function DsrLitePage() {
           <div className="flex items-start justify-between gap-3">
             <div>
               <h2 className={cn("text-lg font-semibold", UI.ink)}>입력</h2>
-              <p className={cn("mt-1 text-sm", UI.inkSoft)}>여러 대출이면 “연간 원리금 합계”로 넣으세요.</p>
+              <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>여러 대출이면 “연간 원리금 합계”로 넣으세요.</p>
             </div>
-            <span className={cn("rounded-full px-3 py-1 text-sm font-semibold", calc.grade.badge)}>
+            <span className={cn("rounded-full px-3 py-1 text-[12px] font-semibold", calc.grade.badge)}>
               {calc.grade.label}
             </span>
           </div>
@@ -62,9 +62,9 @@ export default function DsrLitePage() {
             <MoneyInput label="연간 원리금 상환액(합계)" value={annualDebtService} setValue={setAnnualDebtService} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-            <div className="text-sm font-semibold text-[#3B2F1E]">입력 팁</div>
-            <ul className="mt-2 list-disc pl-5 text-sm text-[#6B5642]">
+          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+            <div className="text-[12px] font-semibold text-[#3B2F1E]">입력 팁</div>
+            <ul className="mt-2 list-disc pl-5 text-[12px] text-[#6d6d6d]">
               <li>월 상환액을 알고 있으면 “월 상환액 × 12”로 연간 원리금을 만들 수 있습니다.</li>
               <li>원리금이 아닌 “이자만”을 넣으면 DSR이 과소 추정됩니다.</li>
             </ul>
@@ -85,8 +85,8 @@ export default function DsrLitePage() {
             />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-            <div className={cn("text-sm font-semibold", UI.ink)}>해석 프레임</div>
+          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+            <div className={cn("text-[12px] font-semibold", UI.ink)}>해석 프레임</div>
             <div className="mt-3 grid gap-2">
               <Row
                 label="부채 상환 부담(정성)"
@@ -94,7 +94,7 @@ export default function DsrLitePage() {
                 tone={calc.grade.label === "부담" ? "danger" : "ok"}
               />
             </div>
-            <p className="mt-3 text-xs font-semibold text-[#6B5642]">
+            <p className="mt-3 text-xs font-semibold text-[#7f7f7f]">
               ※ DSR 규제/적용 기준은 금융기관·상품·정책에 따라 달라질 수 있어요. 이 계산기는 “개인 점검”용입니다.
             </p>
           </div>
@@ -102,13 +102,13 @@ export default function DsrLitePage() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/calculators/loan-payment"
-              className="rounded-2xl bg-[#F97316] px-4 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+              className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
             >
               다음: 대출 월 상환액 →
             </Link>
             <Link
               href="/calculators"
-              className="rounded-2xl border border-[#F2E4B6] bg-white px-4 py-2 text-center text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+              className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
             >
               계산기 모음으로
             </Link>

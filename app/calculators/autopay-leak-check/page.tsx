@@ -14,8 +14,8 @@ const UI = {
   paperDots:
     "bg-[radial-gradient(circle,rgba(251,146,60,0.14)_1px,transparent_1px)] bg-[size:16px_16px]",
   ink: "text-[#3B2F1E]",
-  inkSoft: "text-[#6B5642]",
-  card: "bg-[#FFF9F2] border-[#F2E4B6]",
+  inkSoft: "text-[#7f7f7f]",
+  card: "bg-[#f2fbff] border-[#e8f8ff]",
 };
 
 type Intention = "유지" | "보류" | "해지 고려";
@@ -151,12 +151,12 @@ export default function AutoPayLeakCheckPage() {
         : leakRatio <= 40
         ? {
             label: "주의",
-            badge: "bg-[#FBBF24] text-[#3B2F1E]",
+            badge: "bg-[#52a9ff] text-[#ffffff]",
             msg: "누수 비중이 꽤 있습니다. ‘금액 큰데 사용 적은’ 항목부터 정리해 보세요.",
           }
         : {
             label: "경계",
-            badge: "bg-[#F97316] text-white",
+            badge: "bg-[#5bbbf3] text-white",
             msg: "누수가 크고 자동결제 관리가 필요합니다. 결제수단(카드/앱스토어)별 구독 목록부터 싹 점검하세요.",
           };
 
@@ -174,32 +174,32 @@ export default function AutoPayLeakCheckPage() {
   return (
     <div className={cn("min-h-screen", UI.paperBg)}>
       <div className={cn("min-h-screen", UI.paperDots)}>
-        <div className="mx-auto max-w-6xl px-4 py-7 sm:py-10">
+        <div className="mx-auto w-[1240px] px-4 py-7 sm:py-10">
           {/* 상단 네비 */}
           <div className="mb-5 flex items-center justify-between gap-3">
             <Link
               href="/calculators"
-              className="rounded-full border border-[#F2E4B6] bg-[#FFF9F2] px-3 py-1.5 text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+              className="rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
             >
               ← 계산기 모음
             </Link>
 
-            <span className="rounded-full bg-[#FFE4C7] px-3 py-1.5 text-sm font-semibold text-[#F97316]">
+            <span className="rounded-full bg-[#5bbbf3] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
               자동결제 점검
             </span>
           </div>
 
           {/* 헤더 */}
           <div className="mb-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#F2E4B6] bg-[#FFF9F2] px-3 py-1 text-xs font-medium text-[#6B5642] shadow-sm">
-              <span className="inline-block h-2 w-2 rounded-full bg-[#FB923C]" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm">
+              <span className="inline-block h-2 w-2 rounded-full bg-[#5bbbf3]" />
               Recipe Calculator
             </div>
 
             <h1 className={cn("mt-3 text-2xl sm:text-3xl font-semibold tracking-tight", UI.ink)}>
               자동결제 누수 점검 계산기
             </h1>
-            <p className={cn("mt-2 text-sm sm:text-base", UI.inkSoft)}>
+            <p className={cn("mt-2 text-[12px] sm:text-base", UI.inkSoft)}>
               최근 3개월 사용 빈도를 바탕으로 “안 쓰는 결제” 누수를 추정하고, 정리 우선순위를 뽑아줍니다.
             </p>
           </div>
@@ -211,14 +211,14 @@ export default function AutoPayLeakCheckPage() {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h2 className={cn("text-lg font-semibold", UI.ink)}>자동결제 항목 입력</h2>
-                  <p className={cn("mt-1 text-sm", UI.inkSoft)}>
+                  <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>
                     최근 3개월 사용 횟수(대략)만 넣어도 충분합니다.
                   </p>
                 </div>
 
                 <button
                   onClick={addItem}
-                  className="rounded-2xl bg-[#F97316] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+                  className="rounded-2xl bg-[#5bbbf3] px-3 py-2 text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
                 >
                   + 추가
                 </button>
@@ -226,25 +226,25 @@ export default function AutoPayLeakCheckPage() {
 
               <div className="mt-4 grid gap-3">
                 {items.map((it) => (
-                  <div key={it.id} className="rounded-2xl border border-[#F2E4B6] bg-white p-4">
+                  <div key={it.id} className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
                     <div className="grid gap-3 sm:grid-cols-12 sm:items-end">
                       <div className="sm:col-span-5">
-                        <label className="text-sm font-semibold text-[#3B2F1E]">항목 이름</label>
+                        <label className="text-[12px] font-semibold text-[#3B2F1E]">항목 이름</label>
                         <input
                           value={it.name}
                           onChange={(e) => updateItem(it.id, { name: e.target.value })}
                           placeholder="예: 안 보는 OTT, 안 쓰는 앱 멤버십"
                           className={cn(
-                            "mt-1 h-11 w-full rounded-xl border bg-white px-3 text-sm outline-none",
-                            "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+                            "mt-1 h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
+                            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
                           )}
                         />
                       </div>
 
                       <div className="sm:col-span-3">
-                        <label className="text-sm font-semibold text-[#3B2F1E]">월 금액</label>
+                        <label className="text-[12px] font-semibold text-[#3B2F1E]">월 금액</label>
                         <div className="relative mt-1">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#9C7A55]">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-[#9C7A55]">
                             ₩
                           </span>
                           <input
@@ -253,36 +253,36 @@ export default function AutoPayLeakCheckPage() {
                             onChange={(e) => updateItem(it.id, { monthly: e.target.value })}
                             placeholder="0"
                             className={cn(
-                              "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-sm outline-none",
-                              "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+                              "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-[12px] outline-none",
+                              "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
                             )}
                           />
                         </div>
                       </div>
 
                       <div className="sm:col-span-2">
-                        <label className="text-sm font-semibold text-[#3B2F1E]">최근 3개월 사용</label>
+                        <label className="text-[12px] font-semibold text-[#3B2F1E]">최근 3개월 사용</label>
                         <input
                           inputMode="numeric"
                           value={it.usage3m}
                           onChange={(e) => updateItem(it.id, { usage3m: e.target.value })}
                           placeholder="0"
                           className={cn(
-                            "mt-1 h-11 w-full rounded-xl border bg-white px-3 text-sm outline-none",
-                            "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+                            "mt-1 h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
+                            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
                           )}
                         />
-                        <div className="mt-1 text-[11px] text-[#6B5642]">0~30회</div>
+                        <div className="mt-1 text-[11px] text-[#7f7f7f]">0~30회</div>
                       </div>
 
                       <div className="sm:col-span-2">
-                        <label className="text-sm font-semibold text-[#3B2F1E]">의향</label>
+                        <label className="text-[12px] font-semibold text-[#3B2F1E]">의향</label>
                         <select
                           value={it.intention}
                           onChange={(e) => updateItem(it.id, { intention: e.target.value as Intention })}
                           className={cn(
-                            "mt-1 h-11 w-full rounded-xl border bg-white px-3 text-sm outline-none",
-                            "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+                            "mt-1 h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
+                            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
                           )}
                         >
                           <option value="유지">유지</option>
@@ -293,12 +293,12 @@ export default function AutoPayLeakCheckPage() {
                     </div>
 
                     <div className="mt-3 flex items-center justify-between">
-                      <span className="text-xs text-[#6B5642]">
+                      <span className="text-xs text-[#7f7f7f]">
                         사용이 적을수록 누수로 간주됩니다.
                       </span>
                       <button
                         onClick={() => removeItem(it.id)}
-                        className="rounded-xl border border-[#F2E4B6] bg-[#FFFFFF] px-3 py-1.5 text-xs font-semibold text-[#6B5642] hover:border-[#FB923C]"
+                        className="rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] px-3 py-1.5 text-xs font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
                       >
                         삭제
                       </button>
@@ -307,9 +307,9 @@ export default function AutoPayLeakCheckPage() {
                 ))}
               </div>
 
-              <div className="mt-5 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-                <div className={cn("text-sm font-semibold", UI.ink)}>해지 전 체크리스트</div>
-                <ul className={cn("mt-2 list-disc pl-5 text-sm leading-relaxed", UI.inkSoft)}>
+              <div className="mt-5 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                <div className={cn("text-[12px] font-semibold", UI.ink)}>해지 전 체크리스트</div>
+                <ul className={cn("mt-2 list-disc pl-5 text-[12px] leading-relaxed", UI.inkSoft)}>
                   <li>환불/부분환불 조건(다음 결제일 이전 해지 여부)</li>
                   <li>가족 공유/팀 플랜 사용 중인지</li>
                   <li>앱스토어/구글플레이 결제는 스토어에서 해지해야 하는지</li>
@@ -323,12 +323,12 @@ export default function AutoPayLeakCheckPage() {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h2 className={cn("text-lg font-semibold", UI.ink)}>누수 추정 결과</h2>
-                  <p className={cn("mt-1 text-sm", UI.inkSoft)}>
+                  <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>
                     “사용 빈도 + 금액 + 의향”을 반영해 누수 후보를 정렬합니다.
                   </p>
                 </div>
 
-                <span className={cn("rounded-full px-3 py-1 text-sm font-semibold", calc.signal.badge)}>
+                <span className={cn("rounded-full px-3 py-1 text-[12px] font-semibold", calc.signal.badge)}>
                   {calc.signal.label}
                 </span>
               </div>
@@ -338,48 +338,48 @@ export default function AutoPayLeakCheckPage() {
                 <MetricCard title="월 누수 추정액" value={`${formatKRW(calc.leakMonthlyTotal)}원`} accent />
               </div>
 
-              <div className="mt-3 rounded-2xl border border-[#F2E4B6] bg-white p-4">
+              <div className="mt-3 rounded-2xl border border-[#e8f8ff] bg-white p-4">
                 <div className="flex items-center justify-between">
-                  <div className={cn("text-sm font-semibold", UI.ink)}>최근 3개월 누수 추정</div>
-                  <span className="rounded-full bg-[#FFE4C7] px-3 py-1 text-xs font-semibold text-[#F97316]">
+                  <div className={cn("text-[12px] font-semibold", UI.ink)}>최근 3개월 누수 추정</div>
+                  <span className="rounded-full bg-[#5bbbf3] px-3 py-1 text-xs font-semibold text-[#ffffff]">
                     누수 비중 {calc.monthlyTotal > 0 ? ((calc.leakMonthlyTotal / calc.monthlyTotal) * 100).toFixed(1) : "0.0"}%
                   </span>
                 </div>
-                <div className="mt-2 text-2xl font-bold text-[#F97316]">{formatKRW(calc.leak3m)}원</div>
-                <div className={cn("mt-2 text-sm leading-relaxed", UI.inkSoft)}>{calc.signal.msg}</div>
+                <div className="mt-2 text-2xl font-bold text-[#ffffff]">{formatKRW(calc.leak3m)}원</div>
+                <div className={cn("mt-2 text-[12px] leading-relaxed", UI.inkSoft)}>{calc.signal.msg}</div>
               </div>
 
-              <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
+              <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
                 <div className="flex items-center justify-between gap-3">
-                  <div className={cn("text-sm font-semibold", UI.ink)}>누수 후보 TOP</div>
+                  <div className={cn("text-[12px] font-semibold", UI.ink)}>누수 후보 TOP</div>
                   <div className={cn("text-xs", UI.inkSoft)}>정리 우선순위</div>
                 </div>
 
                 {calc.top.length === 0 ? (
-                  <div className={cn("mt-3 text-sm", UI.inkSoft)}>입력된 항목이 없습니다.</div>
+                  <div className={cn("mt-3 text-[12px]", UI.inkSoft)}>입력된 항목이 없습니다.</div>
                 ) : (
                   <ol className="mt-3 space-y-2">
                     {calc.top.map((t, idx) => (
                       <li
                         key={t.id}
-                        className="rounded-xl border border-[#F2E4B6] bg-[#FFFFFF] p-3"
+                        className="rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] p-3"
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
                             <div className="flex items-center gap-2">
-                              <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-[#FFE4C7] text-xs font-bold text-[#F97316]">
+                              <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-[#5bbbf3] text-xs font-bold text-[#ffffff]">
                                 {idx + 1}
                               </span>
-                              <div className={cn("truncate text-sm font-semibold", UI.ink)}>
+                              <div className={cn("truncate text-[12px] font-semibold", UI.ink)}>
                                 {t.name?.trim() ? t.name.trim() : "이름 미입력"}
                               </div>
                               <span
                                 className={cn(
                                   "rounded-full px-2 py-0.5 text-[11px] font-semibold",
                                   t.intention === "해지 고려"
-                                    ? "bg-[#F97316] text-white"
+                                    ? "bg-[#5bbbf3] text-white"
                                     : t.intention === "보류"
-                                    ? "bg-[#FBBF24] text-[#3B2F1E]"
+                                    ? "bg-[#52a9ff] text-[#ffffff]"
                                     : "bg-[#34D399] text-white"
                                 )}
                               >
@@ -393,10 +393,10 @@ export default function AutoPayLeakCheckPage() {
                           </div>
 
                           <div className="shrink-0 text-right">
-                            <div className={cn("text-sm font-semibold", UI.ink)}>
+                            <div className={cn("text-[12px] font-semibold", UI.ink)}>
                               {formatKRW(t.monthlyNum)}원/월
                             </div>
-                            <div className="text-xs font-semibold text-[#F97316]">
+                            <div className="text-xs font-semibold text-[#ffffff]">
                               누수 {formatKRW(t.leakMonthly)}원/월
                             </div>
                           </div>
@@ -411,13 +411,13 @@ export default function AutoPayLeakCheckPage() {
               <div className="mt-5 flex flex-col gap-2 sm:flex-row">
                 <Link
                   href="/calculators/subscription-total"
-                  className="rounded-2xl bg-[#F97316] px-4 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+                  className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
                 >
                   다음: 구독 총액 합산 →
                 </Link>
                 <Link
                   href="/calculators"
-                  className="rounded-2xl border border-[#F2E4B6] bg-white px-4 py-2 text-center text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+                  className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
                 >
                   계산기 모음으로
                 </Link>
@@ -449,13 +449,13 @@ function MetricCard({
     <div
       className={cn(
         "rounded-2xl border p-4",
-        accent ? "border-[#FB923C] bg-[#FFF3E8]" : "border-[#F2E4B6] bg-white"
+        accent ? "border-[#5bbbf3] bg-[#5bbbf3]" : "border-[#e8f8ff] bg-white"
       )}
     >
-      <div className={cn("text-xs font-semibold", accent ? "text-[#F97316]" : "text-[#6B5642]")}>
+      <div className={cn("text-xs font-semibold", accent ? "text-[#ffffff]" : "text-[#7f7f7f]")}>
         {title}
       </div>
-      <div className={cn("mt-1 text-xl font-bold", accent ? "text-[#F97316]" : "text-[#3B2F1E]")}>
+      <div className={cn("mt-1 text-xl font-bold", accent ? "text-[#ffffff]" : "text-[#3B2F1E]")}>
         {value}
       </div>
     </div>

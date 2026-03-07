@@ -7,7 +7,10 @@ import { ArrowLeft, Check, Plus, X } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 
-const BRAND_ORANGE = "#FF8A3D";
+const BRAND_blue = "rgb(31 172 255)";
+const BRAND_BLUE1 = "#aadffe";
+const BRAND_BLUE2 = "#e8f8ff";
+
 
 /** 항목 단위 (메모 + 금액 + 카테고리) */
 type MoneyItem = {
@@ -477,7 +480,7 @@ export default function CalendarEditClient() {
         style: {
           background: "#FEF9C3", // tailwind: yellow-100
           color: "#713F12",      // tailwind: yellow-900
-          border: "1px solid #FDE68A", // tailwind: amber-200
+          border: "1px solid #FDE68A", // tailwind: blue-200
         },
       });
       router.push("/dashboard/calendar");
@@ -501,7 +504,7 @@ export default function CalendarEditClient() {
         "[background-size:18px_18px]",
       ].join(" ")}
     >
-      <div className="w-full max-w-full lg:max-w-[90vw] mx-auto flex flex-col">
+      <div className="w-full max-w-full lg:max-w-[1240px] mx-auto flex flex-col">
         <header className="flex items-center justify-between px-4 sm:px-8 lg:px-0 py-4 bg-white/90">
           <div className="flex items-center gap-3">
             <button
@@ -525,8 +528,8 @@ export default function CalendarEditClient() {
           <button
             type="submit"
             form="daily-recipe-form"
-            className="inline-flex min-w-[120px] items-center justify-center gap-1.5 rounded-full px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium shadow-sm"
-            style={{ backgroundColor: BRAND_ORANGE, color: "#f5f5f5ff" }}
+            className="inline-flex min-w-[120px] items-center justify-center gap-1.5 rounded-[10px] px-3 sm:px-4 py-1.5 text-xs sm:text-[12px] font-medium shadow-sm"
+            style={{ backgroundColor: BRAND_BLUE2, color: "#5bbbf3" }}
           >
             <Check size={16} />
             레시피 저장
@@ -535,18 +538,18 @@ export default function CalendarEditClient() {
 
         <section className="w-full max-w-full lg:max-w-[90vw] mx-auto flex flex-col">
           <form id="daily-recipe-form" onSubmit={handleSubmit} className="w-full space-y-4">
-            <div className="rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3 shadow-sm">
+            <div className="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="flex flex-col">
-                  <span className="text-[11px] font-medium text-amber-700">
+                  <span className="text-[11px] font-medium text-[#lab(38 6.8 -34.85)]-700">
                     오늘의 레시피 날짜
                   </span>
-                  <span className="text-sm sm:text-base font-semibold text-amber-900">
+                  <span className="text-[12px] sm:text-base font-semibold text-blue-900">
                     {prettyDate}
                   </span>
                 </div>
                 {dateParam && (
-                  <span className="text-[11px] text-amber-700/80">
+                  <span className="text-[11px] text-blue-700/80">
                     {dateParam.replace(/-/g, ".")}
                   </span>
                 )}
@@ -559,7 +562,7 @@ export default function CalendarEditClient() {
                     onClick={() =>
                       router.push(`/dashboard/calendar/edit?date=${getAdjacentDate(dateParam, -1)}`)
                     }
-                    className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-white/70 px-3 py-1 hover:bg-amber-50"
+                    className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-white/70 px-3 py-1 hover:bg-blue-50"
                   >
                     <ArrowLeft size={12} />
                     전날로 이동
@@ -569,7 +572,7 @@ export default function CalendarEditClient() {
                     onClick={() =>
                       router.push(`/dashboard/calendar/edit?date=${getAdjacentDate(dateParam, +1)}`)
                     }
-                    className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-white/70 px-3 py-1 hover:bg-amber-50"
+                    className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-white/70 px-3 py-1 hover:bg-blue-50"
                   >
                     다음날로 이동
                     <ArrowLeft size={12} className="rotate-180" />
@@ -673,15 +676,15 @@ function RecipeCard({
     tone === "income"
       ? "border-sky-200 bg-sky-50/80"
       : tone === "expense"
-      ? "border-orange-200 bg-orange-50/80"
-      : "border-emerald-200 bg-emerald-50/80";
+      ? "border-blue-200 bg-blue-50/80"
+      : "border-blue-200 bg-blue-50/80";
 
   const totalColor =
     tone === "income"
       ? "text-sky-700"
       : tone === "expense"
-      ? "text-orange-700"
-      : "text-emerald-700";
+      ? "text-blue-700"
+      : "text-blue-700";
 
   const optionMap = CATEGORY_OPTIONS[sectionKey];
 
@@ -699,7 +702,7 @@ function RecipeCard({
         </div>
         <div className="text-right">
           <span className="block text-[10px] text-neutral-400">오늘 합계</span>
-          <span className={`text-sm font-semibold ${totalColor} whitespace-nowrap`}>
+          <span className={`text-[12px] font-semibold ${totalColor} whitespace-nowrap`}>
             {total ? total.toLocaleString("ko-KR") : 0}원
           </span>
         </div>
@@ -965,7 +968,7 @@ function CategoryCascadeSelect({
                     onClick={() => selectCategory(c)}
                     className={[
                       "w-full text-left px-3 py-2 text-[11px] hover:bg-neutral-50",
-                      c === category ? "bg-amber-50/60" : "",
+                      c === category ? "bg-blue-50/60" : "",
                     ].join(" ")}
                   >
                     <div className="flex items-center justify-between">
@@ -999,7 +1002,7 @@ function CategoryCascadeSelect({
                       onClick={() => selectSubcategory(s)}
                       className={[
                         "w-full text-left px-3 py-2 text-[11px] hover:bg-neutral-50",
-                        s === subcategory ? "bg-amber-50/60" : "",
+                        s === subcategory ? "bg-blue-50/60" : "",
                       ].join(" ")}
                     >
                       {s}

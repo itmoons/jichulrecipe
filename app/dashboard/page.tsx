@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { supabase } from "@/lib/supabaseClient";
 
-const BRAND_ORANGE = "#FF8A3D";
+const BRAND_blue = "#5bbbf3";
 const BRAND_GREEN = "#22C55E";
 
 /** ✅ edit 페이지와 맞추는 타입 (category/subcategory 추가) */
@@ -579,17 +579,17 @@ function DashboardInner() {
       <PageContainer title="">
         <div className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-[#FFF7EB] via-[#FFFDFC] to-[#F3F4FF]" />
         <main className="min-h-[70vh] flex items-center justify-center px-4">
-          <div className="w-full max-w-xl rounded-3xl bg-white/95 border border-amber-100 px-5 py-6 shadow-lg shadow-amber-100/70">
+          <div className="w-full max-w-xl rounded-3xl bg-white/95 border border-blue-100 px-5 py-6 shadow-lg shadow-blue-100/70">
             <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="text-base">📅</span>
                 <span className="text-xs font-medium text-slate-700">{ymToText(monthParam)} 레시피 없음</span>
               </div>
-              <div className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[10px] text-amber-700 border border-amber-100">
+              <div className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-[10px] text-blue-700 border border-blue-100">
                 <button
                   type="button"
                   onClick={() => handleMoveMonth(-1)}
-                  className="h-5 w-5 flex items-center justify-center rounded-full hover:bg-amber-100"
+                  className="h-5 w-5 flex items-center justify-center rounded-full hover:bg-blue-100"
                 >
                   ←
                 </button>
@@ -597,7 +597,7 @@ function DashboardInner() {
                 <button
                   type="button"
                   onClick={() => handleMoveMonth(1)}
-                  className="h-5 w-5 flex items-center justify-center rounded-full hover:bg-amber-100"
+                  className="h-5 w-5 flex items-center justify-center rounded-full hover:bg-blue-100"
                 >
                   →
                 </button>
@@ -606,18 +606,18 @@ function DashboardInner() {
 
             {loadError && <p className="mb-2 text-[11px] text-red-500">{loadError}</p>}
 
-            <h2 className="mb-2 text-sm font-semibold text-slate-900">{ymToText(monthParam)} 하루 지출 레시피부터 적어볼까요?</h2>
+            <h2 className="mb-2 text-[12px] font-semibold text-slate-900">{ymToText(monthParam)} 하루 지출 레시피부터 적어볼까요?</h2>
             <p className="mb-4 text-[11px] text-slate-600 leading-relaxed">
               <span className="font-semibold text-slate-900">레시피 달력</span>에서 날짜별로 수입·지출·저축을 입력하면,
               <br />
-              이 화면에서 한 달 전체가 <span className="font-semibold text-amber-700">분석 리포트</span>로 정리됩니다.
+              이 화면에서 한 달 전체가 <span className="font-semibold text-blue-700">분석 리포트</span>로 정리됩니다.
             </p>
 
             <button
               type="button"
               onClick={() => router.push(`/dashboard/calendar?month=${monthParam}`)}
-              className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-orange)] px-4 py-2.5 text-xs font-semibold text-white shadow-md shadow-orange-200 hover:bg-[#f97316] transition"
-              style={{ ["--brand-orange" as any]: BRAND_ORANGE }}
+              className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-xs font-semibold text-white shadow-md shadow-blue-200 hover:bg-[#5bbbf3] transition"
+              style={{ ["--brand-blue" as any]: BRAND_blue }}
             >
               🍳 {ymToText(monthParam)} 달력 레시피 쓰러 가기
             </button>
@@ -658,7 +658,7 @@ function DashboardInner() {
         {/* 상단 헤더 */}
         <section className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="inline-flex items-center gap-1 rounded-full bg-white/80 border border-amber-100 px-2 py-1 text-[10px] text-amber-700 shadow-sm">
+            <div className="inline-flex items-center gap-1 rounded-full bg-white/80 border border-blue-100 px-2 py-1 text-[10px] text-blue-700 shadow-sm">
               <span>🍲</span>
               <span>{ymToText(monthParam)} 지출 레시피</span>
             </div>
@@ -700,7 +700,7 @@ function DashboardInner() {
           {summaryChips.map((chip) => (
             <div
               key={chip.label}
-              className="rounded-2xl border border-amber-100 bg-white/95 px-3.5 py-3 shadow-sm shadow-amber-100/60 flex flex-col justify-between w-auto "
+              className="rounded-2xl border border-blue-100 bg-white/95 px-3.5 py-3 shadow-sm shadow-blue-100/60 flex flex-col justify-between w-auto "
             >
               <span className="text-[11px] text-slate-500">{chip.label}</span>
               <span className="mt-1 text-base font-semibold text-slate-900">{chip.value}</span>
@@ -712,11 +712,11 @@ function DashboardInner() {
         {/* 메인 2컬럼 */}
         <section className="grid gap-4 lg:grid-cols-[minmax(280px,340px)_minmax(0,1fr)] ">
           {/* 좌측: 파이 + 카테고리 */}
-          <div className="flex flex-col gap-3 rounded-3xl bg-white/95 border border-amber-100 p-3.5 shadow-sm shadow-amber-100/70  w-fit sm:w-auto">
+          <div className="flex flex-col gap-3 rounded-3xl bg-white/95 border border-blue-100 p-3.5 shadow-sm shadow-blue-100/70  w-fit sm:w-auto">
             {/* 건강도 + 요약 */}
             <div className="flex items-start justify-between gap-2 ">
               <div>
-                <div className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[10px] text-amber-800 border border-amber-100 mb-1">
+                <div className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-[10px] text-blue-800 border border-blue-100 mb-1">
                   <span>{health.emoji}</span>
                   <span>{health.title}</span>
                 </div>
@@ -740,7 +740,7 @@ function DashboardInner() {
             <PieChartCard items={topExpenseItems} total={totalExpense} />
 
             {/* 카테고리 리스트 */}
-            <div className="mt-2 rounded-2xl bg-amber-50/40 border border-amber-100 px-3 py-2.5">
+            <div className="mt-2 rounded-2xl bg-blue-50/40 border border-blue-100 px-3 py-2.5">
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-[11px] text-slate-700">지출 구분 요약</span>
                 <span className="text-[10px] text-slate-500">{topExpenseItems.length}개 항목</span>
@@ -753,13 +753,13 @@ function DashboardInner() {
 
                 {topExpenseItems.map((item, idx) => {
                   const ratio = totalExpense > 0 ? (item.amount / totalExpense) * 100 : 0;
-                  const chipColors = ["bg-orange-500", "bg-amber-400", "bg-lime-400", "bg-emerald-400", "bg-sky-400", "bg-fuchsia-400", "bg-slate-400"];
+                  const chipColors = ["bg-blue-500", "bg-blue-400", "bg-lime-400", "bg-emerald-400", "bg-sky-400", "bg-fuchsia-400", "bg-slate-400"];
                   const chipColor = chipColors[idx % chipColors.length] ?? "bg-slate-400";
 
                   return (
                     <div
                       key={`${item.label}-${idx}`}
-                      className="flex items-center justify-between gap-2 rounded-xl bg-white/80 px-2 py-1 hover:bg-amber-50"
+                      className="flex items-center justify-between gap-2 rounded-xl bg-white/80 px-2 py-1 hover:bg-blue-50"
                     >
                       <div className="flex items-center gap-2 min-w-0">
                         <span className={`h-4 w-4 flex items-center justify-center rounded-full text-[10px] text-white font-semibold ${chipColor}`}>
@@ -793,7 +793,7 @@ function DashboardInner() {
                 {stats.maxExpenseDay ? (
                   <>
                     가장 많이 쓴 날은 <span className="font-semibold">{formatKoreanDate(stats.maxExpenseDay.date)}</span>로,{" "}
-                    <span className="font-semibold text-orange-600">{stats.maxExpenseDay.amount.toLocaleString()}원</span>을 사용했습니다.
+                    <span className="font-semibold text-blue-600">{stats.maxExpenseDay.amount.toLocaleString()}원</span>을 사용했습니다.
                   </>
                 ) : (
                   <>아직 지출이 큰 날은 없습니다.</>
@@ -847,7 +847,7 @@ function DashboardInner() {
                           >
                             <td className="px-2 py-1.5 text-slate-800 whitespace-nowrap">{formatKoreanDate(d.date)}</td>
                             <td className="px-2 py-1.5 text-right text-sky-700">{d.incomeTotal ? d.incomeTotal.toLocaleString() : "-"}</td>
-                            <td className="px-2 py-1.5 text-right text-orange-700">{d.expenseTotal ? d.expenseTotal.toLocaleString() : "-"}</td>
+                            <td className="px-2 py-1.5 text-right text-blue-700">{d.expenseTotal ? d.expenseTotal.toLocaleString() : "-"}</td>
                             <td className="px-2 py-1.5 text-right text-emerald-700">{d.savingTotal ? d.savingTotal.toLocaleString() : "-"}</td>
                             <td className="px-2 py-1.5 text-slate-700 truncate max-w-[220px]">{mainMemo || "-"}</td>
                           </tr>
@@ -883,13 +883,13 @@ function DashboardInner() {
                     {topCat && (
                       <li>
                         • 가장 큰 지출 구분은 <span className="font-semibold">{topCat.label}</span> ({" "}
-                        <span className="font-semibold text-orange-700">{topCat.amount.toLocaleString()}원</span> ) 입니다.
+                        <span className="font-semibold text-blue-700">{topCat.amount.toLocaleString()}원</span> ) 입니다.
                       </li>
                     )}
 
                     <li>
                       • 지출이 있었던 날 기준 하루 평균{" "}
-                      <span className="font-semibold text-orange-700">{stats.avgExpensePerSpendingDay.toLocaleString()}원</span>을 사용했습니다.
+                      <span className="font-semibold text-blue-700">{stats.avgExpensePerSpendingDay.toLocaleString()}원</span>을 사용했습니다.
                     </li>
                     <li>
                       • 저축이 있었던 날 기준 하루 평균{" "}
@@ -899,13 +899,13 @@ function DashboardInner() {
                     {stats.maxExpenseDay && (
                       <li>
                         • 가장 지출이 컸던 날은 <span className="font-semibold">{formatKoreanDate(stats.maxExpenseDay.date)}</span>로,{" "}
-                        <span className="font-semibold text-orange-700">{stats.maxExpenseDay.amount.toLocaleString()}원</span>을 사용했습니다.
+                        <span className="font-semibold text-blue-700">{stats.maxExpenseDay.amount.toLocaleString()}원</span>을 사용했습니다.
                       </li>
                     )}
                   </ul>
                 </div>
 
-                <div className="rounded-3xl bg-gradient-to-r from-[#FFF7EB] to-[#FFEFD9] p-3.5 text-[11px] leading-relaxed text-slate-800 shadow-sm shadow-amber-100/80 w-auto">
+                <div className="rounded-3xl bg-gradient-to-r from-[#FFF7EB] to-[#FFEFD9] p-3.5 text-[11px] leading-relaxed text-slate-800 shadow-sm shadow-blue-100/80 w-auto">
                   <p className="mb-2">
                     🧂 <strong>셰프 TIP.</strong> 이번 달 데이터를 바탕으로 <span className="font-semibold">“줄이고 싶은 구분(카테고리)”</span>를 1~2개만 고른 뒤,
                     다음 달 달력에서 그 구분의 지출을 상한선으로 관리해 보세요.
@@ -1007,7 +1007,7 @@ function LineChartCard({ series }: { series: LinePoint[] }) {
           <polyline
             points={polyline}
             fill="none"
-            stroke={BRAND_ORANGE}
+            stroke={BRAND_blue}
             strokeWidth="2.5"
             strokeLinejoin="round"
             strokeLinecap="round"
@@ -1029,7 +1029,7 @@ function LineChartCard({ series }: { series: LinePoint[] }) {
                 cx={p.x}
                 cy={p.yPix}
                 r={i === hoverIdx ? 5 : 4}
-                fill={BRAND_ORANGE}
+                fill={BRAND_blue}
                 stroke="white"
                 strokeWidth="2"
                 onMouseEnter={() => setHoverIdx(i)}
@@ -1084,7 +1084,7 @@ function PieChartCard({ items, total }: PieChartProps) {
   const radius = 48;
   const circumference = 2 * Math.PI * radius;
 
-  const palette = ["#fb923c", "#facc15", "#4ade80", "#38bdf8", "#a855f7", "#f97373", "#94a3b8"];
+  const palette = ["#5bbbf3", "#facc15", "#4ade80", "#38bdf8", "#a855f7", "#f97373", "#94a3b8"];
 
   let currentOffset = 0;
 

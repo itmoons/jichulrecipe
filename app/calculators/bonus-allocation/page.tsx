@@ -39,15 +39,15 @@ export default function BonusAllocationPage() {
       const items = [
         { label: "저축", pct: ns * 100, amt: B * ns, color: "text-[#10B981]" },
         { label: "부채상환", pct: nd * 100, amt: B * nd, color: "text-[#1E40AF]" },
-        { label: "소비", pct: np * 100, amt: B * np, color: "text-[#F97316]" },
+        { label: "소비", pct: np * 100, amt: B * np, color: "text-[#ffffff]" },
       ];
 
       const status =
         B <= 0
-          ? { label: "입력 필요", badge: "bg-[#FBBF24] text-[#3B2F1E]", msg: "보너스 금액을 입력하세요." }
+          ? { label: "입력 필요", badge: "bg-[#52a9ff] text-[#ffffff]", msg: "보너스 금액을 입력하세요." }
           : sum === 100
           ? { label: "정상", badge: "bg-[#34D399] text-white", msg: "입력한 비율대로 배분합니다." }
-          : { label: "정규화", badge: "bg-[#FBBF24] text-[#3B2F1E]", msg: "비율 합이 100이 아니라 자동 정규화했습니다." };
+          : { label: "정규화", badge: "bg-[#52a9ff] text-[#ffffff]", msg: "비율 합이 100이 아니라 자동 정규화했습니다." };
 
       return { B, items, status, note: "비율 합이 100이 아니면 자동 정규화됩니다." };
     }
@@ -72,13 +72,13 @@ export default function BonusAllocationPage() {
     const items = [
       { label: "비상금 보강", pct: B > 0 ? (toEmergency / B) * 100 : 0, amt: toEmergency, color: "text-[#10B981]" },
       { label: "부채상환", pct: B > 0 ? (toDebt / B) * 100 : 0, amt: toDebt, color: "text-[#1E40AF]" },
-      { label: "소비(상한)", pct: B > 0 ? (toSpend / B) * 100 : 0, amt: toSpend, color: "text-[#F97316]" },
-      { label: "저축(잔여)", pct: B > 0 ? (toSave / B) * 100 : 0, amt: toSave, color: "text-[#6B5642]" },
+      { label: "소비(상한)", pct: B > 0 ? (toSpend / B) * 100 : 0, amt: toSpend, color: "text-[#ffffff]" },
+      { label: "저축(잔여)", pct: B > 0 ? (toSave / B) * 100 : 0, amt: toSave, color: "text-[#7f7f7f]" },
     ];
 
     const status =
       B <= 0
-        ? { label: "입력 필요", badge: "bg-[#FBBF24] text-[#3B2F1E]", msg: "보너스 금액을 입력하세요." }
+        ? { label: "입력 필요", badge: "bg-[#52a9ff] text-[#ffffff]", msg: "보너스 금액을 입력하세요." }
         : { label: "분배됨", badge: "bg-[#34D399] text-white", msg: "우선순위 룰로 한 번에 분배했습니다." };
 
     const note =
@@ -93,7 +93,7 @@ export default function BonusAllocationPage() {
       title="상여/보너스 배분 계산기"
       subtitle={
         <>
-          보너스를 저축·부채·소비로 <span className="font-semibold text-[#F97316]">‘한 번에’</span> 분배합니다.
+          보너스를 저축·부채·소비로 <span className="font-semibold text-[#ffffff]">‘한 번에’</span> 분배합니다.
         </>
       }
     >
@@ -101,10 +101,10 @@ export default function BonusAllocationPage() {
         <button
           onClick={() => setMode("비율로 배분")}
           className={cn(
-            "rounded-2xl px-4 py-2 text-sm font-semibold border",
+            "rounded-2xl px-4 py-2 text-[12px] font-semibold border",
             mode === "비율로 배분"
-              ? "bg-[#F97316] text-white border-[#F97316]"
-              : "bg-white text-[#6B5642] border-[#F2E4B6] hover:border-[#FB923C]"
+              ? "bg-[#5bbbf3] text-white border-[#5bbbf3]"
+              : "bg-white text-[#7f7f7f] border-[#e8f8ff] hover:border-[#5bbbf3]"
           )}
         >
           비율로 배분
@@ -112,10 +112,10 @@ export default function BonusAllocationPage() {
         <button
           onClick={() => setMode("우선순위 룰(추천 아님)")}
           className={cn(
-            "rounded-2xl px-4 py-2 text-sm font-semibold border",
+            "rounded-2xl px-4 py-2 text-[12px] font-semibold border",
             mode === "우선순위 룰(추천 아님)"
-              ? "bg-[#F97316] text-white border-[#F97316]"
-              : "bg-white text-[#6B5642] border-[#F2E4B6] hover:border-[#FB923C]"
+              ? "bg-[#5bbbf3] text-white border-[#5bbbf3]"
+              : "bg-white text-[#7f7f7f] border-[#e8f8ff] hover:border-[#5bbbf3]"
           )}
         >
           우선순위 룰(프레임)
@@ -128,9 +128,9 @@ export default function BonusAllocationPage() {
           <div className="flex items-start justify-between gap-3">
             <div>
               <h2 className={cn("text-lg font-semibold", UI.ink)}>입력</h2>
-              <p className={cn("mt-1 text-sm", UI.inkSoft)}>보너스는 ‘라벨링’하면 남습니다.</p>
+              <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>보너스는 ‘라벨링’하면 남습니다.</p>
             </div>
-            <span className={cn("rounded-full px-3 py-1 text-sm font-semibold", calc.status.badge)}>
+            <span className={cn("rounded-full px-3 py-1 text-[12px] font-semibold", calc.status.badge)}>
               {calc.status.label}
             </span>
           </div>
@@ -139,24 +139,24 @@ export default function BonusAllocationPage() {
             <MoneyInput label="보너스 금액" value={bonus} setValue={setBonus} />
 
             {mode === "비율로 배분" ? (
-              <div className="rounded-2xl border border-[#F2E4B6] bg-white p-4">
-                <div className="text-sm font-semibold text-[#3B2F1E]">비율 입력(합 100 권장)</div>
+              <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                <div className="text-[12px] font-semibold text-[#3B2F1E]">비율 입력(합 100 권장)</div>
                 <div className="mt-3 grid gap-3 sm:grid-cols-3">
                   <PctInput label="저축(%)" value={savePct} setValue={setSavePct} />
                   <PctInput label="부채(%)" value={debtPct} setValue={setDebtPct} />
                   <PctInput label="소비(%)" value={spendPct} setValue={setSpendPct} />
                 </div>
-                <div className="mt-3 text-xs font-semibold text-[#6B5642]">{calc.note}</div>
+                <div className="mt-3 text-xs font-semibold text-[#7f7f7f]">{calc.note}</div>
               </div>
             ) : (
-              <div className="rounded-2xl border border-[#F2E4B6] bg-white p-4">
-                <div className="text-sm font-semibold text-[#3B2F1E]">우선순위 룰 입력</div>
+              <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                <div className="text-[12px] font-semibold text-[#3B2F1E]">우선순위 룰 입력</div>
                 <div className="mt-3 grid gap-3 sm:grid-cols-2">
                   <MoneyInput label="비상금 부족분" value={needEmergencyGap} setValue={setNeedEmergencyGap} />
                   <MoneyInput label="상환할 부채" value={debtBalance} setValue={setDebtBalance} />
                   <MoneyInput label="소비 상한" value={spendCap} setValue={setSpendCap} />
                 </div>
-                <div className="mt-3 text-xs font-semibold text-[#6B5642]">{calc.note}</div>
+                <div className="mt-3 text-xs font-semibold text-[#7f7f7f]">{calc.note}</div>
               </div>
             )}
           </div>
@@ -165,26 +165,26 @@ export default function BonusAllocationPage() {
         {/* 결과 */}
         <section className={cn("rounded-3xl border p-4 sm:p-6 shadow-sm", UI.card)}>
           <h2 className={cn("text-lg font-semibold", UI.ink)}>결과</h2>
-          <p className={cn("mt-1 text-sm", UI.inkSoft)}>{calc.status.msg}</p>
+          <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>{calc.status.msg}</p>
 
-          <div className="mt-4 rounded-3xl border border-[#F2E4B6] bg-white p-5">
-            <div className="text-sm font-semibold text-[#6B5642]">보너스 총액</div>
-            <div className="mt-2 text-4xl font-extrabold text-[#F97316]">{formatKRW(calc.B)}원</div>
+          <div className="mt-4 rounded-3xl border border-[#e8f8ff] bg-white p-5">
+            <div className="text-[12px] font-semibold text-[#7f7f7f]">보너스 총액</div>
+            <div className="mt-2 text-4xl font-extrabold text-[#ffffff]">{formatKRW(calc.B)}원</div>
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-            <div className={cn("text-sm font-semibold", UI.ink)}>배분 결과</div>
+          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+            <div className={cn("text-[12px] font-semibold", UI.ink)}>배분 결과</div>
             <div className="mt-3 grid gap-2">
               {calc.items.map((it) => (
-                <div key={it.label} className="rounded-xl border border-[#F2E4B6] bg-[#FFFFFF] px-3 py-2">
+                <div key={it.label} className="rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] px-3 py-2">
                   <div className="flex items-center justify-between">
-                    <div className="text-sm font-extrabold text-[#3B2F1E]">{it.label}</div>
-                    <div className={cn("text-sm font-extrabold", it.color)}>{formatKRW(it.amt)}원</div>
+                    <div className="text-[12px] font-extrabold text-[#3B2F1E]">{it.label}</div>
+                    <div className={cn("text-[12px] font-extrabold", it.color)}>{formatKRW(it.amt)}원</div>
                   </div>
-                  <div className="mt-1 text-xs font-semibold text-[#6B5642]">비중: {pct(it.pct)}%</div>
-                  <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-[#F2E4B6]">
+                  <div className="mt-1 text-xs font-semibold text-[#7f7f7f]">비중: {pct(it.pct)}%</div>
+                  <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-[#e8f8ff]">
                     <div
-                      className="h-full rounded-full bg-[#FB923C]"
+                      className="h-full rounded-full bg-[#5bbbf3]"
                       style={{ width: `${clamp(it.pct, 0, 100)}%` }}
                     />
                   </div>
@@ -196,13 +196,13 @@ export default function BonusAllocationPage() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/calculators"
-              className="rounded-2xl border border-[#F2E4B6] bg-white px-4 py-2 text-center text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+              className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
             >
               계산기 모음으로
             </Link>
             <Link
               href="/"
-              className="rounded-2xl bg-[#F97316] px-4 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+              className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
             >
               지출레시피 홈으로
             </Link>

@@ -10,12 +10,12 @@ function cn(...xs: Array<string | false | null | undefined>) {
 
 /** 레시피북 톤(연노랑 + 주황) */
 const UI = {
-  paperBg: "bg-[#FFFFFF]",
+  paperBg: "bg-[#ffffff]",
   paperDots:
     "bg-[radial-gradient(circle,rgba(251,146,60,0.14)_1px,transparent_1px)] bg-[size:16px_16px]",
   ink: "text-[#3B2F1E]",
-  inkSoft: "text-[#6B5642]",
-  card: "bg-[#FFF9F2] border-[#F2E4B6]",
+  inkSoft: "text-[#7f7f7f]",
+  card: "bg-[#f2fbff] border-[#e8f8ff]",
 };
 
 function toNumberSafe(v: string) {
@@ -148,7 +148,7 @@ export default function NoSpendGoalPage() {
         dailyCapIfSpendWeekly: 0,
         status: {
           label: "입력 필요",
-          badge: "bg-[#FBBF24] text-[#3B2F1E]",
+          badge: "bg-[#52a9ff] text-[#ffffff]",
           msg: "남은 일수를 확인하세요.",
         },
       };
@@ -163,7 +163,7 @@ export default function NoSpendGoalPage() {
         dailyCapIfSpendWeekly: 0,
         status: {
           label: "위험",
-          badge: "bg-[#F97316] text-white",
+          badge: "bg-[#5bbbf3] text-white",
           msg: "절감액을 반영해도 ‘최소 가변비’ 충당이 어렵습니다. 확정/최소 지출을 다시 점검하세요.",
         },
       };
@@ -192,13 +192,13 @@ export default function NoSpendGoalPage() {
 
   const status1 =
     calc.daysLeft <= 0
-      ? { label: "입력 필요", badge: "bg-[#FBBF24] text-[#3B2F1E]", msg: "남은 일수를 확인하세요." }
+      ? { label: "입력 필요", badge: "bg-[#52a9ff] text-[#ffffff]", msg: "남은 일수를 확인하세요." }
       : calc.remainVar < 0
-      ? { label: "초과", badge: "bg-[#F97316] text-white", msg: "가변비 예산 대비 이미 지출이 큽니다. 예산/지출 입력을 점검하세요." }
+      ? { label: "초과", badge: "bg-[#5bbbf3] text-white", msg: "가변비 예산 대비 이미 지출이 큽니다. 예산/지출 입력을 점검하세요." }
       : calc.safeAfterMust < 0
       ? {
           label: "위험",
-          badge: "bg-[#F97316] text-white",
+          badge: "bg-[#5bbbf3] text-white",
           msg: "목표 무지출 일수를 적용하면 구조적으로 여력이 부족합니다. ‘필수 최소지출’ 또는 목표 일수를 조정해보세요.",
         }
       : { label: "계산됨", badge: "bg-[#34D399] text-white", msg: "목표 달성을 위한 지출데이 한도를 계산했습니다." };
@@ -206,34 +206,34 @@ export default function NoSpendGoalPage() {
   return (
     <div className={cn("min-h-screen", UI.paperBg)}>
       <div className={cn("min-h-screen", UI.paperDots)}>
-        <div className="mx-auto max-w-6xl px-4 py-7 sm:py-10">
+        <div className="mx-auto w-[1240px] px-4 py-7 sm:py-10">
           {/* 상단 네비 */}
           <div className="mb-5 flex items-center justify-between gap-3">
             <Link
               href="/calculators"
-              className="rounded-full border border-[#F2E4B6] bg-[#FFF9F2] px-3 py-1.5 text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+              className="rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
             >
               ← 계산기 모음
             </Link>
 
-            <span className="rounded-full bg-[#FFE4C7] px-3 py-1.5 text-sm font-semibold text-[#F97316]">
+            <span className="rounded-full bg-[#5bbbf3] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
               무지출 목표
             </span>
           </div>
 
           {/* 헤더 */}
           <div className="mb-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#F2E4B6] bg-[#FFF9F2] px-3 py-1 text-xs font-medium text-[#6B5642] shadow-sm">
-              <span className="inline-block h-2 w-2 rounded-full bg-[#FB923C]" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm">
+              <span className="inline-block h-2 w-2 rounded-full bg-[#5bbbf3]" />
               Recipe Calculator
             </div>
 
             <h1 className={cn("mt-3 text-2xl sm:text-3xl font-semibold tracking-tight", UI.ink)}>
               무지출 데이 목표 달성 계산기
             </h1>
-            <p className={cn("mt-2 text-sm sm:text-base", UI.inkSoft)}>
+            <p className={cn("mt-2 text-[12px] sm:text-base", UI.inkSoft)}>
               목표 무지출 일수에 맞추려면, 남은 기간에{" "}
-              <span className="font-semibold text-[#F97316]">얼마나 절감해야 하는지</span>를 역산합니다.
+              <span className="font-semibold text-[#ffffff]">얼마나 절감해야 하는지</span>를 역산합니다.
             </p>
           </div>
 
@@ -242,10 +242,10 @@ export default function NoSpendGoalPage() {
             <button
               onClick={() => setMode("절감액 역산")}
               className={cn(
-                "rounded-2xl px-4 py-2 text-sm font-semibold border",
+                "rounded-2xl px-4 py-2 text-[12px] font-semibold border",
                 mode === "절감액 역산"
-                  ? "bg-[#F97316] text-white border-[#F97316]"
-                  : "bg-white text-[#6B5642] border-[#F2E4B6] hover:border-[#FB923C]"
+                  ? "bg-[#5bbbf3] text-white border-[#5bbbf3]"
+                  : "bg-white text-[#7f7f7f] border-[#e8f8ff] hover:border-[#5bbbf3]"
               )}
             >
               목표일수 → 필요 절감액
@@ -253,10 +253,10 @@ export default function NoSpendGoalPage() {
             <button
               onClick={() => setMode("가능 일수 역산")}
               className={cn(
-                "rounded-2xl px-4 py-2 text-sm font-semibold border",
+                "rounded-2xl px-4 py-2 text-[12px] font-semibold border",
                 mode === "가능 일수 역산"
-                  ? "bg-[#F97316] text-white border-[#F97316]"
-                  : "bg-white text-[#6B5642] border-[#F2E4B6] hover:border-[#FB923C]"
+                  ? "bg-[#5bbbf3] text-white border-[#5bbbf3]"
+                  : "bg-white text-[#7f7f7f] border-[#e8f8ff] hover:border-[#5bbbf3]"
               )}
             >
               절감액 → 가능 무지출 일수
@@ -269,13 +269,13 @@ export default function NoSpendGoalPage() {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h2 className={cn("text-lg font-semibold", UI.ink)}>입력</h2>
-                  <p className={cn("mt-1 text-sm", UI.inkSoft)}>
+                  <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>
                     무지출로 줄일 대상은 “가변비(식비/카페/배달/쇼핑 등)”로 잡는 게 현실적입니다.
                   </p>
                 </div>
                 <span
                   className={cn(
-                    "rounded-full px-3 py-1 text-sm font-semibold",
+                    "rounded-full px-3 py-1 text-[12px] font-semibold",
                     mode === "절감액 역산" ? status1.badge : calc2.status.badge
                   )}
                 >
@@ -284,8 +284,8 @@ export default function NoSpendGoalPage() {
               </div>
 
               <div className="mt-4 grid gap-3">
-                <div className="rounded-2xl border border-[#F2E4B6] bg-white p-4">
-                  <div className="text-sm font-semibold text-[#3B2F1E]">기간</div>
+                <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                  <div className="text-[12px] font-semibold text-[#3B2F1E]">기간</div>
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
                     <NumberInput label="이번 달 총 일수" value={daysInMonth} setValue={setDaysInMonth} hint="28~31" />
                     <NumberInput label="오늘은 몇 일?" value={todayDay} setValue={setTodayDay} hint="1~말일" />
@@ -293,8 +293,8 @@ export default function NoSpendGoalPage() {
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-[#F2E4B6] bg-white p-4">
-                  <div className="text-sm font-semibold text-[#3B2F1E]">가변비 기준</div>
+                <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                  <div className="text-[12px] font-semibold text-[#3B2F1E]">가변비 기준</div>
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
                     <MoneyInput
                       label="이번 달 가변비 예산(또는 예상)"
@@ -322,15 +322,15 @@ export default function NoSpendGoalPage() {
                     />
                   </div>
 
-                  <div className="mt-3 rounded-xl border border-[#F2E4B6] bg-[#FFFFFF] px-3 py-2 text-xs font-semibold text-[#6B5642]">
+                  <div className="mt-3 rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] px-3 py-2 text-xs font-semibold text-[#7f7f7f]">
                     남은 가변비(예산-지출):{" "}
-                    <span className="text-[#F97316]">{formatKRW(calc.remainVar)}원</span>
+                    <span className="text-[#ffffff]">{formatKRW(calc.remainVar)}원</span>
                   </div>
                 </div>
 
                 {mode === "절감액 역산" ? (
-                  <div className="rounded-2xl border border-[#F2E4B6] bg-white p-4">
-                    <div className="text-sm font-semibold text-[#3B2F1E]">목표</div>
+                  <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                    <div className="text-[12px] font-semibold text-[#3B2F1E]">목표</div>
                     <div className="mt-3 grid gap-3 sm:grid-cols-2">
                       <NumberInput
                         label="목표 무지출 일수(남은 기간 중)"
@@ -342,8 +342,8 @@ export default function NoSpendGoalPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="rounded-2xl border border-[#F2E4B6] bg-white p-4">
-                    <div className="text-sm font-semibold text-[#3B2F1E]">절감 계획</div>
+                  <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                    <div className="text-[12px] font-semibold text-[#3B2F1E]">절감 계획</div>
                     <div className="mt-3 grid gap-3 sm:grid-cols-2">
                       <MoneyInput
                         label="남은 기간 추가 절감액"
@@ -357,9 +357,9 @@ export default function NoSpendGoalPage() {
                 )}
               </div>
 
-              <div className="mt-5 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-                <div className={cn("text-sm font-semibold", UI.ink)}>현실 팁(레시피)</div>
-                <ul className={cn("mt-2 list-disc pl-5 text-sm leading-relaxed", UI.inkSoft)}>
+              <div className="mt-5 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                <div className={cn("text-[12px] font-semibold", UI.ink)}>현실 팁(레시피)</div>
+                <ul className={cn("mt-2 list-disc pl-5 text-[12px] leading-relaxed", UI.inkSoft)}>
                   <li>무지출은 “완전 0원”보다, 카페/배달/쇼핑 같은 “가변비 차단”으로 정의하면 성공률이 올라갑니다.</li>
                   <li>지출데이는 “몰아서 장보기”처럼 계획형 지출로 운영하세요.</li>
                   <li>버퍼(10% 내외)를 두면 실패해도 월말 목표가 무너지지 않습니다.</li>
@@ -370,21 +370,21 @@ export default function NoSpendGoalPage() {
             {/* 결과 */}
             <section className={cn("rounded-3xl border p-4 sm:p-6 shadow-sm", UI.card)}>
               <h2 className={cn("text-lg font-semibold", UI.ink)}>결과</h2>
-              <p className={cn("mt-1 text-sm", UI.inkSoft)}>
+              <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>
                 {mode === "절감액 역산" ? status1.msg : calc2.status.msg}
               </p>
 
               {mode === "절감액 역산" ? (
                 <>
                   {/* 헤드라인 */}
-                  <div className="mt-4 rounded-3xl border border-[#F2E4B6] bg-white p-5">
-                    <div className="text-sm font-semibold text-[#6B5642]">
+                  <div className="mt-4 rounded-3xl border border-[#e8f8ff] bg-white p-5">
+                    <div className="text-[12px] font-semibold text-[#7f7f7f]">
                       목표 {calc.goal}일 무지출을 위한 “지출데이 1일 한도(안전)”
                     </div>
-                    <div className="mt-2 text-4xl font-extrabold text-[#F97316]">
+                    <div className="mt-2 text-4xl font-extrabold text-[#ffffff]">
                       {formatKRW(calc.dailyCapSpendDay)}원
                     </div>
-                    <div className={cn("mt-2 text-sm", UI.inkSoft)}>
+                    <div className={cn("mt-2 text-[12px]", UI.inkSoft)}>
                       지출을 “{calc.spendDays}일”에만 하도록 설계했을 때의 1일 평균 한도입니다.
                     </div>
                   </div>
@@ -396,15 +396,15 @@ export default function NoSpendGoalPage() {
                     <MetricCard title="지출데이 수" value={`${calc.spendDays}일`} />
                   </div>
 
-                  <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-                    <div className={cn("text-sm font-semibold", UI.ink)}>필요 절감액(역산)</div>
-                    <div className={cn("mt-2 text-sm", UI.inkSoft)}>
+                  <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                    <div className={cn("text-[12px] font-semibold", UI.ink)}>필요 절감액(역산)</div>
+                    <div className={cn("mt-2 text-[12px]", UI.inkSoft)}>
                       목표 구조에서 안전 여력이 음수라면, 그만큼을 추가로 줄여야 “0 이상”이 됩니다.
                     </div>
 
-                    <div className="mt-3 rounded-xl border border-[#F2E4B6] bg-[#FFFFFF] px-3 py-2">
-                      <div className="text-xs font-semibold text-[#6B5642]">필요 추가 절감액(최소)</div>
-                      <div className="mt-1 text-2xl font-extrabold text-[#F97316]">
+                    <div className="mt-3 rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] px-3 py-2">
+                      <div className="text-xs font-semibold text-[#7f7f7f]">필요 추가 절감액(최소)</div>
+                      <div className="mt-1 text-2xl font-extrabold text-[#ffffff]">
                         {formatKRW(calc.needCutToNonNegative)}원
                       </div>
                     </div>
@@ -418,21 +418,21 @@ export default function NoSpendGoalPage() {
               ) : (
                 <>
                   {/* 헤드라인 */}
-                  <div className="mt-4 rounded-3xl border border-[#F2E4B6] bg-white p-5">
-                    <div className="text-sm font-semibold text-[#6B5642]">추가 절감 {formatKRW(calc2.cut)}원일 때</div>
-                    <div className="mt-2 text-4xl font-extrabold text-[#F97316]">
+                  <div className="mt-4 rounded-3xl border border-[#e8f8ff] bg-white p-5">
+                    <div className="text-[12px] font-semibold text-[#7f7f7f]">추가 절감 {formatKRW(calc2.cut)}원일 때</div>
+                    <div className="mt-2 text-4xl font-extrabold text-[#ffffff]">
                       최대 무지출 {calc2.maxNoSpendDays}일
                     </div>
-                    <div className={cn("mt-2 text-sm", UI.inkSoft)}>
+                    <div className={cn("mt-2 text-[12px]", UI.inkSoft)}>
                       최소 지출데이 1일을 가정한 “이론상 최대치”입니다. 현실적 운영은 주 1~2회 지출데이가 보통입니다.
                     </div>
                   </div>
 
-                  <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-                    <div className={cn("text-sm font-semibold", UI.ink)}>현실 운영 예시(주 2회 지출)</div>
-                    <div className="mt-3 rounded-xl border border-[#F2E4B6] bg-[#FFFFFF] px-3 py-2">
-                      <div className="text-xs font-semibold text-[#6B5642]">지출데이 1일 한도(주 2회 가정)</div>
-                      <div className="mt-1 text-2xl font-extrabold text-[#F97316]">
+                  <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                    <div className={cn("text-[12px] font-semibold", UI.ink)}>현실 운영 예시(주 2회 지출)</div>
+                    <div className="mt-3 rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] px-3 py-2">
+                      <div className="text-xs font-semibold text-[#7f7f7f]">지출데이 1일 한도(주 2회 가정)</div>
+                      <div className="mt-1 text-2xl font-extrabold text-[#ffffff]">
                         {formatKRW(calc2.dailyCapIfSpendWeekly)}원
                       </div>
                     </div>
@@ -447,13 +447,13 @@ export default function NoSpendGoalPage() {
               <div className="mt-5 flex flex-col gap-2 sm:flex-row">
                 <Link
                   href="/calculators/cutback-goal"
-                  className="rounded-2xl bg-[#F97316] px-4 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+                  className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
                 >
                   다음: 지출 컷 목표 역산 →
                 </Link>
                 <Link
                   href="/calculators"
-                  className="rounded-2xl border border-[#F2E4B6] bg-white px-4 py-2 text-center text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+                  className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
                 >
                   계산기 모음으로
                 </Link>
@@ -486,11 +486,11 @@ function MoneyInput({
   return (
     <div className="grid gap-1.5">
       <div className="flex items-end justify-between gap-2">
-        <label className="text-sm font-semibold text-[#3B2F1E]">{label}</label>
-        {hint && <span className="text-xs text-[#6B5642]">{hint}</span>}
+        <label className="text-[12px] font-semibold text-[#3B2F1E]">{label}</label>
+        {hint && <span className="text-xs text-[#7f7f7f]">{hint}</span>}
       </div>
       <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#9C7A55]">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-[#9C7A55]">
           ₩
         </span>
         <input
@@ -499,8 +499,8 @@ function MoneyInput({
           onChange={(e) => setValue(e.target.value)}
           placeholder="0"
           className={cn(
-            "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-sm outline-none",
-            "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+            "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-[12px] outline-none",
+            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
           )}
         />
       </div>
@@ -522,8 +522,8 @@ function NumberInput({
   return (
     <div className="grid gap-1.5">
       <div className="flex items-end justify-between gap-2">
-        <label className="text-sm font-semibold text-[#3B2F1E]">{label}</label>
-        {hint && <span className="text-xs text-[#6B5642]">{hint}</span>}
+        <label className="text-[12px] font-semibold text-[#3B2F1E]">{label}</label>
+        {hint && <span className="text-xs text-[#7f7f7f]">{hint}</span>}
       </div>
       <input
         inputMode="numeric"
@@ -531,8 +531,8 @@ function NumberInput({
         onChange={(e) => setValue(e.target.value)}
         placeholder="0"
         className={cn(
-          "h-11 w-full rounded-xl border bg-white px-3 text-sm outline-none",
-          "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+          "h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
+          "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
         )}
       />
     </div>
@@ -553,8 +553,8 @@ function PctInput({
   return (
     <div className="grid gap-1.5">
       <div className="flex items-end justify-between gap-2">
-        <label className="text-sm font-semibold text-[#3B2F1E]">{label}</label>
-        {hint && <span className="text-xs text-[#6B5642]">{hint}</span>}
+        <label className="text-[12px] font-semibold text-[#3B2F1E]">{label}</label>
+        {hint && <span className="text-xs text-[#7f7f7f]">{hint}</span>}
       </div>
       <div className="relative">
         <input
@@ -563,11 +563,11 @@ function PctInput({
           onChange={(e) => setValue(e.target.value)}
           placeholder="0"
           className={cn(
-            "h-11 w-full rounded-xl border bg-white px-3 pr-10 text-sm outline-none",
-            "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+            "h-11 w-full rounded-xl border bg-white px-3 pr-10 text-[12px] outline-none",
+            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
           )}
         />
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#9C7A55]">
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-[#9C7A55]">
           %
         </span>
       </div>
@@ -577,8 +577,8 @@ function PctInput({
 
 function MetricCard({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[#F2E4B6] bg-white p-4">
-      <div className="text-xs font-semibold text-[#6B5642]">{title}</div>
+    <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
+      <div className="text-xs font-semibold text-[#7f7f7f]">{title}</div>
       <div className="mt-1 text-xl font-bold text-[#3B2F1E]">{value}</div>
     </div>
   );
@@ -587,8 +587,8 @@ function MetricCard({ title, value }: { title: string; value: string }) {
 function InfoPill({ label, value }: { label: string; value: string }) {
   return (
     <div className="grid gap-1.5">
-      <div className="text-sm font-semibold text-[#3B2F1E]">{label}</div>
-      <div className="rounded-xl border border-[#F2E4B6] bg-[#FFFFFF] px-3 py-2 text-sm font-bold text-[#6B5642]">
+      <div className="text-[12px] font-semibold text-[#3B2F1E]">{label}</div>
+      <div className="rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] px-3 py-2 text-[12px] font-bold text-[#7f7f7f]">
         {value}
       </div>
     </div>

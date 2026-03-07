@@ -59,10 +59,10 @@ export default function TaxDeductionCheckPage() {
 
     const status =
       income <= 0
-        ? { label: "입력 필요", badge: "bg-[#FBBF24] text-[#3B2F1E]" }
+        ? { label: "입력 필요", badge: "bg-[#52a9ff] text-[#ffffff]" }
         : flags.length <= 3
         ? { label: "양호", badge: "bg-[#34D399] text-white" }
-        : { label: "체크 필요", badge: "bg-[#F97316] text-white" };
+        : { label: "체크 필요", badge: "bg-[#5bbbf3] text-white" };
 
     return { income, c, m, e, d, flags, priority, completeness, status };
   }, [
@@ -84,7 +84,7 @@ export default function TaxDeductionCheckPage() {
       title="연말정산 공제 항목 체크 계산기"
       subtitle={
         <>
-          숫자를 “맞추는 계산기”가 아니라, <span className="font-semibold text-[#F97316]">누락을 줄이는 체크 흐름</span>입니다.
+          숫자를 “맞추는 계산기”가 아니라, <span className="font-semibold text-[#ffffff]">누락을 줄이는 체크 흐름</span>입니다.
         </>
       }
     >
@@ -94,9 +94,9 @@ export default function TaxDeductionCheckPage() {
           <div className="flex items-start justify-between gap-3">
             <div>
               <h2 className={cn("text-lg font-semibold", UI.ink)}>간단 입력</h2>
-              <p className={cn("mt-1 text-sm", UI.inkSoft)}>아는 것만 넣어도 체크 우선순위가 잡힙니다.</p>
+              <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>아는 것만 넣어도 체크 우선순위가 잡힙니다.</p>
             </div>
-            <span className={cn("rounded-full px-3 py-1 text-sm font-semibold", calc.status.badge)}>
+            <span className={cn("rounded-full px-3 py-1 text-[12px] font-semibold", calc.status.badge)}>
               {calc.status.label}
             </span>
           </div>
@@ -117,9 +117,9 @@ export default function TaxDeductionCheckPage() {
             <SelectInput label="부양가족 있음" value={hasDependent} onChange={(v) => setHasDependent(v as any)} options={["예", "아니오"]} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-            <div className="text-sm font-semibold text-[#3B2F1E]">주의</div>
-            <p className="mt-2 text-sm text-[#6B5642]">
+          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+            <div className="text-[12px] font-semibold text-[#3B2F1E]">주의</div>
+            <p className="mt-2 text-[12px] text-[#6d6d6d]">
               이 페이지는 “예상 환급액”을 단정하지 않습니다. 대신, 공제 항목별 증빙/요건 체크 순서를 제공합니다.
             </p>
           </div>
@@ -134,12 +134,12 @@ export default function TaxDeductionCheckPage() {
             <MetricCard title="체크 알림" value={`${calc.flags.length}개`} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-            <div className={cn("text-sm font-semibold", UI.ink)}>우선순위(추천 흐름)</div>
+          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+            <div className={cn("text-[12px] font-semibold", UI.ink)}>우선순위(추천 흐름)</div>
             <div className="mt-3 grid gap-2">
               {calc.priority.map((p, idx) => (
-                <div key={idx} className="rounded-xl border border-[#F2E4B6] bg-[#FFFFFF] px-3 py-2">
-                  <div className="text-sm font-semibold text-[#3B2F1E]">
+                <div key={idx} className="rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] px-3 py-2">
+                  <div className="text-[12px] font-semibold text-[#3B2F1E]">
                     {idx + 1}. {p}
                   </div>
                 </div>
@@ -148,8 +148,8 @@ export default function TaxDeductionCheckPage() {
           </div>
 
           {calc.flags.length > 0 && (
-            <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-              <div className={cn("text-sm font-semibold", UI.ink)}>누락/점검 포인트</div>
+            <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+              <div className={cn("text-[12px] font-semibold", UI.ink)}>누락/점검 포인트</div>
               <div className="mt-3 grid gap-2">
                 {calc.flags.map((f, idx) => (
                   <Row key={idx} label={`체크 ${idx + 1}`} value={f} tone="danger" />
@@ -161,13 +161,13 @@ export default function TaxDeductionCheckPage() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/calculators/net-pay-insurance"
-              className="rounded-2xl bg-[#F97316] px-4 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+              className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
             >
               다음: 4대보험 실수령액 →
             </Link>
             <Link
               href="/calculators"
-              className="rounded-2xl border border-[#F2E4B6] bg-white px-4 py-2 text-center text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+              className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
             >
               계산기 모음으로
             </Link>

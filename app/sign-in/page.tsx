@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { Suspense } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
-const BRAND_ORANGE = "#FF8A3D";
+const BRAND_blue = "#5bbbf3";
 
 /**
  * ✅ 실제 로그인/회원가입 로직이 들어 있는 컴포넌트
@@ -230,13 +230,13 @@ function SignInInner() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: "easeOut" }}
-        className="w-full max-w-md rounded-3xl bg-white/95 p-6 shadow-lg shadow-orange-100"
+        className="w-full max-w-md rounded-3xl bg-white/95 p-6 shadow-lg shadow-blue-100"
       >
         {/* 로고 + 인사말 */}
         <div className="mb-5 flex flex-col gap-1">
           <div className="inline-flex items-center gap-2">
             <span className="text-xl">🥕</span>
-            <span className="text-sm font-semibold tracking-tight text-slate-900">
+            <span className="text-[12px] font-semibold tracking-tight text-slate-900">
               지출레시피
             </span>
           </div>
@@ -282,7 +282,7 @@ function SignInInner() {
 
         {/* 회원가입 성공 메시지 배너 */}
         {successMsg && (
-          <div className="mb-3 rounded-xl border border-orange-200 bg-[#FFF7EB] px-3 py-2 text-[11px] text-orange-700">
+          <div className="mb-3 rounded-xl border border-blue-200 bg-[#FFF7EB] px-3 py-2 text-[11px] text-blue-700">
             <strong className="mr-1">🎉 쉐프가 된것을 축하합니다!</strong>
             <span>
               이제 로그인하고 나만의 지출 레시피를 시작해 보세요.
@@ -305,7 +305,7 @@ function SignInInner() {
             </label>
             <input
               type="email"
-              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-[12px] outline-none focus:border-slate-400"
               placeholder="예: user@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -319,7 +319,7 @@ function SignInInner() {
             </label>
             <input
               type="password"
-              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-[12px] outline-none focus:border-slate-400"
               placeholder="6자 이상 입력해 주세요"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -334,7 +334,7 @@ function SignInInner() {
               </label>
               <input
                 type="password"
-                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-[12px] outline-none focus:border-slate-400"
                 placeholder="비밀번호를 다시 입력해 주세요"
                 value={passwordCheck}
                 onChange={(e) => setPasswordCheck(e.target.value)}
@@ -350,8 +350,8 @@ function SignInInner() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="mt-1 flex w-full items-center justify-center rounded-xl bg-[color:var(--brand-orange)] px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-orange-200 transition hover:bg-[#f27422] disabled:cursor-not-allowed disabled:opacity-70"
-            style={{ ["--brand-orange" as any]: BRAND_ORANGE }}
+            className="mt-1 flex w-full items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-white shadow-md shadow-blue-200 transition hover:bg-[#f27422] disabled:cursor-not-allowed disabled:opacity-70"
+            style={{ ["--brand-blue" as any]: BRAND_blue }}
           >
             {isSubmitting
               ? "처리 중..."
@@ -388,7 +388,7 @@ export default function SignInPage() {
     <Suspense
       fallback={
         <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#FFF8EC] via-[#FFFDFC] to-[#F7FAFF] px-4">
-          <div className="rounded-3xl bg-white/90 p-6 text-sm text-slate-600 shadow">
+          <div className="rounded-3xl bg-white/90 p-6 text-[12px] text-slate-600 shadow">
             로그인 화면을 준비 중입니다...
           </div>
         </main>

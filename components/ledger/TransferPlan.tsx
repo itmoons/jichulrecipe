@@ -51,14 +51,14 @@ export default function TransferPlan({ ledgerId }: { ledgerId: string }) {
     <RecipeCard
       title="송금 지시표"
       description="정산 결과를 ‘누가 → 누구에게 → 얼마’로 변환합니다."
-      right={<RecipeBadge variant="orange">{month}</RecipeBadge>}
+      right={<RecipeBadge variant="blue">{month}</RecipeBadge>}
     >
       <div className="flex items-center gap-2">
         <input
           type="month"
           value={month}
           onChange={(e) => setMonth(e.target.value)}
-          className="w-[160px] rounded-xl border border-orange-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-200"
+          className="w-[160px] rounded-xl border border-blue-200 bg-white px-3 py-2 text-[12px] outline-none focus:ring-2 focus:ring-blue-200"
         />
         <RecipeButton onClick={load} disabled={loading}>
           {loading ? "계산중…" : "계산"}
@@ -68,15 +68,15 @@ export default function TransferPlan({ ledgerId }: { ledgerId: string }) {
 
       <div className="mt-4 flex flex-col gap-2">
         {plan.length === 0 ? (
-          <div className="text-sm text-zinc-500">송금이 필요 없거나(균형) 데이터가 없습니다.</div>
+          <div className="text-[12px] text-zinc-500">송금이 필요 없거나(균형) 데이터가 없습니다.</div>
         ) : (
           plan.map((r, idx) => (
-            <div key={idx} className="rounded-2xl border border-orange-100 bg-white p-3">
+            <div key={idx} className="rounded-2xl border border-blue-100 bg-white p-3">
               <div className="flex items-center justify-between gap-2">
-                <div className="text-sm font-bold text-zinc-900">
+                <div className="text-[12px] font-bold text-zinc-900">
                   {nameOf(r.from_user_id)} → {nameOf(r.to_user_id)}
                 </div>
-                <RecipeBadge variant="orange">{Math.round(Number(r.amount)).toLocaleString()}원</RecipeBadge>
+                <RecipeBadge variant="blue">{Math.round(Number(r.amount)).toLocaleString()}원</RecipeBadge>
               </div>
               <div className="mt-1 text-xs text-zinc-500">이 송금만 하면 해당 월 정산이 깔끔히 맞춰집니다.</div>
             </div>

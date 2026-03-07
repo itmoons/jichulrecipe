@@ -54,7 +54,7 @@ export default function SettlementLockAndPay({ ledgerId }: { ledgerId: string })
     <RecipeCard
       title="✅ 정산 확정 & 송금 완료"
       description="정산을 확정하면 해당 월이 잠기고, 승인 없이는 수정이 제한됩니다."
-      right={<RecipeBadge variant="orange">{month}</RecipeBadge>}
+      right={<RecipeBadge variant="blue">{month}</RecipeBadge>}
       className="w-full"
     >
       <div className="flex items-center gap-2">
@@ -62,7 +62,7 @@ export default function SettlementLockAndPay({ ledgerId }: { ledgerId: string })
           type="month"
           value={month}
           onChange={(e) => setMonth(e.target.value)}
-          className="w-[160px] rounded-xl border border-orange-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-200"
+          className="w-[160px] rounded-xl border border-blue-200 bg-white px-3 py-2 text-[12px] outline-none focus:ring-2 focus:ring-blue-200"
         />
 
         <RecipeButton onClick={lock} disabled={loading !== null}>

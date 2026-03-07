@@ -10,12 +10,12 @@ function cn(...xs: Array<string | false | null | undefined>) {
 
 /** 레시피북 톤(연노랑 + 주황) */
 const UI = {
-  paperBg: "bg-[#FFFFFF]",
+  paperBg: "bg-[#ffffff]",
   paperDots:
     "bg-[radial-gradient(circle,rgba(251,146,60,0.14)_1px,transparent_1px)] bg-[size:16px_16px]",
   ink: "text-[#3B2F1E]",
-  inkSoft: "text-[#6B5642]",
-  card: "bg-[#FFF9F2] border-[#F2E4B6]",
+  inkSoft: "text-[#7f7f7f]",
+  card: "bg-[#f2fbff] border-[#e8f8ff]",
 };
 
 function toNumberSafe(v: string) {
@@ -87,12 +87,12 @@ export default function CoffeeDeliveryAccumPage() {
         : monthlyTotal <= 200000
         ? {
             label: "주의",
-            badge: "bg-[#FBBF24] text-[#3B2F1E]",
+            badge: "bg-[#52a9ff] text-[#ffffff]",
             msg: "월 누적이 눈에 띕니다. 횟수/단가 중 하나만 조정해도 체감이 큽니다.",
           }
         : {
             label: "점검 필요",
-            badge: "bg-[#F97316] text-white",
+            badge: "bg-[#5bbbf3] text-white",
             msg: "월 누적이 큽니다. 특히 배달은 ‘횟수×단가’가 동시에 커지기 쉬워 우선순위를 두고 줄여보세요.",
           };
 
@@ -112,32 +112,32 @@ export default function CoffeeDeliveryAccumPage() {
   return (
     <div className={cn("min-h-screen", UI.paperBg)}>
       <div className={cn("min-h-screen", UI.paperDots)}>
-        <div className="mx-auto max-w-6xl px-4 py-7 sm:py-10">
+        <div className="mx-auto w-[1240px] px-4 py-7 sm:py-10">
           {/* 상단 네비 */}
           <div className="mb-5 flex items-center justify-between gap-3">
             <Link
               href="/calculators"
-              className="rounded-full border border-[#F2E4B6] bg-[#FFF9F2] px-3 py-1.5 text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+              className="rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
             >
               ← 계산기 모음
             </Link>
 
-            <span className="rounded-full bg-[#FFE4C7] px-3 py-1.5 text-sm font-semibold text-[#F97316]">
+            <span className="rounded-full bg-[#5bbbf3] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
               누적 점검
             </span>
           </div>
 
           {/* 헤더 */}
           <div className="mb-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#F2E4B6] bg-[#FFF9F2] px-3 py-1 text-xs font-medium text-[#6B5642] shadow-sm">
-              <span className="inline-block h-2 w-2 rounded-full bg-[#FB923C]" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm">
+              <span className="inline-block h-2 w-2 rounded-full bg-[#5bbbf3]" />
               Recipe Calculator
             </div>
 
             <h1 className={cn("mt-3 text-2xl sm:text-3xl font-semibold tracking-tight", UI.ink)}>
               커피/배달 지출 누적 계산기
             </h1>
-            <p className={cn("mt-2 text-sm sm:text-base", UI.inkSoft)}>
+            <p className={cn("mt-2 text-[12px] sm:text-base", UI.inkSoft)}>
               주당 횟수를 월/연으로 환산해, “작은 지출의 누적”을 숫자로 보이게 합니다.
             </p>
           </div>
@@ -146,7 +146,7 @@ export default function CoffeeDeliveryAccumPage() {
             {/* 입력 */}
             <section className={cn("rounded-3xl border p-4 sm:p-6 shadow-sm", UI.card)}>
               <h2 className={cn("text-lg font-semibold", UI.ink)}>입력</h2>
-              <p className={cn("mt-1 text-sm", UI.inkSoft)}>
+              <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>
                 커피/배달을 각각 입력하면 월/연 누적이 자동 계산됩니다.
               </p>
 
@@ -167,9 +167,9 @@ export default function CoffeeDeliveryAccumPage() {
                 />
               </div>
 
-              <div className="mt-5 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-                <div className={cn("text-sm font-semibold", UI.ink)}>빠른 해석</div>
-                <ul className={cn("mt-2 list-disc pl-5 text-sm leading-relaxed", UI.inkSoft)}>
+              <div className="mt-5 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                <div className={cn("text-[12px] font-semibold", UI.ink)}>빠른 해석</div>
+                <ul className={cn("mt-2 list-disc pl-5 text-[12px] leading-relaxed", UI.inkSoft)}>
                   <li>주당 1회 차이는 월로 환산하면 생각보다 큽니다(4.33주).</li>
                   <li>배달은 단가가 높아 “횟수 1회” 조정 효과가 더 크게 나타나기 쉽습니다.</li>
                   <li>단가는 “음료/사이드/배달비”를 분리하면 줄일 구멍이 보입니다.</li>
@@ -182,12 +182,12 @@ export default function CoffeeDeliveryAccumPage() {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h2 className={cn("text-lg font-semibold", UI.ink)}>누적 결과</h2>
-                  <p className={cn("mt-1 text-sm", UI.inkSoft)}>
+                  <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>
                     월/연으로 환산한 총액과 비중을 확인하세요.
                   </p>
                 </div>
 
-                <span className={cn("rounded-full px-3 py-1 text-sm font-semibold", calc.signal.badge)}>
+                <span className={cn("rounded-full px-3 py-1 text-[12px] font-semibold", calc.signal.badge)}>
                   {calc.signal.label}
                 </span>
               </div>
@@ -199,36 +199,36 @@ export default function CoffeeDeliveryAccumPage() {
                 <MetricCard title="연 누적(합계)" value={`${formatKRW(calc.yearlyTotal)}원`} />
               </div>
 
-              <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
+              <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
                 <div className="flex items-center justify-between">
-                  <div className={cn("text-sm font-semibold", UI.ink)}>비중(월 기준)</div>
-                  <div className="text-xs text-[#6B5642]">커피 vs 배달</div>
+                  <div className={cn("text-[12px] font-semibold", UI.ink)}>비중(월 기준)</div>
+                  <div className="text-xs text-[#7f7f7f]">커피 vs 배달</div>
                 </div>
 
                 <div className="mt-3">
-                  <div className="flex items-center justify-between text-xs font-semibold text-[#6B5642]">
+                  <div className="flex items-center justify-between text-xs font-semibold text-[#7f7f7f]">
                     <span>커피 {pct(calc.coffeeShare)}%</span>
                     <span>배달 {pct(calc.deliveryShare)}%</span>
                   </div>
-                  <div className="mt-2 h-3 overflow-hidden rounded-full border border-[#F2E4B6] bg-[#FFFFFF]">
+                  <div className="mt-2 h-3 overflow-hidden rounded-full border border-[#e8f8ff] bg-[#5bbbf3]">
                     <div
-                      className="h-full bg-[#FB923C]"
+                      className="h-full bg-[#5bbbf3]"
                       style={{ width: `${clamp(calc.coffeeShare, 0, 100)}%` }}
                     />
                   </div>
-                  <div className="mt-1 text-[11px] text-[#6B5642]">
+                  <div className="mt-1 text-[11px] text-[#7f7f7f]">
                     남은 구간은 배달 비중입니다.
                   </div>
                 </div>
 
-                <div className={cn("mt-3 text-sm leading-relaxed", UI.inkSoft)}>
+                <div className={cn("mt-3 text-[12px] leading-relaxed", UI.inkSoft)}>
                   {calc.signal.msg}
                 </div>
               </div>
 
               {/* 시나리오 */}
-              <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-                <div className={cn("text-sm font-semibold", UI.ink)}>시나리오(이번 달만 조정하면)</div>
+              <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                <div className={cn("text-[12px] font-semibold", UI.ink)}>시나리오(이번 달만 조정하면)</div>
 
                 <div className="mt-3 grid gap-2">
                   <ScenarioRow
@@ -248,13 +248,13 @@ export default function CoffeeDeliveryAccumPage() {
               <div className="mt-5 flex flex-col gap-2 sm:flex-row">
                 <Link
                   href="/calculators/transport-compare"
-                  className="rounded-2xl bg-[#F97316] px-4 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+                  className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
                 >
                   다음: 교통비 비교 →
                 </Link>
                 <Link
                   href="/calculators"
-                  className="rounded-2xl border border-[#F2E4B6] bg-white px-4 py-2 text-center text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+                  className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
                 >
                   계산기 모음으로
                 </Link>
@@ -289,13 +289,13 @@ function BucketBox({
   const patch = (k: keyof Bucket, v: string) => onChange({ ...bucket, [k]: v });
 
   return (
-    <div className="rounded-2xl border border-[#F2E4B6] bg-white p-4">
+    <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-sm font-semibold text-[#3B2F1E]">{title}</div>
-          <div className="mt-1 text-xs text-[#6B5642]">{subtitle}</div>
+          <div className="text-[12px] font-semibold text-[#3B2F1E]">{title}</div>
+          <div className="mt-1 text-xs text-[#7f7f7f]">{subtitle}</div>
         </div>
-        <span className="rounded-full bg-[#FFE4C7] px-3 py-1 text-xs font-semibold text-[#F97316]">
+        <span className="rounded-full bg-[#5bbbf3] px-3 py-1 text-xs font-semibold text-[#ffffff]">
           {chip}
         </span>
       </div>
@@ -322,8 +322,8 @@ function NumberInput({
   return (
     <div className="grid gap-1.5">
       <div className="flex items-end justify-between gap-2">
-        <label className="text-sm font-semibold text-[#3B2F1E]">{label}</label>
-        {hint && <span className="text-xs text-[#6B5642]">{hint}</span>}
+        <label className="text-[12px] font-semibold text-[#3B2F1E]">{label}</label>
+        {hint && <span className="text-xs text-[#7f7f7f]">{hint}</span>}
       </div>
       <input
         inputMode="numeric"
@@ -331,8 +331,8 @@ function NumberInput({
         onChange={(e) => setValue(e.target.value)}
         placeholder="0"
         className={cn(
-          "h-11 w-full rounded-xl border bg-white px-3 text-sm outline-none",
-          "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+          "h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
+          "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
         )}
       />
     </div>
@@ -353,11 +353,11 @@ function MoneyInput({
   return (
     <div className="grid gap-1.5">
       <div className="flex items-end justify-between gap-2">
-        <label className="text-sm font-semibold text-[#3B2F1E]">{label}</label>
-        {hint && <span className="text-xs text-[#6B5642]">{hint}</span>}
+        <label className="text-[12px] font-semibold text-[#3B2F1E]">{label}</label>
+        {hint && <span className="text-xs text-[#7f7f7f]">{hint}</span>}
       </div>
       <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#9C7A55]">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-[#9C7A55]">
           ₩
         </span>
         <input
@@ -366,8 +366,8 @@ function MoneyInput({
           onChange={(e) => setValue(e.target.value)}
           placeholder="0"
           className={cn(
-            "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-sm outline-none",
-            "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+            "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-[12px] outline-none",
+            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
           )}
         />
       </div>
@@ -388,13 +388,13 @@ function MetricCard({
     <div
       className={cn(
         "rounded-2xl border p-4",
-        accent ? "border-[#FB923C] bg-[#FFF3E8]" : "border-[#F2E4B6] bg-white"
+        accent ? "border-[#5bbbf3] bg-[#5bbbf3]" : "border-[#e8f8ff] bg-white"
       )}
     >
-      <div className={cn("text-xs font-semibold", accent ? "text-[#F97316]" : "text-[#6B5642]")}>
+      <div className={cn("text-xs font-semibold", accent ? "text-[#ffffff]" : "text-[#7f7f7f]")}>
         {title}
       </div>
-      <div className={cn("mt-1 text-xl font-bold", accent ? "text-[#F97316]" : "text-[#3B2F1E]")}>
+      <div className={cn("mt-1 text-xl font-bold", accent ? "text-[#ffffff]" : "text-[#3B2F1E]")}>
         {value}
       </div>
     </div>
@@ -411,13 +411,13 @@ function ScenarioRow({
   sub?: string;
 }) {
   return (
-    <div className="rounded-xl border border-[#F2E4B6] bg-[#FFFFFF] p-3">
+    <div className="rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] p-3">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="text-sm font-semibold text-[#3B2F1E]">{label}</div>
-          {sub && <div className="mt-1 text-xs text-[#6B5642]}">{sub}</div>}
+          <div className="text-[12px] font-semibold text-[#3B2F1E]">{label}</div>
+          {sub && <div className="mt-1 text-xs text-[#7f7f7f]}">{sub}</div>}
         </div>
-        <div className="shrink-0 text-sm font-bold text-[#F97316]">{value}</div>
+        <div className="shrink-0 text-[12px] font-bold text-[#ffffff]">{value}</div>
       </div>
     </div>
   );

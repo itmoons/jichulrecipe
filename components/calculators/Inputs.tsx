@@ -18,11 +18,11 @@ export function MoneyInput({
   return (
     <div className="grid gap-1.5">
       <div className="flex items-end justify-between gap-2">
-        <label className="text-sm font-semibold text-[#3B2F1E]">{label}</label>
-        {hint && <span className="text-xs text-[#6B5642]">{hint}</span>}
+        <label className="text-[12px] font-semibold text-[#3B2F1E]">{label}</label>
+        {hint && <span className="text-xs text-[#7f7f7f]">{hint}</span>}
       </div>
       <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#9C7A55]">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-[#9C7A55]">
           ₩
         </span>
         <input
@@ -30,8 +30,8 @@ export function MoneyInput({
           value={value}
           onChange={(e) => setValue(e.target.value)}
           className={cn(
-            "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-sm outline-none",
-            "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+            "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-[12px] outline-none",
+            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
           )}
         />
       </div>
@@ -53,16 +53,16 @@ export function NumberInput({
   return (
     <div className="grid gap-1.5">
       <div className="flex items-end justify-between gap-2">
-        <label className="text-sm font-semibold text-[#3B2F1E]">{label}</label>
-        {hint && <span className="text-xs text-[#6B5642]">{hint}</span>}
+        <label className="text-[12px] font-semibold text-[#3B2F1E]">{label}</label>
+        {hint && <span className="text-xs text-[#7f7f7f]">{hint}</span>}
       </div>
       <input
         inputMode="numeric"
         value={value}
         onChange={(e) => setValue(e.target.value)}
         className={cn(
-          "h-11 w-full rounded-xl border bg-white px-3 text-sm outline-none",
-          "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+          "h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
+          "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
         )}
       />
     </div>
@@ -80,13 +80,13 @@ export function TextInput({
 }) {
   return (
     <div className="grid gap-1.5">
-      <label className="text-sm font-semibold text-[#3B2F1E]">{label}</label>
+      <label className="text-[12px] font-semibold text-[#3B2F1E]">{label}</label>
       <input
         value={value}
         onChange={(e) => setValue(e.target.value)}
         className={cn(
-          "h-11 w-full rounded-xl border bg-white px-3 text-sm outline-none",
-          "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+          "h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
+          "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
         )}
       />
     </div>
@@ -106,13 +106,13 @@ export function SelectInput({
 }) {
   return (
     <div className="grid gap-1.5">
-      <label className="text-sm font-semibold text-[#3B2F1E]">{label}</label>
+      <label className="text-[12px] font-semibold text-[#3B2F1E]">{label}</label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={cn(
-          "h-11 w-full rounded-xl border bg-white px-3 text-sm outline-none",
-          "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+          "h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
+          "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
         )}
       >
         {options.map((o) => (
@@ -136,18 +136,18 @@ export function PctInput({
 }) {
   return (
     <div className="grid gap-1.5">
-      <label className="text-sm font-semibold text-[#3B2F1E]">{label}</label>
+      <label className="text-[12px] font-semibold text-[#3B2F1E]">{label}</label>
       <div className="relative">
         <input
           inputMode="decimal"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           className={cn(
-            "h-11 w-full rounded-xl border bg-white px-3 pr-10 text-sm outline-none",
-            "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+            "h-11 w-full rounded-xl border bg-white px-3 pr-10 text-[12px] outline-none",
+            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
           )}
         />
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#9C7A55]">
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-[#9C7A55]">
           %
         </span>
       </div>
@@ -158,8 +158,8 @@ export function PctInput({
 export function InfoPill({ label, value }: { label: string; value: string }) {
   return (
     <div className="grid gap-1.5">
-      <div className="text-sm font-semibold text-[#3B2F1E]">{label}</div>
-      <div className="rounded-xl border border-[#F2E4B6] bg-[#FFFFFF] px-3 py-2 text-sm font-bold text-[#6B5642]">
+      <div className="text-[12px] font-semibold text-[#3B2F1E]">{label}</div>
+      <div className="rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] px-3 py-2 text-[12px] font-bold text-[#7f7f7f]">
         {value}
       </div>
     </div>

@@ -10,12 +10,12 @@ function cn(...xs: Array<string | false | null | undefined>) {
 
 /** 레시피북 톤(연노랑 + 주황) */
 const UI = {
-  paperBg: "bg-[#FFFFFF]",
+  paperBg: "bg-[#ffffff]",
   paperDots:
     "bg-[radial-gradient(circle,rgba(251,146,60,0.14)_1px,transparent_1px)] bg-[size:16px_16px]",
   ink: "text-[#3B2F1E]",
-  inkSoft: "text-[#6B5642]",
-  card: "bg-[#FFF9F2] border-[#F2E4B6]",
+  inkSoft: "text-[#7f7f7f]",
+  card: "bg-[#f2fbff] border-[#e8f8ff]",
 };
 
 function toNumberSafe(v: string) {
@@ -168,9 +168,9 @@ export default function MonthlyBudgetSplitPage() {
     // 신호: 선택이 지나치게 작거나 저축이 0에 가까우면 경보
     const signal =
       I <= 0
-        ? { label: "입력 필요", badge: "bg-[#FBBF24] text-[#3B2F1E]", msg: "월 예산(실수령)을 입력하세요." }
+        ? { label: "입력 필요", badge: "bg-[#52a9ff] text-[#ffffff]", msg: "월 예산(실수령)을 입력하세요." }
         : rounded.save < 5
-        ? { label: "저축 낮음", badge: "bg-[#F97316] text-white", msg: "저축 비율이 매우 낮습니다. 단기 목표가 아니라면 점검 권장." }
+        ? { label: "저축 낮음", badge: "bg-[#5bbbf3] text-white", msg: "저축 비율이 매우 낮습니다. 단기 목표가 아니라면 점검 권장." }
         : rounded.want < 10
         ? { label: "선택 낮음", badge: "bg-[#60A5FA] text-white", msg: "선택(여유) 예산이 낮습니다. 지속 가능성을 확인하세요." }
         : { label: "균형", badge: "bg-[#34D399] text-white", msg: "현재 비율은 일반적으로 균형 범위입니다." };
@@ -219,32 +219,32 @@ export default function MonthlyBudgetSplitPage() {
   return (
     <div className={cn("min-h-screen", UI.paperBg)}>
       <div className={cn("min-h-screen", UI.paperDots)}>
-        <div className="mx-auto max-w-6xl px-4 py-7 sm:py-10">
+        <div className="mx-auto w-[1240px] px-4 py-7 sm:py-10">
           {/* 상단 네비 */}
           <div className="mb-5 flex items-center justify-between gap-3">
             <Link
               href="/calculators"
-              className="rounded-full border border-[#F2E4B6] bg-[#FFF9F2] px-3 py-1.5 text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+              className="rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
             >
               ← 계산기 모음
             </Link>
 
-            <span className="rounded-full bg-[#FFE4C7] px-3 py-1.5 text-sm font-semibold text-[#F97316]">
+            <span className="rounded-full bg-[#5bbbf3] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
               예산 배분
             </span>
           </div>
 
           {/* 헤더 */}
           <div className="mb-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#F2E4B6] bg-[#FFF9F2] px-3 py-1 text-xs font-medium text-[#6B5642] shadow-sm">
-              <span className="inline-block h-2 w-2 rounded-full bg-[#FB923C]" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm">
+              <span className="inline-block h-2 w-2 rounded-full bg-[#5bbbf3]" />
               Recipe Calculator
             </div>
 
             <h1 className={cn("mt-3 text-2xl sm:text-3xl font-semibold tracking-tight", UI.ink)}>
               월 예산 자동 배분 계산기
             </h1>
-            <p className={cn("mt-2 text-sm sm:text-base", UI.inkSoft)}>
+            <p className={cn("mt-2 text-[12px] sm:text-base", UI.inkSoft)}>
               필수/선택/저축 비율을 커스터마이즈해 월 예산을 자동 배분합니다. (추천이 아니라 “배분 틀”입니다.)
             </p>
           </div>
@@ -255,11 +255,11 @@ export default function MonthlyBudgetSplitPage() {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h2 className={cn("text-lg font-semibold", UI.ink)}>입력</h2>
-                  <p className={cn("mt-1 text-sm", UI.inkSoft)}>
+                  <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>
                     월 예산은 “실수령(가용)” 기준이 가장 안정적입니다.
                   </p>
                 </div>
-                <span className={cn("rounded-full px-3 py-1 text-sm font-semibold", calc.signal.badge)}>
+                <span className={cn("rounded-full px-3 py-1 text-[12px] font-semibold", calc.signal.badge)}>
                   {calc.signal.label}
                 </span>
               </div>
@@ -267,21 +267,21 @@ export default function MonthlyBudgetSplitPage() {
               <div className="mt-4 grid gap-3">
                 <MoneyInput label="월 예산(실수령/가용)" value={income} setValue={setIncome} />
 
-                <div className="rounded-2xl border border-[#F2E4B6] bg-white p-4">
+                <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <div className="text-sm font-semibold text-[#3B2F1E]">고정비(선택 입력)</div>
-                      <div className="mt-1 text-xs text-[#6B5642]">
+                      <div className="text-[12px] font-semibold text-[#3B2F1E]">고정비(선택 입력)</div>
+                      <div className="mt-1 text-xs text-[#7f7f7f]">
                         주거/관리비/통신/보험/구독 등 “매달 빠져나가는 돈” 합계
                       </div>
                     </div>
 
-                    <label className="inline-flex items-center gap-2 text-xs font-semibold text-[#6B5642]">
+                    <label className="inline-flex items-center gap-2 text-xs font-semibold text-[#7f7f7f]">
                       <input
                         type="checkbox"
                         checked={fixedFirst}
                         onChange={(e) => setFixedFirst(e.target.checked)}
-                        className="h-4 w-4 rounded border-[#F2E4B6]"
+                        className="h-4 w-4 rounded border-[#e8f8ff]"
                       />
                       고정비 먼저 보정
                     </label>
@@ -289,17 +289,17 @@ export default function MonthlyBudgetSplitPage() {
 
                   <div className="mt-3">
                     <MoneyInput label="월 고정비 합계" value={fixedCost} setValue={setFixedCost} />
-                    <div className="mt-2 text-xs text-[#6B5642]">
+                    <div className="mt-2 text-xs text-[#7f7f7f]">
                       “고정비 먼저 보정”을 켜면, 필수 예산이 고정비보다 작을 때 자동으로 필수=고정비로 맞춥니다.
                     </div>
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-[#F2E4B6] bg-white p-4">
+                <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <div className="text-sm font-semibold text-[#3B2F1E]">비율 프리셋</div>
-                      <div className="mt-1 text-xs text-[#6B5642]">클릭하면 비율이 자동 입력됩니다.</div>
+                      <div className="text-[12px] font-semibold text-[#3B2F1E]">비율 프리셋</div>
+                      <div className="mt-1 text-xs text-[#7f7f7f]">클릭하면 비율이 자동 입력됩니다.</div>
                     </div>
                   </div>
 
@@ -308,17 +308,17 @@ export default function MonthlyBudgetSplitPage() {
                       <button
                         key={p.key}
                         onClick={() => applyPreset(p)}
-                        className="rounded-2xl border border-[#F2E4B6] bg-[#FFFFFF] px-3 py-3 text-left hover:border-[#FB923C]"
+                        className="rounded-2xl border border-[#e8f8ff] bg-[#5bbbf3] px-3 py-3 text-left hover:border-[#5bbbf3]"
                       >
-                        <div className="text-sm font-semibold text-[#3B2F1E]">{p.label}</div>
-                        <div className="mt-0.5 text-xs text-[#6B5642]">{p.desc}</div>
+                        <div className="text-[12px] font-semibold text-[#3B2F1E]">{p.label}</div>
+                        <div className="mt-0.5 text-xs text-[#7f7f7f]">{p.desc}</div>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-[#F2E4B6] bg-white p-4">
-                  <div className="text-sm font-semibold text-[#3B2F1E]">비율 커스터마이즈(합 100% 자동 보정)</div>
+                <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                  <div className="text-[12px] font-semibold text-[#3B2F1E]">비율 커스터마이즈(합 100% 자동 보정)</div>
 
                   <div className="mt-3 grid gap-3 sm:grid-cols-3">
                     <PctInput label="필수(Need) %" value={needPct} setValue={setNeedPct} />
@@ -326,36 +326,36 @@ export default function MonthlyBudgetSplitPage() {
                     <PctInput label="저축(Save) %" value={savePct} setValue={setSavePct} />
                   </div>
 
-                  <div className="mt-3 rounded-xl border border-[#F2E4B6] bg-[#FFFFFF] px-3 py-2 text-xs font-semibold text-[#6B5642]">
+                  <div className="mt-3 rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] px-3 py-2 text-xs font-semibold text-[#7f7f7f]">
                     적용 비율:{" "}
-                    <span className="text-[#F97316]">
+                    <span className="text-[#ffffff]">
                       필수 {calc.rounded.need}% · 선택 {calc.rounded.want}% · 저축 {calc.rounded.save}%
                     </span>
-                    <span className="ml-2 text-[#6B5642]">(합 100%)</span>
+                    <span className="ml-2 text-[#7f7f7f]">(합 100%)</span>
                   </div>
 
                   {calc.adjusted && (
-                    <div className="mt-3 rounded-xl border border-[#F2E4B6] bg-white px-3 py-2 text-xs font-semibold text-[#6B5642]">
-                      <span className="text-[#F97316]">보정 적용:</span> {calc.adjustNote}
+                    <div className="mt-3 rounded-xl border border-[#e8f8ff] bg-white px-3 py-2 text-xs font-semibold text-[#7f7f7f]">
+                      <span className="text-[#ffffff]">보정 적용:</span> {calc.adjustNote}
                     </div>
                   )}
                 </div>
 
-                <div className="rounded-2xl border border-[#F2E4B6] bg-white p-4">
+                <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <div className="text-sm font-semibold text-[#3B2F1E]">저축 쪼개기(선택)</div>
-                      <div className="mt-1 text-xs text-[#6B5642]">
+                      <div className="text-[12px] font-semibold text-[#3B2F1E]">저축 쪼개기(선택)</div>
+                      <div className="mt-1 text-xs text-[#7f7f7f]">
                         저축 예산을 비상금/장기/투자로 나눠 “계좌 분리”에 바로 쓰세요.
                       </div>
                     </div>
 
-                    <label className="inline-flex items-center gap-2 text-xs font-semibold text-[#6B5642]">
+                    <label className="inline-flex items-center gap-2 text-xs font-semibold text-[#7f7f7f]">
                       <input
                         type="checkbox"
                         checked={splitSaving}
                         onChange={(e) => setSplitSaving(e.target.checked)}
-                        className="h-4 w-4 rounded border-[#F2E4B6]"
+                        className="h-4 w-4 rounded border-[#e8f8ff]"
                       />
                       사용
                     </label>
@@ -366,7 +366,7 @@ export default function MonthlyBudgetSplitPage() {
                       <PctInput label="비상금 %" value={emgPct} setValue={setEmgPct} />
                       <PctInput label="장기목표 %" value={longPct} setValue={setLongPct} />
                       <PctInput label="투자/기타 %" value={investPct} setValue={setInvestPct} />
-                      <div className="sm:col-span-3 text-xs text-[#6B5642]">
+                      <div className="sm:col-span-3 text-xs text-[#7f7f7f]">
                         합 100% 자동 보정(비례 스케일링)됩니다.
                       </div>
                     </div>
@@ -378,7 +378,7 @@ export default function MonthlyBudgetSplitPage() {
             {/* 결과 */}
             <section className={cn("rounded-3xl border p-4 sm:p-6 shadow-sm", UI.card)}>
               <h2 className={cn("text-lg font-semibold", UI.ink)}>배분 결과</h2>
-              <p className={cn("mt-1 text-sm", UI.inkSoft)}>{calc.signal.msg}</p>
+              <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>{calc.signal.msg}</p>
 
               <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <MetricCard title="필수(Need)" value={`${formatKRW(calc.needAmt)}원`} accent="need" />
@@ -387,8 +387,8 @@ export default function MonthlyBudgetSplitPage() {
                 <MetricCard title="배분 합계" value={`${formatKRW(calc.totalAllocated)}원`} />
               </div>
 
-              <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-                <div className={cn("text-sm font-semibold", UI.ink)}>주간 가이드(지속 가능성 체크)</div>
+              <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                <div className={cn("text-[12px] font-semibold", UI.ink)}>주간 가이드(지속 가능성 체크)</div>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   <InfoPill
                     label="선택 예산(주간)"
@@ -407,8 +407,8 @@ export default function MonthlyBudgetSplitPage() {
               </div>
 
               {splitSaving && (
-                <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-                  <div className={cn("text-sm font-semibold", UI.ink)}>저축 쪼개기 결과</div>
+                <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                  <div className={cn("text-[12px] font-semibold", UI.ink)}>저축 쪼개기 결과</div>
                   <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
                     <MiniCard title="비상금" value={`${formatKRW(calc.emgAmt)}원`} />
                     <MiniCard title="장기목표" value={`${formatKRW(calc.longAmt)}원`} />
@@ -421,9 +421,9 @@ export default function MonthlyBudgetSplitPage() {
               )}
 
               {/* 레시피 체크리스트 */}
-              <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-                <div className={cn("text-sm font-semibold", UI.ink)}>레시피 체크(3개)</div>
-                <ul className={cn("mt-2 list-disc pl-5 text-sm leading-relaxed", UI.inkSoft)}>
+              <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                <div className={cn("text-[12px] font-semibold", UI.ink)}>레시피 체크(3개)</div>
+                <ul className={cn("mt-2 list-disc pl-5 text-[12px] leading-relaxed", UI.inkSoft)}>
                   <li>필수(Need)는 “고정비+생활 필수”를 커버하는가?</li>
                   <li>선택(Want)이 너무 낮아 지치지 않는가(지속 가능성)?</li>
                   <li>저축(Save)은 ‘목표’가 명확한가(비상금/단기/장기)?</li>
@@ -434,13 +434,13 @@ export default function MonthlyBudgetSplitPage() {
               <div className="mt-5 flex flex-col gap-2 sm:flex-row">
                 <Link
                   href="/calculators/variable-spend-safe"
-                  className="rounded-2xl bg-[#F97316] px-4 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+                  className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
                 >
                   다음: 가변비 안전예산 →
                 </Link>
                 <Link
                   href="/calculators"
-                  className="rounded-2xl border border-[#F2E4B6] bg-white px-4 py-2 text-center text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+                  className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
                 >
                   계산기 모음으로
                 </Link>
@@ -470,9 +470,9 @@ function MoneyInput({
 }) {
   return (
     <div className="grid gap-1.5">
-      <label className="text-sm font-semibold text-[#3B2F1E]">{label}</label>
+      <label className="text-[12px] font-semibold text-[#3B2F1E]">{label}</label>
       <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#9C7A55]">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-[#9C7A55]">
           ₩
         </span>
         <input
@@ -481,8 +481,8 @@ function MoneyInput({
           onChange={(e) => setValue(e.target.value)}
           placeholder="0"
           className={cn(
-            "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-sm outline-none",
-            "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+            "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-[12px] outline-none",
+            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
           )}
         />
       </div>
@@ -501,7 +501,7 @@ function PctInput({
 }) {
   return (
     <div className="grid gap-1.5">
-      <label className="text-sm font-semibold text-[#3B2F1E]">{label}</label>
+      <label className="text-[12px] font-semibold text-[#3B2F1E]">{label}</label>
       <div className="relative">
         <input
           inputMode="decimal"
@@ -509,11 +509,11 @@ function PctInput({
           onChange={(e) => setValue(e.target.value)}
           placeholder="0"
           className={cn(
-            "h-11 w-full rounded-xl border bg-white px-3 pr-10 text-sm outline-none",
-            "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+            "h-11 w-full rounded-xl border bg-white px-3 pr-10 text-[12px] outline-none",
+            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
           )}
         />
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#9C7A55]">
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-[#9C7A55]">
           %
         </span>
       </div>
@@ -532,15 +532,15 @@ function MetricCard({
 }) {
   const cls =
     accent === "need"
-      ? "border-[#F59E0B] bg-[#FFF3E8]"
+      ? "border-[#F59E0B] bg-[#5bbbf3]"
       : accent === "want"
-      ? "border-[#FB923C] bg-[#FFF3E8]"
+      ? "border-[#5bbbf3] bg-[#5bbbf3]"
       : accent === "save"
       ? "border-[#34D399] bg-[#ECFDF5]"
-      : "border-[#F2E4B6] bg-white";
+      : "border-[#e8f8ff] bg-white";
 
   const titleCls =
-    accent === "save" ? "text-[#059669]" : accent ? "text-[#F97316]" : "text-[#6B5642]";
+    accent === "save" ? "text-[#059669]" : accent ? "text-[#ffffff]" : "text-[#7f7f7f]";
 
   return (
     <div className={cn("rounded-2xl border p-4", cls)}>
@@ -552,8 +552,8 @@ function MetricCard({
 
 function MiniCard({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[#F2E4B6] bg-[#FFF9F2] p-4">
-      <div className="text-xs font-semibold text-[#6B5642]">{title}</div>
+    <div className="rounded-2xl border border-[#e8f8ff] bg-[#f2fbff] p-4">
+      <div className="text-xs font-semibold text-[#7f7f7f]">{title}</div>
       <div className="mt-1 text-lg font-bold text-[#3B2F1E]">{value}</div>
     </div>
   );
@@ -568,11 +568,11 @@ function InfoPill({
   value: string;
   tone?: "need" | "want";
 }) {
-  const cls = tone === "want" ? "text-[#F97316]" : tone === "need" ? "text-[#B45309]" : "text-[#6B5642]";
+  const cls = tone === "want" ? "text-[#ffffff]" : tone === "need" ? "text-[#B45309]" : "text-[#7f7f7f]";
   return (
-    <div className="rounded-xl border border-[#F2E4B6] bg-[#FFFFFF] px-3 py-2">
-      <div className="text-xs font-semibold text-[#6B5642]">{label}</div>
-      <div className={cn("mt-1 text-sm font-bold", cls)}>{value}</div>
+    <div className="rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] px-3 py-2">
+      <div className="text-xs font-semibold text-[#7f7f7f]">{label}</div>
+      <div className={cn("mt-1 text-[12px] font-bold", cls)}>{value}</div>
     </div>
   );
 }

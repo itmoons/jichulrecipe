@@ -77,9 +77,9 @@ export default function CardBillingDateShiftPage() {
 
     const status =
       newSim.deficitDay
-        ? { label: "위험", badge: "bg-[#F97316] text-white", msg: `변경 후 첫 적자일: ${newSim.deficitDay}일` }
+        ? { label: "위험", badge: "bg-[#5bbbf3] text-white", msg: `변경 후 첫 적자일: ${newSim.deficitDay}일` }
         : newSim.lowDays > 0
-        ? { label: "경고", badge: "bg-[#FBBF24] text-[#3B2F1E]", msg: `변경 후 버퍼 이하 ${newSim.lowDays}일` }
+        ? { label: "경고", badge: "bg-[#52a9ff] text-[#ffffff]", msg: `변경 후 버퍼 이하 ${newSim.lowDays}일` }
         : { label: "안정", badge: "bg-[#34D399] text-white", msg: "변경 후 위험 구간이 거의 없습니다." };
 
     return { dim, buffer, oldDay, newDay, oldSim, newSim, diff, status };
@@ -115,7 +115,7 @@ export default function CardBillingDateShiftPage() {
       title="카드 결제일 변경 효과 계산기"
       subtitle={
         <>
-          결제일을 옮기면 “총지출”보다 <span className="font-semibold text-[#F97316]">월중 최소 잔액</span>이 바뀝니다.
+          결제일을 옮기면 “총지출”보다 <span className="font-semibold text-[#ffffff]">월중 최소 잔액</span>이 바뀝니다.
         </>
       }
     >
@@ -125,11 +125,11 @@ export default function CardBillingDateShiftPage() {
           <div className="flex items-start justify-between gap-3">
             <div>
               <h2 className={cn("text-lg font-semibold", UI.ink)}>입력</h2>
-              <p className={cn("mt-1 text-sm", UI.inkSoft)}>
+              <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>
                 “급여/카드결제/월초 고정비” 날짜만으로도 민감도가 드러납니다.
               </p>
             </div>
-            <span className={cn("rounded-full px-3 py-1 text-sm font-semibold", calc.status.badge)}>
+            <span className={cn("rounded-full px-3 py-1 text-[12px] font-semibold", calc.status.badge)}>
               {calc.status.label}
             </span>
           </div>
@@ -168,23 +168,23 @@ export default function CardBillingDateShiftPage() {
         {/* 결과 */}
         <section className={cn("rounded-3xl border p-4 sm:p-6 shadow-sm", UI.card)}>
           <h2 className={cn("text-lg font-semibold", UI.ink)}>결과</h2>
-          <p className={cn("mt-1 text-sm", UI.inkSoft)}>{calc.status.msg}</p>
+          <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>{calc.status.msg}</p>
 
-          <div className="mt-4 rounded-3xl border border-[#F2E4B6] bg-white p-5">
-            <div className="text-sm font-semibold text-[#6B5642]">판정</div>
+          <div className="mt-4 rounded-3xl border border-[#e8f8ff] bg-white p-5">
+            <div className="text-[12px] font-semibold text-[#7f7f7f]">판정</div>
             <div
               className={cn(
                 "mt-2 text-4xl font-extrabold",
                 verdict.tone === "good"
                   ? "text-[#10B981]"
                   : verdict.tone === "bad"
-                  ? "text-[#F97316]"
+                  ? "text-[#ffffff]"
                   : "text-[#F59E0B]"
               )}
             >
               {verdict.label}
             </div>
-            <div className={cn("mt-2 text-sm", UI.inkSoft)}>{verdict.msg}</div>
+            <div className={cn("mt-2 text-[12px]", UI.inkSoft)}>{verdict.msg}</div>
           </div>
 
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -199,8 +199,8 @@ export default function CardBillingDateShiftPage() {
             />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-            <div className={cn("text-sm font-semibold", UI.ink)}>변화</div>
+          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+            <div className={cn("text-[12px] font-semibold", UI.ink)}>변화</div>
             <div className="mt-3 grid gap-2">
               <Row
                 label="최소 잔액 변화"
@@ -218,13 +218,13 @@ export default function CardBillingDateShiftPage() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/calculators/bonus-allocation"
-              className="rounded-2xl bg-[#F97316] px-4 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+              className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
             >
               다음: 상여/보너스 배분 →
             </Link>
             <Link
               href="/calculators"
-              className="rounded-2xl border border-[#F2E4B6] bg-white px-4 py-2 text-center text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+              className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
             >
               계산기 모음으로
             </Link>

@@ -10,12 +10,12 @@ function cn(...xs: Array<string | false | null | undefined>) {
 
 /** 레시피북 톤(연노랑 + 주황) */
 const UI = {
-  paperBg: "bg-[#FFFFFF]",
+  paperBg: "bg-[#ffffff]",
   paperDots:
     "bg-[radial-gradient(circle,rgba(251,146,60,0.14)_1px,transparent_1px)] bg-[size:16px_16px]",
   ink: "text-[#3B2F1E]",
-  inkSoft: "text-[#6B5642]",
-  card: "bg-[#FFF9F2] border-[#F2E4B6]",
+  inkSoft: "text-[#7f7f7f]",
+  card: "bg-[#f2fbff] border-[#e8f8ff]",
 };
 
 function toNumberSafe(v: string) {
@@ -109,8 +109,8 @@ export default function MobilePlanOptimizerPage() {
       monthlySave > 0
         ? { label: "절감", badge: "bg-[#34D399] text-white", msg: "변경 시 월 통신비가 줄어듭니다." }
         : monthlySave < 0
-        ? { label: "증가", badge: "bg-[#F97316] text-white", msg: "변경 시 월 통신비가 늘어납니다." }
-        : { label: "동일", badge: "bg-[#FBBF24] text-[#3B2F1E]", msg: "두 요금제의 월 부담이 동일합니다." };
+        ? { label: "증가", badge: "bg-[#5bbbf3] text-white", msg: "변경 시 월 통신비가 늘어납니다." }
+        : { label: "동일", badge: "bg-[#52a9ff] text-[#ffffff]", msg: "두 요금제의 월 부담이 동일합니다." };
 
     return { c, n, monthlySave, yearlySave, saveRate, delta, effect, driver, verdict };
   }, [current, next]);
@@ -118,33 +118,33 @@ export default function MobilePlanOptimizerPage() {
   return (
     <div className={cn("min-h-screen", UI.paperBg)}>
       <div className={cn("min-h-screen", UI.paperDots)}>
-        <div className="mx-auto max-w-6xl px-4 py-7 sm:py-10">
+        <div className="mx-auto w-[1240px] px-4 py-7 sm:py-10">
           {/* 상단 네비 */}
           <div className="mb-5 flex items-center justify-between gap-3">
             <Link
               href="/calculators"
-              className="rounded-full border border-[#F2E4B6] bg-[#FFF9F2] px-3 py-1.5 text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+              className="rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
             >
               ← 계산기 모음
             </Link>
 
-            <span className="rounded-full bg-[#FFE4C7] px-3 py-1.5 text-sm font-semibold text-[#F97316]">
+            <span className="rounded-full bg-[#5bbbf3] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
               통신비 점검
             </span>
           </div>
 
           {/* 헤더 */}
           <div className="mb-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#F2E4B6] bg-[#FFF9F2] px-3 py-1 text-xs font-medium text-[#6B5642] shadow-sm">
-              <span className="inline-block h-2 w-2 rounded-full bg-[#FB923C]" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm">
+              <span className="inline-block h-2 w-2 rounded-full bg-[#5bbbf3]" />
               Recipe Calculator
             </div>
 
             <h1 className={cn("mt-3 text-2xl sm:text-3xl font-semibold tracking-tight", UI.ink)}>
               통신비 최적화 계산기
             </h1>
-            <p className={cn("mt-2 text-sm sm:text-base", UI.inkSoft)}>
-              요금제 변경 전/후를 입력하면 <span className="font-semibold text-[#F97316]">월 절감액·연 절감액</span>을 계산합니다.
+            <p className={cn("mt-2 text-[12px] sm:text-base", UI.inkSoft)}>
+              요금제 변경 전/후를 입력하면 <span className="font-semibold text-[#ffffff]">월 절감액·연 절감액</span>을 계산합니다.
             </p>
           </div>
 
@@ -152,7 +152,7 @@ export default function MobilePlanOptimizerPage() {
             {/* 입력: 현재/변경 */}
             <section className={cn("rounded-3xl border p-4 sm:p-6 shadow-sm", UI.card)}>
               <h2 className={cn("text-lg font-semibold", UI.ink)}>입력</h2>
-              <p className={cn("mt-1 text-sm", UI.inkSoft)}>
+              <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>
                 할인은 “월 할인 금액”을 양수로 입력하세요. (총액에서 자동 차감)
               </p>
 
@@ -164,7 +164,7 @@ export default function MobilePlanOptimizerPage() {
                   chip="현재"
                 />
 
-                <div className="h-px bg-[#F2E4B6]" />
+                <div className="h-px bg-[#e8f8ff]" />
 
                 <PlanBox
                   title="변경 후"
@@ -174,9 +174,9 @@ export default function MobilePlanOptimizerPage() {
                 />
               </div>
 
-              <div className="mt-5 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-                <div className={cn("text-sm font-semibold", UI.ink)}>현실 체크</div>
-                <ul className={cn("mt-2 list-disc pl-5 text-sm leading-relaxed", UI.inkSoft)}>
+              <div className="mt-5 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                <div className={cn("text-[12px] font-semibold", UI.ink)}>현실 체크</div>
+                <ul className={cn("mt-2 list-disc pl-5 text-[12px] leading-relaxed", UI.inkSoft)}>
                   <li>결합할인/약정할인은 변경 시 깨질 수 있습니다. 할인 조건을 먼저 확인하세요.</li>
                   <li>부가서비스(컬러링, 데이터부가팩 등)가 “기타”에 숨어있는 경우가 많습니다.</li>
                   <li>단말 할부가 남아있다면, 요금제만 내려도 체감 절감이 작을 수 있어요.</li>
@@ -189,12 +189,12 @@ export default function MobilePlanOptimizerPage() {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h2 className={cn("text-lg font-semibold", UI.ink)}>결과</h2>
-                  <p className={cn("mt-1 text-sm", UI.inkSoft)}>
+                  <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>
                     총액 기준으로 절감/증가를 계산합니다.
                   </p>
                 </div>
 
-                <span className={cn("rounded-full px-3 py-1 text-sm font-semibold", calc.verdict.badge)}>
+                <span className={cn("rounded-full px-3 py-1 text-[12px] font-semibold", calc.verdict.badge)}>
                   {calc.verdict.label}
                 </span>
               </div>
@@ -204,19 +204,19 @@ export default function MobilePlanOptimizerPage() {
                 <MetricCard title="변경 후 월 총액" value={`${formatKRW(calc.n.total)}원`} />
               </div>
 
-              <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
+              <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
                 <div className="flex items-center justify-between gap-3">
-                  <div className={cn("text-sm font-semibold", UI.ink)}>월 절감액</div>
-                  <span className="rounded-full bg-[#FFE4C7] px-3 py-1 text-xs font-semibold text-[#F97316]">
+                  <div className={cn("text-[12px] font-semibold", UI.ink)}>월 절감액</div>
+                  <span className="rounded-full bg-[#5bbbf3] px-3 py-1 text-xs font-semibold text-[#ffffff]">
                     절감률 {pct(calc.saveRate)}%
                   </span>
                 </div>
 
-                <div className="mt-2 text-3xl font-bold text-[#F97316]">
+                <div className="mt-2 text-3xl font-bold text-[#ffffff]">
                   {(calc.monthlySave >= 0 ? "+" : "") + formatKRW(calc.monthlySave)}원/월
                 </div>
 
-                <div className={cn("mt-1 text-sm", UI.inkSoft)}>{calc.verdict.msg}</div>
+                <div className={cn("mt-1 text-[12px]", UI.inkSoft)}>{calc.verdict.msg}</div>
 
                 <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                   <MiniCard title="연 절감액(×12)" value={`${(calc.yearlySave >= 0 ? "+" : "") + formatKRW(calc.yearlySave)}원`} accent={calc.yearlySave > 0} />
@@ -234,8 +234,8 @@ export default function MobilePlanOptimizerPage() {
               </div>
 
               {/* 요인 분해 */}
-              <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-                <div className={cn("text-sm font-semibold", UI.ink)}>변경 요인(어디서 변했나)</div>
+              <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                <div className={cn("text-[12px] font-semibold", UI.ink)}>변경 요인(어디서 변했나)</div>
                 <div className={cn("mt-1 text-xs", UI.inkSoft)}>
                   ‘변경 후 - 현재’ 기준입니다. (할인 증가는 총액에 감소 효과)
                 </div>
@@ -248,13 +248,13 @@ export default function MobilePlanOptimizerPage() {
                   <DeltaRow label="기타(부가서비스)" delta={calc.effect.other} />
                 </div>
 
-                <div className="mt-3 rounded-xl border border-[#F2E4B6] bg-[#FFFFFF] p-3">
-                  <div className="text-xs font-semibold text-[#6B5642]">가장 큰 변화 TOP 3</div>
+                <div className="mt-3 rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] p-3">
+                  <div className="text-xs font-semibold text-[#7f7f7f]">가장 큰 변화 TOP 3</div>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {calc.driver.map((d) => (
                       <span
                         key={d.k}
-                        className="rounded-full border border-[#F2E4B6] bg-white px-3 py-1 text-xs font-semibold text-[#6B5642]"
+                        className="rounded-full border border-[#e8f8ff] bg-white px-3 py-1 text-xs font-semibold text-[#7f7f7f]"
                       >
                         {d.k === "planFee"
                           ? "요금제"
@@ -276,13 +276,13 @@ export default function MobilePlanOptimizerPage() {
               <div className="mt-5 flex flex-col gap-2 sm:flex-row">
                 <Link
                   href="/calculators/fixed-cost-ratio"
-                  className="rounded-2xl bg-[#F97316] px-4 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+                  className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
                 >
                   다음: 고정비 비율 점검 →
                 </Link>
                 <Link
                   href="/calculators"
-                  className="rounded-2xl border border-[#F2E4B6] bg-white px-4 py-2 text-center text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+                  className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
                 >
                   계산기 모음으로
                 </Link>
@@ -315,13 +315,13 @@ function PlanBox({
   const patch = (k: keyof Plan, v: string) => onChange({ ...plan, [k]: v });
 
   return (
-    <div className="rounded-2xl border border-[#F2E4B6] bg-white p-4">
+    <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-sm font-semibold text-[#3B2F1E]">{title}</div>
-          <div className="mt-1 text-xs text-[#6B5642]">월 기준 총액을 비교합니다.</div>
+          <div className="text-[12px] font-semibold text-[#3B2F1E]">{title}</div>
+          <div className="mt-1 text-xs text-[#7f7f7f]">월 기준 총액을 비교합니다.</div>
         </div>
-        <span className="rounded-full bg-[#FFE4C7] px-3 py-1 text-xs font-semibold text-[#F97316]">
+        <span className="rounded-full bg-[#5bbbf3] px-3 py-1 text-xs font-semibold text-[#ffffff]">
           {chip}
         </span>
       </div>
@@ -351,12 +351,12 @@ function MoneyInput({
   return (
     <div className="grid gap-1.5">
       <div className="flex items-end justify-between gap-2">
-        <label className="text-sm font-semibold text-[#3B2F1E]">{label}</label>
-        {hint && <span className="text-xs text-[#6B5642]">{hint}</span>}
+        <label className="text-[12px] font-semibold text-[#3B2F1E]">{label}</label>
+        {hint && <span className="text-xs text-[#7f7f7f]">{hint}</span>}
       </div>
 
       <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#9C7A55]">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-[#9C7A55]">
           ₩
         </span>
         <input
@@ -365,8 +365,8 @@ function MoneyInput({
           onChange={(e) => setValue(e.target.value)}
           placeholder="0"
           className={cn(
-            "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-sm outline-none",
-            "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+            "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-[12px] outline-none",
+            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
           )}
         />
       </div>
@@ -376,8 +376,8 @@ function MoneyInput({
 
 function MetricCard({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[#F2E4B6] bg-white p-4">
-      <div className="text-xs font-semibold text-[#6B5642]">{title}</div>
+    <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
+      <div className="text-xs font-semibold text-[#7f7f7f]">{title}</div>
       <div className="mt-1 text-xl font-bold text-[#3B2F1E]">{value}</div>
     </div>
   );
@@ -393,11 +393,11 @@ function MiniCard({
   accent?: boolean;
 }) {
   return (
-    <div className={cn("rounded-2xl border p-4", accent ? "border-[#FB923C] bg-[#FFF3E8]" : "border-[#F2E4B6] bg-white")}>
-      <div className={cn("text-xs font-semibold", accent ? "text-[#F97316]" : "text-[#6B5642]")}>
+    <div className={cn("rounded-2xl border p-4", accent ? "border-[#5bbbf3] bg-[#5bbbf3]" : "border-[#e8f8ff] bg-white")}>
+      <div className={cn("text-xs font-semibold", accent ? "text-[#ffffff]" : "text-[#7f7f7f]")}>
         {title}
       </div>
-      <div className={cn("mt-1 text-lg font-bold", accent ? "text-[#F97316]" : "text-[#3B2F1E]")}>
+      <div className={cn("mt-1 text-lg font-bold", accent ? "text-[#ffffff]" : "text-[#3B2F1E]")}>
         {value}
       </div>
     </div>
@@ -410,13 +410,13 @@ function DeltaRow({ label, delta }: { label: string; delta: number }) {
     delta < 0
       ? "text-[#34D399]" // 총액 감소 요인
       : delta > 0
-      ? "text-[#F97316]" // 총액 증가 요인
-      : "text-[#6B5642]";
+      ? "text-[#ffffff]" // 총액 증가 요인
+      : "text-[#7f7f7f]";
 
   return (
-    <div className="flex items-center justify-between rounded-xl border border-[#F2E4B6] bg-[#FFFFFF] px-3 py-2">
-      <span className="text-sm font-semibold text-[#3B2F1E]">{label}</span>
-      <span className={cn("text-sm font-bold", tone)}>
+    <div className="flex items-center justify-between rounded-xl border border-[#e8f8ff] bg-[#f2fbff] px-3 py-2">
+      <span className="text-[12px] font-semibold text-[#3B2F1E]">{label}</span>
+      <span className={cn("text-[12px] font-bold", tone)}>
         {sign}
         {formatKRW(delta)}원
       </span>

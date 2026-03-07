@@ -4,12 +4,12 @@ export function cn(...xs: Array<string | false | null | undefined>) {
 }
 
 export const UI = {
-  paperBg: "bg-[#FFFFFF]",
+  paperBg: "bg-[#ffffff]",
   paperDots:
     "bg-[radial-gradient(circle,rgba(251,146,60,0.14)_1px,transparent_1px)] bg-[size:16px_16px]",
   ink: "text-[#3B2F1E]",
-  inkSoft: "text-[#6B5642]",
-  card: "bg-[#FFF9F2] border-[#F2E4B6]",
+  inkSoft: "text-[#7f7f7f]",
+  card: "bg-[#f2fbff] border-[#e8f8ff]",
 };
 
 export function toNumberSafe(v: string) {

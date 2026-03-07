@@ -34,7 +34,7 @@ export default function FeeAccumulatorPage() {
       title="각종 수수료 누적 계산기"
       subtitle={
         <>
-          배달/플랫폼/송금/환전 등 <span className="font-semibold text-[#F97316]">보이지 않는 비용</span>을 월·연 단위로 합산합니다.
+          배달/플랫폼/송금/환전 등 <span className="font-semibold text-[#ffffff]">보이지 않는 비용</span>을 월·연 단위로 합산합니다.
         </>
       }
     >
@@ -44,11 +44,11 @@ export default function FeeAccumulatorPage() {
           <div className="flex items-start justify-between gap-3">
             <div>
               <h2 className={cn("text-lg font-semibold", UI.ink)}>항목 입력</h2>
-              <p className={cn("mt-1 text-sm", UI.inkSoft)}>월 기준 평균값으로 넣으면 ‘누적’이 보입니다.</p>
+              <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>월 기준 평균값으로 넣으면 ‘누적’이 보입니다.</p>
             </div>
             <button
               onClick={addItem}
-              className="rounded-full border border-[#F2E4B6] bg-white px-3 py-1.5 text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+              className="rounded-full border border-[#e8f8ff] bg-white px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
             >
               + 추가
             </button>
@@ -56,12 +56,12 @@ export default function FeeAccumulatorPage() {
 
           <div className="mt-4 grid gap-2">
             {items.map((it) => (
-              <div key={it.id} className="rounded-2xl border border-[#F2E4B6] bg-white p-4">
+              <div key={it.id} className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
                 <div className="flex items-center justify-between gap-2">
-                  <div className="text-sm font-semibold text-[#3B2F1E]">항목</div>
+                  <div className="text-[12px] font-semibold text-[#3B2F1E]">항목</div>
                   <button
                     onClick={() => removeItem(it.id)}
-                    className="rounded-full border border-[#F2E4B6] bg-white px-3 py-1 text-xs font-semibold text-[#6B5642] hover:border-[#FB923C]"
+                    className="rounded-full border border-[#e8f8ff] bg-white px-3 py-1 text-xs font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
                   >
                     삭제
                   </button>
@@ -88,9 +88,9 @@ export default function FeeAccumulatorPage() {
             ))}
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-            <div className="text-sm font-semibold text-[#3B2F1E]">팁</div>
-            <ul className="mt-2 list-disc pl-5 text-sm text-[#6B5642]">
+          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+            <div className="text-[12px] font-semibold text-[#3B2F1E]">팁</div>
+            <ul className="mt-2 list-disc pl-5 text-[12px] text-[#6d6d6d]">
               <li>가장 큰 1~2개 항목만 줄여도 체감 절감이 큽니다.</li>
               <li>‘수수료’는 대체로 자동화된 경로에 숨어 있습니다(구독/플랫폼/결제).</li>
             </ul>
@@ -114,8 +114,8 @@ export default function FeeAccumulatorPage() {
             />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-            <div className={cn("text-sm font-semibold", UI.ink)}>개선 포인트</div>
+          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+            <div className={cn("text-[12px] font-semibold", UI.ink)}>개선 포인트</div>
             <div className="mt-3 grid gap-2">
               <Row label="1순위" value="가장 큰 항목부터 ‘빈도/단가/대체재’로 쪼개서 줄이기" tone="ok" />
               <Row label="2순위" value="자잘한 수수료는 자동결제/결제수단 설정에서 줄어드는 경우가 많음" tone="ok" />
@@ -125,13 +125,13 @@ export default function FeeAccumulatorPage() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/calculators"
-              className="rounded-2xl border border-[#F2E4B6] bg-white px-4 py-2 text-center text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+              className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
             >
               계산기 모음으로
             </Link>
             <Link
               href="/"
-              className="rounded-2xl bg-[#F97316] px-4 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+              className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
             >
               지출레시피 홈으로
             </Link>

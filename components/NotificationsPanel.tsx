@@ -270,7 +270,7 @@ export default function NotificationsPanel({
   const previousItems = visibleItems.filter((n) => !isToday(n.created_at));
 
   if (!me) {
-    return <div className="text-sm text-zinc-700">로그인이 필요합니다.</div>;
+    return <div className="text-[12px] text-zinc-700">로그인이 필요합니다.</div>;
   }
 
   const renderActions = (n: NotificationRow) => {
@@ -393,7 +393,7 @@ export default function NotificationsPanel({
               className={[
                 "relative rounded-2xl border p-4 transition",
                 isUnread
-                  ? "border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50 shadow-sm"
+                  ? "border-blue-200 bg-gradient-to-br from-blue-50 to-blue-50 shadow-sm"
                   : "border-zinc-200 bg-white",
               ].join(" ")}
               onClick={stopBubble}
@@ -404,10 +404,10 @@ export default function NotificationsPanel({
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="text-lg">{meta.icon}</span>
-                    <div className="text-sm font-extrabold text-zinc-900">
+                    <div className="text-[12px] font-extrabold text-zinc-900">
                       {meta.title}
                     </div>
-                    {isUnread && <RecipeBadge variant="orange">NEW</RecipeBadge>}
+                    {isUnread && <RecipeBadge variant="blue">NEW</RecipeBadge>}
                   </div>
 
                   <div className="mt-1 text-xs text-zinc-500">{subtitle}</div>
@@ -429,7 +429,7 @@ export default function NotificationsPanel({
 
               {body && (
                 <div
-                  className="mt-3 rounded-xl bg-white/80 px-3 py-2 text-sm text-zinc-800"
+                  className="mt-3 rounded-xl bg-white/80 px-3 py-2 text-[12px] text-zinc-800"
                   onClick={stopBubble}
                   onPointerDown={stopBubble}
                 >
@@ -459,7 +459,7 @@ export default function NotificationsPanel({
               onClick={stopBubble}
               onPointerDown={stopBubble}
             >
-              <RecipeBadge variant="orange">LIVE</RecipeBadge>
+              <RecipeBadge variant="blue">LIVE</RecipeBadge>
               <RecipeButton
                 variant="ghost"
                 onClick={(e: any) => {
@@ -486,7 +486,7 @@ export default function NotificationsPanel({
       >
         <div onClick={stopBubble} onPointerDown={stopBubble}>
           {visibleItems.length === 0 && !loading && (
-            <div className="text-sm text-zinc-500">알림이 없습니다.</div>
+            <div className="text-[12px] text-zinc-500">알림이 없습니다.</div>
           )}
 
           {todayItems.length > 0 && (
@@ -512,9 +512,9 @@ export default function NotificationsPanel({
       {toast && (
         <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 px-4">
           <div
-            className={`min-w-[220px] rounded-2xl px-4 py-3 text-sm font-semibold text-white shadow-xl ${
+            className={`min-w-[220px] rounded-2xl px-4 py-3 text-[12px] font-semibold text-white shadow-xl ${
               toast.type === "success"
-                ? "bg-orange-500"
+                ? "bg-blue-500"
                 : toast.type === "error"
                 ? "bg-red-500"
                 : "bg-slate-900"

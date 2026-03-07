@@ -72,7 +72,7 @@ export default function LoanPaymentPage() {
       title="대출 월 상환액 계산기"
       subtitle={
         <>
-          <span className="font-semibold text-[#F97316]">원리금균등 vs 원금균등</span>의 월 부담과 총이자를 비교합니다.
+          <span className="font-semibold text-[#ffffff]">원리금균등 vs 원금균등</span>의 월 부담과 총이자를 비교합니다.
         </>
       }
     >
@@ -81,7 +81,7 @@ export default function LoanPaymentPage() {
         <section className={cn("rounded-3xl border p-4 sm:p-6 shadow-sm", UI.card)}>
           <div>
             <h2 className={cn("text-lg font-semibold", UI.ink)}>입력</h2>
-            <p className={cn("mt-1 text-sm", UI.inkSoft)}>금리는 연이율(%) 기준, 기간은 개월로 입력하세요.</p>
+            <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>금리는 연이율(%) 기준, 기간은 개월로 입력하세요.</p>
           </div>
 
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -96,9 +96,9 @@ export default function LoanPaymentPage() {
             />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-            <div className="text-sm font-semibold text-[#3B2F1E]">개념</div>
-            <ul className="mt-2 list-disc pl-5 text-sm text-[#6B5642]">
+          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+            <div className="text-[12px] font-semibold text-[#3B2F1E]">개념</div>
+            <ul className="mt-2 list-disc pl-5 text-[12px] text-[#6d6d6d]">
               <li>원리금균등: 매달 상환액이 거의 고정(초기 이자 비중 큼)</li>
               <li>원금균등: 매달 원금은 일정, 이자는 줄어들어 상환액이 점점 감소</li>
             </ul>
@@ -116,8 +116,8 @@ export default function LoanPaymentPage() {
             <MetricCard title="총이자(더 적은 쪽)" value={interestWinner} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-            <div className={cn("text-sm font-semibold", UI.ink)}>총비용 비교</div>
+          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+            <div className={cn("text-[12px] font-semibold", UI.ink)}>총비용 비교</div>
             <div className="mt-3 grid gap-2">
               <Row
                 label="원리금균등 총이자"
@@ -135,13 +135,13 @@ export default function LoanPaymentPage() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/calculators/rate-sensitivity"
-              className="rounded-2xl bg-[#F97316] px-4 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+              className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
             >
               다음: 금리 인상 민감도 →
             </Link>
             <Link
               href="/calculators"
-              className="rounded-2xl border border-[#F2E4B6] bg-white px-4 py-2 text-center text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+              className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
             >
               계산기 모음으로
             </Link>

@@ -21,15 +21,15 @@ export function RecipeShell({
   return (
     <div className={cn("min-h-screen", UI.paperBg)}>
       <div className={cn("min-h-screen", UI.paperDots)}>
-        <div className="mx-auto max-w-6xl px-4 py-7 sm:py-10">
+        <div className="mx-auto w-[1240px] px-4 py-7 sm:py-10">
           <div className="mb-5 flex items-center justify-between gap-3">
             <Link
               href={backHref}
-              className="rounded-full border border-[#F2E4B6] bg-[#FFF9F2] px-3 py-1.5 text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+              className="rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
             >
               ← 계산기 모음
             </Link>
-            <span className="rounded-full bg-[#FFE4C7] px-3 py-1.5 text-sm font-semibold text-[#F97316]">
+            <span className="rounded-full bg-[#5bbbf3] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
               {badge}
             </span>
           </div>
@@ -39,7 +39,7 @@ export function RecipeShell({
               {title}
             </h1>
             {subtitle ? (
-              <p className={cn("mt-2 text-sm sm:text-base", UI.inkSoft)}>{subtitle}</p>
+              <p className={cn("mt-2 text-[12px] sm:text-base", UI.inkSoft)}>{subtitle}</p>
             ) : null}
           </div>
 

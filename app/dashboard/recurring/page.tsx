@@ -191,7 +191,7 @@ async function chunkedUpsertDailyRecipes(rows: any[], chunkSize = 200) {
    - 그 위에 규칙+예외로 정기항목 다시 생성
    - (중복 방지) rule_id + date 기반 고정 id로 덮어쓰기
    ========================= */
-async function applyRecurringToRange(params: { userId: string; rangeStart: string; rangeEnd: string }) {
+async function applyRecurringTblue(params: { userId: string; rangeStart: string; rangeEnd: string }) {
   const { userId, rangeStart, rangeEnd } = params;
 
   // 1) rules
@@ -486,7 +486,7 @@ export default function RecurringManagerPage() {
     const [y, m] = ym.split("-").map(Number);
     if (!y || !m) throw new Error("월 형식이 올바르지 않습니다. (YYYY-MM)");
     const { start, end } = monthRange(y, m);
-    const res = await applyRecurringToRange({ userId: uid, rangeStart: start, rangeEnd: end });
+    const res = await applyRecurringTblue({ userId: uid, rangeStart: start, rangeEnd: end });
     return { start, end, applied: res.applied };
   }
 

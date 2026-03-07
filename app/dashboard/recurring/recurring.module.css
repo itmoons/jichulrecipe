@@ -10,7 +10,7 @@
 
 .container {
   width: 100%;
-  max-width: 1220px;
+  max-width: 1240px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -52,8 +52,8 @@
   font-size: 11px;
   font-weight: 700;
   color: #0b1220;
-  background: rgba(255, 138, 61, 0.12);
-  border: 1px solid rgba(255, 138, 61, 0.25);
+  background: rgba(61, 139, 255, 0.12);
+  border: 1px solid rgba(61, 106, 255, 0.25);
   white-space: nowrap;
 }
 
@@ -153,8 +153,8 @@
 .btnPrimary {
   height: 32px;
   border-radius: 10px;
-  border: 1px solid rgba(255, 138, 61, 0.25);
-  background: rgba(255, 138, 61, 0.92);
+  border: 1px solid rgba(61, 106, 255, 0.25);
+  background: rgba(61, 168, 255, 0.92);
   color: #fff;
   font-size: 10px;
   font-weight: 600;
@@ -246,7 +246,7 @@
 .page input[type="checkbox"] {
   width: 14px;
   height: 14px;
-  accent-color: rgba(255, 138, 61, 0.92);
+  accent-color: rgba(61, 168, 255, 0.92);
 }
 
 .topbar {

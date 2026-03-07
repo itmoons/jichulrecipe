@@ -37,7 +37,7 @@ export default function RequestChangeForLockedMonth({ ledgerId }: { ledgerId: st
     <RecipeCard
       title="🔒 잠금 월 수정 요청"
       description="정산이 잠긴 달은 바로 수정할 수 없어요. 승인받으면 15분만 열립니다."
-      right={<RecipeBadge variant="orange">{month}</RecipeBadge>}
+      right={<RecipeBadge variant="blue">{month}</RecipeBadge>}
       className="w-full"
     >
       <div className="flex items-center gap-2">
@@ -45,7 +45,7 @@ export default function RequestChangeForLockedMonth({ ledgerId }: { ledgerId: st
           type="month"
           value={month}
           onChange={(e) => setMonth(e.target.value)}
-          className="w-[160px] rounded-xl border border-orange-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-200"
+          className="w-[160px] rounded-xl border border-blue-200 bg-white px-3 py-2 text-[12px] outline-none focus:ring-2 focus:ring-blue-200"
         />
 
         <RecipeButton onClick={submit} disabled={loading || reason.trim().length < 3}>

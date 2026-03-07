@@ -39,8 +39,8 @@ export default function RevolvingCostPage() {
 
     const status =
       B0 <= 0
-        ? { label: "입력 필요", badge: "bg-[#FBBF24] text-[#3B2F1E]" }
-        : { label: "점검", badge: "bg-[#F97316] text-white" };
+        ? { label: "입력 필요", badge: "bg-[#52a9ff] text-[#ffffff]" }
+        : { label: "점검", badge: "bg-[#5bbbf3] text-white" };
 
     return { B0, r, n, paydown, totalFee, endBal, status };
   }, [balance, annualFeeRate, months, monthlyPaydown]);
@@ -51,7 +51,7 @@ export default function RevolvingCostPage() {
       title="카드 리볼빙 비용 계산기"
       subtitle={
         <>
-          이월금액에 수수료율을 적용해 <span className="font-semibold text-[#F97316]">기간 누적 비용</span>을 추정합니다.
+          이월금액에 수수료율을 적용해 <span className="font-semibold text-[#ffffff]">기간 누적 비용</span>을 추정합니다.
         </>
       }
     >
@@ -61,9 +61,9 @@ export default function RevolvingCostPage() {
           <div className="flex items-start justify-between gap-3">
             <div>
               <h2 className={cn("text-lg font-semibold", UI.ink)}>입력</h2>
-              <p className={cn("mt-1 text-sm", UI.inkSoft)}>단순 모델: 매달 수수료 발생 + 선택적 원금상환 반영</p>
+              <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>단순 모델: 매달 수수료 발생 + 선택적 원금상환 반영</p>
             </div>
-            <span className={cn("rounded-full px-3 py-1 text-sm font-semibold", calc.status.badge)}>
+            <span className={cn("rounded-full px-3 py-1 text-[12px] font-semibold", calc.status.badge)}>
               {calc.status.label}
             </span>
           </div>
@@ -75,9 +75,9 @@ export default function RevolvingCostPage() {
             <MoneyInput label="월 원금 상환(선택)" value={monthlyPaydown} setValue={setMonthlyPaydown} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-            <div className="text-sm font-semibold text-[#3B2F1E]">주의</div>
-            <p className="mt-2 text-sm text-[#6B5642]">
+          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+            <div className="text-[12px] font-semibold text-[#3B2F1E]">주의</div>
+            <p className="mt-2 text-[12px] text-[#6d6d6d]">
               실제 리볼빙은 최소결제, 이월비율, 결제일별 산정 등 복잡합니다. 여기서는 “비용 감(感)”을 잡는 용도입니다.
             </p>
           </div>
@@ -94,8 +94,8 @@ export default function RevolvingCostPage() {
             <MetricCard title="기간(개월)" value={`${calc.n}개월`} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-            <div className={cn("text-sm font-semibold", UI.ink)}>해석 프레임</div>
+          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+            <div className={cn("text-[12px] font-semibold", UI.ink)}>해석 프레임</div>
             <div className="mt-3 grid gap-2">
               <Row
                 label="원금상환이 0이면"
@@ -113,13 +113,13 @@ export default function RevolvingCostPage() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/calculators/credit-line-cost"
-              className="rounded-2xl bg-[#F97316] px-4 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+              className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
             >
               다음: 마이너스통장 비용 →
             </Link>
             <Link
               href="/calculators"
-              className="rounded-2xl border border-[#F2E4B6] bg-white px-4 py-2 text-center text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+              className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
             >
               계산기 모음으로
             </Link>

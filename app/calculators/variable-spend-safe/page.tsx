@@ -10,12 +10,12 @@ function cn(...xs: Array<string | false | null | undefined>) {
 
 /** 레시피북 톤(연노랑 + 주황) */
 const UI = {
-  paperBg: "bg-[#FFFFFF]",
+  paperBg: "bg-[#ffffff]",
   paperDots:
     "bg-[radial-gradient(circle,rgba(251,146,60,0.14)_1px,transparent_1px)] bg-[size:16px_16px]",
   ink: "text-[#3B2F1E]",
-  inkSoft: "text-[#6B5642]",
-  card: "bg-[#FFF9F2] border-[#F2E4B6]",
+  inkSoft: "text-[#7f7f7f]",
+  card: "bg-[#f2fbff] border-[#e8f8ff]",
 };
 
 function toNumberSafe(v: string) {
@@ -98,19 +98,19 @@ export default function VariableSpendSafePage() {
       rawAvailable < 0
         ? {
             label: "위험",
-            badge: "bg-[#F97316] text-white",
+            badge: "bg-[#5bbbf3] text-white",
             msg: "현재 잔액으로는 월말 목표/확정지출을 감당하기 어렵습니다. 목표 잔액 또는 확정지출 입력을 우선 점검하세요.",
           }
         : safeAvailable < 0
         ? {
             label: "경고",
-            badge: "bg-[#FBBF24] text-[#3B2F1E]",
+            badge: "bg-[#52a9ff] text-[#ffffff]",
             msg: "안전 버퍼를 적용하면 가변비 여력이 거의 없습니다. 버퍼를 낮추거나 지출 계획을 더 보수적으로 잡으세요.",
           }
         : daily <= 0
         ? {
             label: "타이트",
-            badge: "bg-[#FBBF24] text-[#3B2F1E]",
+            badge: "bg-[#52a9ff] text-[#ffffff]",
             msg: "일 예산이 0원에 가깝습니다. 남은 기간에 가변비를 거의 쓰기 어려운 상태입니다.",
           }
         : {
@@ -164,33 +164,33 @@ export default function VariableSpendSafePage() {
   return (
     <div className={cn("min-h-screen", UI.paperBg)}>
       <div className={cn("min-h-screen", UI.paperDots)}>
-        <div className="mx-auto max-w-6xl px-4 py-7 sm:py-10">
+        <div className="mx-auto w-[1240px] px-4 py-7 sm:py-10">
           {/* 상단 네비 */}
           <div className="mb-5 flex items-center justify-between gap-3">
             <Link
               href="/calculators"
-              className="rounded-full border border-[#F2E4B6] bg-[#FFF9F2] px-3 py-1.5 text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+              className="rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
             >
               ← 계산기 모음
             </Link>
 
-            <span className="rounded-full bg-[#FFE4C7] px-3 py-1.5 text-sm font-semibold text-[#F97316]">
+            <span className="rounded-full bg-[#5bbbf3] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
               가변비 안전예산
             </span>
           </div>
 
           {/* 헤더 */}
           <div className="mb-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#F2E4B6] bg-[#FFF9F2] px-3 py-1 text-xs font-medium text-[#6B5642] shadow-sm">
-              <span className="inline-block h-2 w-2 rounded-full bg-[#FB923C]" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm">
+              <span className="inline-block h-2 w-2 rounded-full bg-[#5bbbf3]" />
               Recipe Calculator
             </div>
 
             <h1 className={cn("mt-3 text-2xl sm:text-3xl font-semibold tracking-tight", UI.ink)}>
               가변비 안전예산 계산기
             </h1>
-            <p className={cn("mt-2 text-sm sm:text-base", UI.inkSoft)}>
-              월말 목표 잔액을 남기면서, <span className="font-semibold text-[#F97316]">“이번 주 쓸 수 있는 돈”</span>을 계산합니다.
+            <p className={cn("mt-2 text-[12px] sm:text-base", UI.inkSoft)}>
+              월말 목표 잔액을 남기면서, <span className="font-semibold text-[#ffffff]">“이번 주 쓸 수 있는 돈”</span>을 계산합니다.
             </p>
           </div>
 
@@ -200,11 +200,11 @@ export default function VariableSpendSafePage() {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h2 className={cn("text-lg font-semibold", UI.ink)}>입력</h2>
-                  <p className={cn("mt-1 text-sm", UI.inkSoft)}>
+                  <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>
                     핵심은 “현재 잔액”에서 “월말 목표 잔액”과 “확정지출”을 먼저 빼는 것입니다.
                   </p>
                 </div>
-                <span className={cn("rounded-full px-3 py-1 text-sm font-semibold", calc.status.badge)}>
+                <span className={cn("rounded-full px-3 py-1 text-[12px] font-semibold", calc.status.badge)}>
                   {calc.status.label}
                 </span>
               </div>
@@ -230,8 +230,8 @@ export default function VariableSpendSafePage() {
                   hint="예: 카드결제일, 정기회비, 공과금"
                 />
 
-                <div className="rounded-2xl border border-[#F2E4B6] bg-white p-4">
-                  <div className="text-sm font-semibold text-[#3B2F1E]">기간 설정</div>
+                <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                  <div className="text-[12px] font-semibold text-[#3B2F1E]">기간 설정</div>
 
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
                     <SelectInput
@@ -282,9 +282,9 @@ export default function VariableSpendSafePage() {
                 />
               </div>
 
-              <div className="mt-5 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-                <div className={cn("text-sm font-semibold", UI.ink)}>해석 팁</div>
-                <ul className={cn("mt-2 list-disc pl-5 text-sm leading-relaxed", UI.inkSoft)}>
+              <div className="mt-5 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                <div className={cn("text-[12px] font-semibold", UI.ink)}>해석 팁</div>
+                <ul className={cn("mt-2 list-disc pl-5 text-[12px] leading-relaxed", UI.inkSoft)}>
                   <li>확정지출은 “미리 아는 카드결제/회비/공과금”만 넣고, 변동은 버퍼로 흡수하세요.</li>
                   <li>주간 한도가 음수면, 이번 주는 “지출 정지 모드”로 보는 게 합리적입니다.</li>
                   <li>총액이 촘촘할수록, “남은 기간 균등”이 계획을 안정화합니다.</li>
@@ -295,15 +295,15 @@ export default function VariableSpendSafePage() {
             {/* 결과 */}
             <section className={cn("rounded-3xl border p-4 sm:p-6 shadow-sm", UI.card)}>
               <h2 className={cn("text-lg font-semibold", UI.ink)}>결과</h2>
-              <p className={cn("mt-1 text-sm", UI.inkSoft)}>{calc.status.msg}</p>
+              <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>{calc.status.msg}</p>
 
               {/* 헤드라인 */}
-              <div className="mt-4 rounded-3xl border border-[#F2E4B6] bg-white p-5">
-                <div className="text-sm font-semibold text-[#6B5642]">이번 주 쓸 수 있는 돈</div>
-                <div className="mt-2 text-4xl font-extrabold text-[#F97316]">
+              <div className="mt-4 rounded-3xl border border-[#e8f8ff] bg-white p-5">
+                <div className="text-[12px] font-semibold text-[#7f7f7f]">이번 주 쓸 수 있는 돈</div>
+                <div className="mt-2 text-4xl font-extrabold text-[#ffffff]">
                   {formatKRW(calc.headline)}원
                 </div>
-                <div className={cn("mt-2 text-sm", UI.inkSoft)}>{calc.note}</div>
+                <div className={cn("mt-2 text-[12px]", UI.inkSoft)}>{calc.note}</div>
               </div>
 
               <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -314,8 +314,8 @@ export default function VariableSpendSafePage() {
               </div>
 
               {/* 분해 */}
-              <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-                <div className={cn("text-sm font-semibold", UI.ink)}>계산식(분해)</div>
+              <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                <div className={cn("text-[12px] font-semibold", UI.ink)}>계산식(분해)</div>
                 <div className="mt-3 grid gap-2">
                   <Row label="현재 잔액" value={`${formatKRW(calc.bal)}원`} />
                   <Row label="(-) 월말 목표 잔액" value={`${formatKRW(calc.target)}원`} />
@@ -337,13 +337,13 @@ export default function VariableSpendSafePage() {
               <div className="mt-5 flex flex-col gap-2 sm:flex-row">
                 <Link
                   href="/calculators/no-spend-goal"
-                  className="rounded-2xl bg-[#F97316] px-4 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+                  className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
                 >
                   다음: 무지출 데이 목표 →
                 </Link>
                 <Link
                   href="/calculators"
-                  className="rounded-2xl border border-[#F2E4B6] bg-white px-4 py-2 text-center text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+                  className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
                 >
                   계산기 모음으로
                 </Link>
@@ -376,11 +376,11 @@ function MoneyInput({
   return (
     <div className="grid gap-1.5">
       <div className="flex items-end justify-between gap-2">
-        <label className="text-sm font-semibold text-[#3B2F1E]">{label}</label>
-        {hint && <span className="text-xs text-[#6B5642]">{hint}</span>}
+        <label className="text-[12px] font-semibold text-[#3B2F1E]">{label}</label>
+        {hint && <span className="text-xs text-[#7f7f7f]">{hint}</span>}
       </div>
       <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#9C7A55]">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-[#9C7A55]">
           ₩
         </span>
         <input
@@ -389,8 +389,8 @@ function MoneyInput({
           onChange={(e) => setValue(e.target.value)}
           placeholder="0"
           className={cn(
-            "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-sm outline-none",
-            "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+            "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-[12px] outline-none",
+            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
           )}
         />
       </div>
@@ -412,8 +412,8 @@ function NumberInput({
   return (
     <div className="grid gap-1.5">
       <div className="flex items-end justify-between gap-2">
-        <label className="text-sm font-semibold text-[#3B2F1E]">{label}</label>
-        {hint && <span className="text-xs text-[#6B5642]">{hint}</span>}
+        <label className="text-[12px] font-semibold text-[#3B2F1E]">{label}</label>
+        {hint && <span className="text-xs text-[#7f7f7f]">{hint}</span>}
       </div>
       <input
         inputMode="numeric"
@@ -421,8 +421,8 @@ function NumberInput({
         onChange={(e) => setValue(e.target.value)}
         placeholder="0"
         className={cn(
-          "h-11 w-full rounded-xl border bg-white px-3 text-sm outline-none",
-          "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+          "h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
+          "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
         )}
       />
     </div>
@@ -443,8 +443,8 @@ function PctInput({
   return (
     <div className="grid gap-1.5">
       <div className="flex items-end justify-between gap-2">
-        <label className="text-sm font-semibold text-[#3B2F1E]">{label}</label>
-        {hint && <span className="text-xs text-[#6B5642]">{hint}</span>}
+        <label className="text-[12px] font-semibold text-[#3B2F1E]">{label}</label>
+        {hint && <span className="text-xs text-[#7f7f7f]">{hint}</span>}
       </div>
       <div className="relative">
         <input
@@ -453,11 +453,11 @@ function PctInput({
           onChange={(e) => setValue(e.target.value)}
           placeholder="0"
           className={cn(
-            "h-11 w-full rounded-xl border bg-white px-3 pr-10 text-sm outline-none",
-            "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+            "h-11 w-full rounded-xl border bg-white px-3 pr-10 text-[12px] outline-none",
+            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
           )}
         />
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#9C7A55]">
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-[#9C7A55]">
           %
         </span>
       </div>
@@ -478,13 +478,13 @@ function SelectInput({
 }) {
   return (
     <div className="grid gap-1.5">
-      <label className="text-sm font-semibold text-[#3B2F1E]">{label}</label>
+      <label className="text-[12px] font-semibold text-[#3B2F1E]">{label}</label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={cn(
-          "h-11 w-full rounded-xl border bg-white px-3 text-sm outline-none",
-          "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+          "h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
+          "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
         )}
       >
         {options.map((o) => (
@@ -499,8 +499,8 @@ function SelectInput({
 
 function MetricCard({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[#F2E4B6] bg-white p-4">
-      <div className="text-xs font-semibold text-[#6B5642]">{title}</div>
+    <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
+      <div className="text-xs font-semibold text-[#7f7f7f]">{title}</div>
       <div className="mt-1 text-xl font-bold text-[#3B2F1E]">{value}</div>
     </div>
   );
@@ -509,8 +509,8 @@ function MetricCard({ title, value }: { title: string; value: string }) {
 function InfoPill({ label, value }: { label: string; value: string }) {
   return (
     <div className="grid gap-1.5">
-      <div className="text-sm font-semibold text-[#3B2F1E]">{label}</div>
-      <div className="rounded-xl border border-[#F2E4B6] bg-[#FFFFFF] px-3 py-2 text-sm font-bold text-[#6B5642]">
+      <div className="text-[12px] font-semibold text-[#3B2F1E]">{label}</div>
+      <div className="rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] px-3 py-2 text-[12px] font-bold text-[#7f7f7f]">
         {value}
       </div>
     </div>
@@ -526,11 +526,11 @@ function Row({
   value: string;
   tone?: "ok" | "danger";
 }) {
-  const vCls = tone === "danger" ? "text-[#F97316]" : tone === "ok" ? "text-[#6B5642]" : "text-[#6B5642]";
+  const vCls = tone === "danger" ? "text-[#ffffff]" : tone === "ok" ? "text-[#7f7f7f]" : "text-[#7f7f7f]";
   return (
-    <div className="flex items-center justify-between rounded-xl border border-[#F2E4B6] bg-[#FFFFFF] px-3 py-2">
-      <span className="text-sm font-semibold text-[#3B2F1E]">{label}</span>
-      <span className={cn("text-sm font-bold", vCls)}>{value}</span>
+    <div className="flex items-center justify-between rounded-xl border border-[#e8f8ff] bg-[#f2fbff] px-3 py-2">
+      <span className="text-[12px] font-semibold text-[#3B2F1E]">{label}</span>
+      <span className={cn("text-[12px] font-bold", vCls)}>{value}</span>
     </div>
   );
 }

@@ -11,15 +11,15 @@ function cn(...xs: Array<string | false | null | undefined>) {
 
 /** 레시피북 톤(연노랑 + 주황) */
 const UI = {
-  pageBg: "bg-[#FFFFFF]",
+  pageBg: "bg-[#ffffff]",
   paperDots:
     "bg-[radial-gradient(circle,rgba(251,146,60,0.12)_1px,transparent_1px)] bg-[size:16px_16px]",
   ink: "text-[#3B2F1E]",
-  inkSoft: "text-[#6B5642]",
-  line: "border-[#F2E4B6]",
-  card: "bg-[#FFF9F2] border-[#F2E4B6]",
-  accent: "text-[#F97316]",
-  accentBg: "bg-[#F97316]",
+  inkSoft: "text-[#7f7f7f]",
+  line: "border-[#e8f8ff]",
+  card: "bg-[#f2fbff] border-[#e8f8ff]",
+  accent: "text-[#ffffff]",
+  accentBg: "bg-[#5bbbf3]",
 };
 
 type CalcLink = { title: string; slug: string; group: "A" | "B" | "C" | "D" };
@@ -128,14 +128,14 @@ export default function CalculatorsLayout({ children }: { children: React.ReactN
       <div className={cn("min-h-screen", UI.paperDots)}>
         {/* Top bar */}
         <header className={cn("sticky top-0 z-30 border-b bg-white/80 backdrop-blur", UI.line)}>
-          <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
+          <div className="mx-auto flex w-[1240px] items-center justify-between gap-3 px-4 py-3">
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="inline-flex h-2 w-2 rounded-full bg-[#FB923C]" />
+                <span className="inline-flex h-2 w-2 rounded-full bg-[#5bbbf3]" />
                 <Link
                   href="/calculators"
                   className={cn(
-                    "text-sm font-semibold hover:underline whitespace-nowrap",
+                    "text-[12px] font-semibold hover:underline whitespace-nowrap",
                     UI.ink
                   )}
                 >
@@ -144,13 +144,13 @@ export default function CalculatorsLayout({ children }: { children: React.ReactN
                 {active && (
                   <>
                     <span className="text-xs text-[#C8B79A]">/</span>
-                    <span className={cn("text-sm font-semibold truncate", UI.ink)}>
+                    <span className={cn("text-[12px] font-semibold truncate", UI.ink)}>
                       {active.title}
                     </span>
                   </>
                 )}
               </div>
-              <div className={cn("mt-0.5 text-xs text-[#6B5642] truncate", UI.inkSoft)}>
+              <div className={cn("mt-0.5 text-xs text-[#7f7f7f] truncate", UI.inkSoft)}>
                 {groupMeta.title} · {groupMeta.subtitle}
               </div>
             </div>
@@ -161,7 +161,7 @@ export default function CalculatorsLayout({ children }: { children: React.ReactN
               target="_blank"
               rel="noopener noreferrer"
               className={cn(
-                "shrink-0 rounded-full px-3 py-1.5 text-sm font-semibold text-white shadow-sm",
+                "shrink-0 rounded-[10px] mt-[10px] px-3 py-1.5 text-[12px] font-semibold text-white shadow-sm",
                 "whitespace-nowrap",
                 UI.accentBg
               )}
@@ -172,7 +172,7 @@ export default function CalculatorsLayout({ children }: { children: React.ReactN
         </header>
 
         {/* Main grid */}
-        <div className="mx-auto grid max-w-6xl gap-4 px-4  lg:gap-6">
+        <div className="mx-auto grid max-w-[1200px]gap-4 px-4  lg:gap-6">
           {/* Content */}
           <main className={cn("min-w-0", "pb-24 lg:pb-6")}>{children}</main>
 
@@ -180,12 +180,12 @@ export default function CalculatorsLayout({ children }: { children: React.ReactN
 
         {/* Mobile sticky CTA */}
         <div className="fixed inset-x-0 bottom-0 z-40 lg:hidden">
-          <div className="mx-auto max-w-6xl px-4 pb-3">
+          <div className="mx-auto max-w-[1200px]px-4 pb-3">
             <div className={cn("rounded-2xl border bg-white/95 backdrop-blur shadow-lg", UI.line)}>
               <div className="flex items-center justify-between gap-3 p-3">
                 <div className="min-w-0">
                   <div className={cn("text-xs font-semibold", UI.inkSoft)}>계산 결과 → 실행으로</div>
-                  <div className={cn("text-sm font-extrabold truncate", UI.ink)}>
+                  <div className={cn("text-[12px] font-extrabold truncate", UI.ink)}>
                     지출레시피 점검으로 이어가기
                   </div>
                 </div>
@@ -195,7 +195,7 @@ export default function CalculatorsLayout({ children }: { children: React.ReactN
                   target="_blank"
                   rel="noopener noreferrer"
                   className={cn(
-                    "shrink-0 rounded-xl px-3 py-2 text-sm font-semibold text-white",
+                    "shrink-0 rounded-xl px-3 py-2 text-[12px] font-semibold text-white",
                     "whitespace-nowrap",
                     UI.accentBg
                   )}
@@ -208,9 +208,9 @@ export default function CalculatorsLayout({ children }: { children: React.ReactN
         </div>
 
         {/* Footer */}
-        <footer className="border-t border-[#F2E4B6] bg-white">
-          <div className="mx-auto max-w-6xl px-4 py-6">
-            <div className={cn("text-sm font-semibold", UI.ink)}>지출레시피</div>
+        <footer className="border-t border-[#e8f8ff] bg-white">
+          <div className="mx-auto w-[1240px] px-4 py-6">
+            <div className={cn("text-[12px] font-semibold", UI.ink)}>지출레시피</div>
             <p className={cn("mt-1 text-xs leading-relaxed", UI.inkSoft)}>
               계산기는 의사결정을 돕는 도구입니다. 실제 결제·계약·수수료는 각 서비스/금융기관 기준을 확인하세요.
             </p>
@@ -219,13 +219,13 @@ export default function CalculatorsLayout({ children }: { children: React.ReactN
                 href={jiculHome}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-full border border-[#F2E4B6] bg-[#FFF9F2] px-3 py-1.5 text-xs font-semibold text-[#6B5642] hover:border-[#FB923C] whitespace-nowrap"
+                className="rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1.5 text-xs font-semibold text-[#7f7f7f] hover:border-[#5bbbf3] whitespace-nowrap"
               >
                 https://www.jiculrecipe.com/ 방문 →
               </a>
               <Link
                 href="/calculators"
-                className="rounded-full border border-[#F2E4B6] bg-white px-3 py-1.5 text-xs font-semibold text-[#6B5642] hover:border-[#FB923C] whitespace-nowrap"
+                className="rounded-full border border-[#e8f8ff] bg-white px-3 py-1.5 text-xs font-semibold text-[#7f7f7f] hover:border-[#5bbbf3] whitespace-nowrap"
               >
                 계산기 목록으로
               </Link>

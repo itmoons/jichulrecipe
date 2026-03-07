@@ -21,12 +21,12 @@ export default function InsuranceRatioCheckPage() {
     // 단정 대신 “경보 레벨”만 (보수적/일반적으로 쓰이는 점검 프레임)
     const level =
       inc <= 0
-        ? { label: "입력 필요", badge: "bg-[#FBBF24] text-[#3B2F1E]" }
+        ? { label: "입력 필요", badge: "bg-[#52a9ff] text-[#ffffff]" }
         : ratio < 5
         ? { label: "낮음", badge: "bg-[#34D399] text-white" }
         : ratio < 10
-        ? { label: "보통", badge: "bg-[#FBBF24] text-[#3B2F1E]" }
-        : { label: "과다 의심", badge: "bg-[#F97316] text-white" };
+        ? { label: "보통", badge: "bg-[#52a9ff] text-[#ffffff]" }
+        : { label: "과다 의심", badge: "bg-[#5bbbf3] text-white" };
 
     const target5 = inc * 0.05;
     const target8 = inc * 0.08;
@@ -40,7 +40,7 @@ export default function InsuranceRatioCheckPage() {
       title="보험료 점검 계산기"
       subtitle={
         <>
-          월 소득 대비 보험료 비율을 보고 <span className="font-semibold text-[#F97316]">과다 가능성</span>을 점검합니다.
+          월 소득 대비 보험료 비율을 보고 <span className="font-semibold text-[#ffffff]">과다 가능성</span>을 점검합니다.
         </>
       }
     >
@@ -50,9 +50,9 @@ export default function InsuranceRatioCheckPage() {
           <div className="flex items-start justify-between gap-3">
             <div>
               <h2 className={cn("text-lg font-semibold", UI.ink)}>입력</h2>
-              <p className={cn("mt-1 text-sm", UI.inkSoft)}>실수령(또는 가용 소득) 기준으로 넣어야 체감과 맞습니다.</p>
+              <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>실수령(또는 가용 소득) 기준으로 넣어야 체감과 맞습니다.</p>
             </div>
-            <span className={cn("rounded-full px-3 py-1 text-sm font-semibold", calc.level.badge)}>
+            <span className={cn("rounded-full px-3 py-1 text-[12px] font-semibold", calc.level.badge)}>
               {calc.level.label}
             </span>
           </div>
@@ -62,9 +62,9 @@ export default function InsuranceRatioCheckPage() {
             <MoneyInput label="월 보험료 합계" value={monthlyInsurance} setValue={setMonthlyInsurance} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-            <div className="text-sm font-semibold text-[#3B2F1E]">팁</div>
-            <ul className="mt-2 list-disc pl-5 text-sm text-[#6B5642]">
+          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+            <div className="text-[12px] font-semibold text-[#3B2F1E]">팁</div>
+            <ul className="mt-2 list-disc pl-5 text-[12px] text-[#6d6d6d]">
               <li>보장성/저축성/실손 등 성격이 섞이면 ‘합계’만으로도 과다 신호를 볼 수 있습니다.</li>
               <li>보험료가 높으면 “중복 담보/필요보장/갱신형 구조”부터 점검하세요.</li>
             </ul>
@@ -82,8 +82,8 @@ export default function InsuranceRatioCheckPage() {
             <MetricCard title="8% 기준(참고)" value={`${formatKRW(calc.target8)}원`} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-            <div className={cn("text-sm font-semibold", UI.ink)}>점검 포인트</div>
+          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+            <div className={cn("text-[12px] font-semibold", UI.ink)}>점검 포인트</div>
             <div className="mt-3 grid gap-2">
               <Row label="현재 레벨" value={calc.level.label} tone={calc.level.label === "과다 의심" ? "danger" : "ok"} />
               <Row
@@ -97,7 +97,7 @@ export default function InsuranceRatioCheckPage() {
                 tone={calc.level.label === "과다 의심" ? "danger" : "ok"}
               />
             </div>
-            <p className="mt-3 text-xs font-semibold text-[#6B5642]">
+            <p className="mt-3 text-xs font-semibold text-[#7f7f7f]">
               ※ ‘몇 %가 정답’은 개인 상황에 따라 달라요. 이 계산기는 과다 가능성을 빠르게 잡는 용도입니다.
             </p>
           </div>
@@ -105,13 +105,13 @@ export default function InsuranceRatioCheckPage() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/calculators/pension-pace"
-              className="rounded-2xl bg-[#F97316] px-4 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+              className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
             >
               다음: 연금저축/IRP 페이스 →
             </Link>
             <Link
               href="/calculators"
-              className="rounded-2xl border border-[#F2E4B6] bg-white px-4 py-2 text-center text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+              className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
             >
               계산기 모음으로
             </Link>

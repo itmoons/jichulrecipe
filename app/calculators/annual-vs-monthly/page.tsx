@@ -14,8 +14,8 @@ const UI = {
   paperDots:
     "bg-[radial-gradient(circle,rgba(251,146,60,0.14)_1px,transparent_1px)] bg-[size:16px_16px]",
   ink: "text-[#3B2F1E]",
-  inkSoft: "text-[#6B5642]",
-  card: "bg-[#FFF9F2] border-[#F2E4B6]",
+  inkSoft: "text-[#7f7f7f]",
+  card: "bg-[#f2fbff] border-[#e8f8ff]",
 };
 
 function toNumberSafe(v: string) {
@@ -118,34 +118,34 @@ export default function AnnualVsMonthlyPage() {
   return (
     <div className={cn("min-h-screen", UI.paperBg)}>
       <div className={cn("min-h-screen", UI.paperDots)}>
-        <div className="mx-auto max-w-6xl px-4 py-7 sm:py-10">
+        <div className="mx-auto w-[1240px] px-4 py-7 sm:py-10">
           {/* 상단 네비 */}
           <div className="mb-5 flex items-center justify-between gap-3">
             <Link
               href="/calculators"
-              className="rounded-full border border-[#F2E4B6] bg-[#FFF9F2] px-3 py-1.5 text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+              className="rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
             >
               ← 계산기 모음
             </Link>
 
-            <span className="rounded-full bg-[#FFE4C7] px-3 py-1.5 text-sm font-semibold text-[#F97316]">
+            <span className="rounded-full bg-[#5bbbf3] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
               결제 비교
             </span>
           </div>
 
           {/* 헤더 */}
           <div className="mb-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#F2E4B6] bg-[#FFF9F2] px-3 py-1 text-xs font-medium text-[#6B5642] shadow-sm">
-              <span className="inline-block h-2 w-2 rounded-full bg-[#FB923C]" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm">
+              <span className="inline-block h-2 w-2 rounded-full bg-[#5bbbf3]" />
               Recipe Calculator
             </div>
 
             <h1 className={cn("mt-3 text-2xl sm:text-3xl font-semibold tracking-tight", UI.ink)}>
               연간 결제 vs 월간 결제 손익 계산기
             </h1>
-            <p className={cn("mt-2 text-sm sm:text-base", UI.inkSoft)}>
+            <p className={cn("mt-2 text-[12px] sm:text-base", UI.inkSoft)}>
               월간 요금과 연간 결제(가격 또는 할인율)를 입력하면{" "}
-              <span className="font-semibold text-[#F97316]">절감액·절감률·손익분기점</span>을 계산합니다.
+              <span className="font-semibold text-[#ffffff]">절감액·절감률·손익분기점</span>을 계산합니다.
             </p>
           </div>
 
@@ -154,7 +154,7 @@ export default function AnnualVsMonthlyPage() {
             {/* 입력 카드 */}
             <section className={cn("rounded-3xl border p-4 sm:p-6 shadow-sm", UI.card)}>
               <h2 className={cn("text-lg font-semibold", UI.ink)}>입력</h2>
-              <p className={cn("mt-1 text-sm", UI.inkSoft)}>
+              <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>
                 연간 결제는 “연간 가격 직접 입력” 또는 “할인율 입력” 중 하나로 계산할 수 있습니다.
               </p>
 
@@ -168,10 +168,10 @@ export default function AnnualVsMonthlyPage() {
 
                 <MoneyInput label="월간 요금" value={monthlyPrice} setValue={setMonthlyPrice} />
 
-                <div className="rounded-2xl border border-[#F2E4B6] bg-white p-4">
+                <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <div className={cn("text-sm font-semibold", UI.ink)}>연간 결제 입력 방식</div>
+                      <div className={cn("text-[12px] font-semibold", UI.ink)}>연간 결제 입력 방식</div>
                       <div className={cn("text-xs", UI.inkSoft)}>
                         실제 가격을 알고 있으면 “연간 가격”, 할인만 알면 “할인율”이 편합니다.
                       </div>
@@ -181,10 +181,10 @@ export default function AnnualVsMonthlyPage() {
                       <button
                         onClick={() => setMode("discount")}
                         className={cn(
-                          "rounded-full border px-3 py-2 text-sm font-semibold transition",
+                          "rounded-full border px-3 py-2 text-[12px] font-semibold transition",
                           mode === "discount"
-                            ? "border-[#F97316] bg-[#F97316] text-white"
-                            : "border-[#F2E4B6] bg-[#FFF9F2] text-[#6B5642] hover:border-[#FB923C]"
+                            ? "border-[#5bbbf3] bg-[#5bbbf3] text-white"
+                            : "border-[#e8f8ff] bg-[#f2fbff] text-[#7f7f7f] hover:border-[#5bbbf3]"
                         )}
                       >
                         할인율
@@ -192,10 +192,10 @@ export default function AnnualVsMonthlyPage() {
                       <button
                         onClick={() => setMode("price")}
                         className={cn(
-                          "rounded-full border px-3 py-2 text-sm font-semibold transition",
+                          "rounded-full border px-3 py-2 text-[12px] font-semibold transition",
                           mode === "price"
-                            ? "border-[#F97316] bg-[#F97316] text-white"
-                            : "border-[#F2E4B6] bg-[#FFF9F2] text-[#6B5642] hover:border-[#FB923C]"
+                            ? "border-[#5bbbf3] bg-[#5bbbf3] text-white"
+                            : "border-[#e8f8ff] bg-[#f2fbff] text-[#7f7f7f] hover:border-[#5bbbf3]"
                         )}
                       >
                         연간 가격
@@ -212,9 +212,9 @@ export default function AnnualVsMonthlyPage() {
                         hint="0~80% 범위 자동 제한"
                         placeholder="예: 15"
                       />
-                      <div className="rounded-2xl bg-[#FFFFFF] p-3">
-                        <div className="text-xs font-semibold text-[#6B5642]">할인 적용 연간 가격</div>
-                        <div className="mt-1 text-lg font-bold text-[#F97316]">
+                      <div className="rounded-2xl bg-[#5bbbf3] p-3">
+                        <div className="text-xs font-semibold text-[#7f7f7f]">할인 적용 연간 가격</div>
+                        <div className="mt-1 text-lg font-bold text-[#ffffff]">
                           {formatKRW(calc.annual)}원
                         </div>
                       </div>
@@ -235,9 +235,9 @@ export default function AnnualVsMonthlyPage() {
                 />
               </div>
 
-              <div className="mt-5 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-                <div className={cn("text-sm font-semibold", UI.ink)}>해석 팁</div>
-                <ul className={cn("mt-2 list-disc pl-5 text-sm leading-relaxed", UI.inkSoft)}>
+              <div className="mt-5 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                <div className={cn("text-[12px] font-semibold", UI.ink)}>해석 팁</div>
+                <ul className={cn("mt-2 list-disc pl-5 text-[12px] leading-relaxed", UI.inkSoft)}>
                   <li>연간 결제는 “할인”보다 “중간 해지 가능성”이 변수입니다.</li>
                   <li>손익분기점(개월)이 짧을수록 연간 결제가 합리적일 가능성이 큽니다.</li>
                   <li>가격이 아니라 “사용 습관”이 결론을 좌우합니다.</li>
@@ -250,12 +250,12 @@ export default function AnnualVsMonthlyPage() {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h2 className={cn("text-lg font-semibold", UI.ink)}>결과</h2>
-                  <p className={cn("mt-1 text-sm", UI.inkSoft)}>
+                  <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>
                     월간(12개월) 대비 연간 결제의 손익을 요약합니다.
                   </p>
                 </div>
 
-                <span className="rounded-full bg-[#FFE4C7] px-3 py-1 text-sm font-semibold text-[#F97316]">
+                <span className="rounded-full bg-[#5bbbf3] px-3 py-1 text-[12px] font-semibold text-[#ffffff]">
                   {serviceName?.trim() ? serviceName.trim() : "구독"}
                 </span>
               </div>
@@ -265,17 +265,17 @@ export default function AnnualVsMonthlyPage() {
                 <MetricCard title="연간 결제 가격" value={`${formatKRW(calc.annual)}원`} />
               </div>
 
-              <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
+              <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
                 <div className="flex items-center justify-between gap-3">
-                  <div className={cn("text-sm font-semibold", UI.ink)}>핵심 손익</div>
+                  <div className={cn("text-[12px] font-semibold", UI.ink)}>핵심 손익</div>
                   <span
                     className={cn(
-                      "rounded-full px-3 py-1 text-sm font-semibold",
+                      "rounded-full px-3 py-1 text-[12px] font-semibold",
                       calc.save > 0
                         ? "bg-[#34D399] text-white"
                         : calc.save < 0
-                        ? "bg-[#F97316] text-white"
-                        : "bg-[#FBBF24] text-[#3B2F1E]"
+                        ? "bg-[#5bbbf3] text-white"
+                        : "bg-[#52a9ff] text-[#ffffff]"
                     )}
                   >
                     {calc.verdict}
@@ -295,34 +295,34 @@ export default function AnnualVsMonthlyPage() {
                   />
                 </div>
 
-                <div className={cn("mt-3 text-sm font-semibold", UI.ink)}>
+                <div className={cn("mt-3 text-[12px] font-semibold", UI.ink)}>
                   손익분기점: 약 {calc.breakevenMonths || 0}개월
                 </div>
-                <div className={cn("mt-1 text-sm leading-relaxed", UI.inkSoft)}>{calc.caution}</div>
+                <div className={cn("mt-1 text-[12px] leading-relaxed", UI.inkSoft)}>{calc.caution}</div>
               </div>
 
-              <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-                <div className={cn("text-sm font-semibold", UI.ink)}>체감 월 환산(연간 결제 기준)</div>
+              <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                <div className={cn("text-[12px] font-semibold", UI.ink)}>체감 월 환산(연간 결제 기준)</div>
                 <div className="mt-2 flex items-center justify-between">
-                  <span className={cn("text-sm", UI.inkSoft)}>연간 결제를 월로 환산하면</span>
-                  <span className="text-lg font-bold text-[#F97316]">
+                  <span className={cn("text-[12px]", UI.inkSoft)}>연간 결제를 월로 환산하면</span>
+                  <span className="text-lg font-bold text-[#ffffff]">
                     {formatKRW(calc.monthlyEquivalent)}원/월
                   </span>
                 </div>
 
-                <div className="mt-3 rounded-xl border border-[#F2E4B6] bg-[#FFFFFF] p-3">
-                  <div className="text-xs font-semibold text-[#6B5642]">예상 사용기간({calc.months}개월) 기준 비교</div>
+                <div className="mt-3 rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] p-3">
+                  <div className="text-xs font-semibold text-[#7f7f7f]">예상 사용기간({calc.months}개월) 기준 비교</div>
                   <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <SmallLine title="월간으로 {months}개월" value={`${formatKRW(calc.costIfMonthly)}원`} />
                     <SmallLine title="연간 선결제(환불없음 가정)" value={`${formatKRW(calc.costIfAnnual)}원`} />
                   </div>
 
-                  <div className="mt-2 text-sm font-semibold text-[#3B2F1E]">
+                  <div className="mt-2 text-[12px] font-semibold text-[#3B2F1E]">
                     차이:{" "}
-                    <span className={cn(calc.diffByMonths >= 0 ? "text-[#F97316]" : "text-[#6B5642]")}>
+                    <span className={cn(calc.diffByMonths >= 0 ? "text-[#ffffff]" : "text-[#7f7f7f]")}>
                       {(calc.diffByMonths >= 0 ? "+" : "") + formatKRW(calc.diffByMonths)}원
                     </span>
-                    <span className="text-xs text-[#6B5642]"> (＋면 연간이 유리)</span>
+                    <span className="text-xs text-[#7f7f7f]"> (＋면 연간이 유리)</span>
                   </div>
                 </div>
               </div>
@@ -331,13 +331,13 @@ export default function AnnualVsMonthlyPage() {
               <div className="mt-5 flex flex-col gap-2 sm:flex-row">
                 <Link
                   href="/calculators/subscription-total"
-                  className="rounded-2xl bg-[#F97316] px-4 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+                  className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
                 >
                   이전: 구독 총액 계산기 ←
                 </Link>
                 <Link
                   href="/calculators"
-                  className="rounded-2xl border border-[#F2E4B6] bg-white px-4 py-2 text-center text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+                  className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
                 >
                   계산기 모음으로
                 </Link>
@@ -369,14 +369,14 @@ function TextInput({
 }) {
   return (
     <div className="grid gap-1.5">
-      <label className="text-sm font-semibold text-[#3B2F1E]">{label}</label>
+      <label className="text-[12px] font-semibold text-[#3B2F1E]">{label}</label>
       <input
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
         className={cn(
-          "h-11 w-full rounded-xl border bg-white px-3 text-sm outline-none",
-          "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+          "h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
+          "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
         )}
       />
     </div>
@@ -394,9 +394,9 @@ function MoneyInput({
 }) {
   return (
     <div className="grid gap-1.5">
-      <label className="text-sm font-semibold text-[#3B2F1E]">{label}</label>
+      <label className="text-[12px] font-semibold text-[#3B2F1E]">{label}</label>
       <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#9C7A55]">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-[#9C7A55]">
           ₩
         </span>
         <input
@@ -405,8 +405,8 @@ function MoneyInput({
           onChange={(e) => setValue(e.target.value)}
           placeholder="0"
           className={cn(
-            "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-sm outline-none",
-            "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+            "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-[12px] outline-none",
+            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
           )}
         />
       </div>
@@ -430,8 +430,8 @@ function NumberInput({
   return (
     <div className="grid gap-1.5">
       <div className="flex items-end justify-between gap-2">
-        <label className="text-sm font-semibold text-[#3B2F1E]">{label}</label>
-        {hint && <span className="text-xs text-[#6B5642]">{hint}</span>}
+        <label className="text-[12px] font-semibold text-[#3B2F1E]">{label}</label>
+        {hint && <span className="text-xs text-[#7f7f7f]">{hint}</span>}
       </div>
       <input
         inputMode="numeric"
@@ -439,8 +439,8 @@ function NumberInput({
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
         className={cn(
-          "h-11 w-full rounded-xl border bg-white px-3 text-sm outline-none",
-          "border-[#F2E4B6] focus:border-[#FB923C] focus:ring-2 focus:ring-[#FB923C]/20"
+          "h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
+          "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
         )}
       />
     </div>
@@ -449,8 +449,8 @@ function NumberInput({
 
 function MetricCard({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[#F2E4B6] bg-white p-4">
-      <div className="text-xs font-semibold text-[#6B5642]">{title}</div>
+    <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
+      <div className="text-xs font-semibold text-[#7f7f7f]">{title}</div>
       <div className="mt-1 text-xl font-bold text-[#3B2F1E]">{value}</div>
     </div>
   );
@@ -469,13 +469,13 @@ function MiniCard({
     <div
       className={cn(
         "rounded-2xl border p-4",
-        accent ? "border-[#FB923C] bg-[#FFF3E8]" : "border-[#F2E4B6] bg-white"
+        accent ? "border-[#5bbbf3] bg-[#5bbbf3]" : "border-[#e8f8ff] bg-white"
       )}
     >
-      <div className={cn("text-xs font-semibold", accent ? "text-[#F97316]" : "text-[#6B5642]")}>
+      <div className={cn("text-xs font-semibold", accent ? "text-[#ffffff]" : "text-[#7f7f7f]")}>
         {title}
       </div>
-      <div className={cn("mt-1 text-lg font-bold", accent ? "text-[#F97316]" : "text-[#3B2F1E]")}>
+      <div className={cn("mt-1 text-lg font-bold", accent ? "text-[#ffffff]" : "text-[#3B2F1E]")}>
         {value}
       </div>
     </div>
@@ -484,9 +484,9 @@ function MiniCard({
 
 function SmallLine({ title, value }: { title: string; value: string }) {
   return (
-    <div className="flex items-center justify-between rounded-xl border border-[#F2E4B6] bg-white px-3 py-2">
-      <span className="text-xs font-semibold text-[#6B5642]">{title}</span>
-      <span className="text-sm font-bold text-[#3B2F1E]">{value}</span>
+    <div className="flex items-center justify-between rounded-xl border border-[#e8f8ff] bg-white px-3 py-2">
+      <span className="text-xs font-semibold text-[#7f7f7f]">{title}</span>
+      <span className="text-[12px] font-bold text-[#3B2F1E]">{value}</span>
     </div>
   );
 }

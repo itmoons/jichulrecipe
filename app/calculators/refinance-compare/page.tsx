@@ -41,12 +41,12 @@ export default function RefinanceComparePage() {
 
     const verdict =
       P <= 0
-        ? { label: "입력 필요", badge: "bg-[#FBBF24] text-[#3B2F1E]" }
+        ? { label: "입력 필요", badge: "bg-[#52a9ff] text-[#ffffff]" }
         : saving > 0
         ? { label: "대환 유리(총비용)", badge: "bg-[#34D399] text-white" }
         : saving < 0
-        ? { label: "유지 유리(총비용)", badge: "bg-[#F97316] text-white" }
-        : { label: "비슷", badge: "bg-[#FBBF24] text-[#3B2F1E]" };
+        ? { label: "유지 유리(총비용)", badge: "bg-[#5bbbf3] text-white" }
+        : { label: "비슷", badge: "bg-[#52a9ff] text-[#ffffff]" };
 
     return { P, n, fee, curPay, curInterest, newPay, newInterest, newAllIn, saving, verdict };
   }, [principal, remainMonths, currentRate, newRate, refiFee]);
@@ -58,7 +58,7 @@ export default function RefinanceComparePage() {
       subtitle={
         <>
           수수료를 포함해 “총이자(총비용)” 관점에서 대환 손익을 봅니다.{" "}
-          <span className="font-semibold text-[#F97316]">원리금균등 가정</span>입니다.
+          <span className="font-semibold text-[#ffffff]">원리금균등 가정</span>입니다.
         </>
       }
     >
@@ -68,9 +68,9 @@ export default function RefinanceComparePage() {
           <div className="flex items-start justify-between gap-3">
             <div>
               <h2 className={cn("text-lg font-semibold", UI.ink)}>입력</h2>
-              <p className={cn("mt-1 text-sm", UI.inkSoft)}>대환 후 기간이 달라지면 해석이 달라질 수 있어요.</p>
+              <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>대환 후 기간이 달라지면 해석이 달라질 수 있어요.</p>
             </div>
-            <span className={cn("rounded-full px-3 py-1 text-sm font-semibold", calc.verdict.badge)}>
+            <span className={cn("rounded-full px-3 py-1 text-[12px] font-semibold", calc.verdict.badge)}>
               {calc.verdict.label}
             </span>
           </div>
@@ -95,8 +95,8 @@ export default function RefinanceComparePage() {
             <MetricCard title="대환 총비용(이자+수수료)" value={`${formatKRW(calc.newAllIn)}원`} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-            <div className={cn("text-sm font-semibold", UI.ink)}>손익</div>
+          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+            <div className={cn("text-[12px] font-semibold", UI.ink)}>손익</div>
             <div className="mt-3 grid gap-2">
               <Row
                 label="총비용 기준 절감액(+) / 추가비용(-)"
@@ -104,7 +104,7 @@ export default function RefinanceComparePage() {
                 tone={calc.saving >= 0 ? "ok" : "danger"}
               />
             </div>
-            <p className="mt-3 text-xs font-semibold text-[#6B5642]">
+            <p className="mt-3 text-xs font-semibold text-[#7f7f7f]">
               ※ 월상환이 줄어도 기간/수수료 때문에 총비용이 늘 수 있습니다(현금흐름 vs 총비용 분리).
             </p>
           </div>
@@ -112,13 +112,13 @@ export default function RefinanceComparePage() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/calculators/revolving-cost"
-              className="rounded-2xl bg-[#F97316] px-4 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+              className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
             >
               다음: 리볼빙 비용 →
             </Link>
             <Link
               href="/calculators"
-              className="rounded-2xl border border-[#F2E4B6] bg-white px-4 py-2 text-center text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+              className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
             >
               계산기 모음으로
             </Link>

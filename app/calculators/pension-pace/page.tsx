@@ -26,10 +26,10 @@ export default function PensionPacePage() {
 
     const status =
       target <= 0
-        ? { label: "입력 필요", badge: "bg-[#FBBF24] text-[#3B2F1E]" }
+        ? { label: "입력 필요", badge: "bg-[#52a9ff] text-[#ffffff]" }
         : remain === 0
         ? { label: "목표 달성", badge: "bg-[#34D399] text-white" }
-        : { label: "페이스 점검", badge: "bg-[#F97316] text-white" };
+        : { label: "페이스 점검", badge: "bg-[#5bbbf3] text-white" };
 
     // “2주/4주” 납입 옵션 같은 실전 가이드
     const weekly = needPerMonth / 4;
@@ -44,7 +44,7 @@ export default function PensionPacePage() {
       title="연금저축/IRP 납입 페이스 계산기"
       subtitle={
         <>
-          목표액 대비 남은 기간에 필요한 <span className="font-semibold text-[#F97316]">월 납입 페이스</span>를 계산합니다.
+          목표액 대비 남은 기간에 필요한 <span className="font-semibold text-[#ffffff]">월 납입 페이스</span>를 계산합니다.
         </>
       }
     >
@@ -54,9 +54,9 @@ export default function PensionPacePage() {
           <div className="flex items-start justify-between gap-3">
             <div>
               <h2 className={cn("text-lg font-semibold", UI.ink)}>입력</h2>
-              <p className={cn("mt-1 text-sm", UI.inkSoft)}>세액공제 한도/적용은 개인 조건에 따라 달라질 수 있어요.</p>
+              <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>세액공제 한도/적용은 개인 조건에 따라 달라질 수 있어요.</p>
             </div>
-            <span className={cn("rounded-full px-3 py-1 text-sm font-semibold", calc.status.badge)}>
+            <span className={cn("rounded-full px-3 py-1 text-[12px] font-semibold", calc.status.badge)}>
               {calc.status.label}
             </span>
           </div>
@@ -68,9 +68,9 @@ export default function PensionPacePage() {
             <MoneyInput label="현재까지 납입액" value={alreadyPaid} setValue={setAlreadyPaid} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-            <div className="text-sm font-semibold text-[#3B2F1E]">팁</div>
-            <ul className="mt-2 list-disc pl-5 text-sm text-[#6B5642]">
+          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+            <div className="text-[12px] font-semibold text-[#3B2F1E]">팁</div>
+            <ul className="mt-2 list-disc pl-5 text-[12px] text-[#6d6d6d]">
               <li>월 납입이 부담이면 “주간/격주 자동이체”로 쪼개면 체감이 줄어듭니다.</li>
               <li>목표액은 ‘한도’가 아니라 ‘내가 넣기로 한 금액’으로 잡는 게 지속됩니다.</li>
             </ul>
@@ -88,13 +88,13 @@ export default function PensionPacePage() {
             <MetricCard title="격주 페이스(참고)" value={`${formatKRW(calc.biWeekly)}원/2주`} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#F2E4B6] bg-white p-4">
-            <div className={cn("text-sm font-semibold", UI.ink)}>실행 가이드</div>
+          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+            <div className={cn("text-[12px] font-semibold", UI.ink)}>실행 가이드</div>
             <div className="mt-3 grid gap-2">
               <Row label="권장 루틴" value="월급일 다음날 자동이체(또는 주간 분할)" tone="ok" />
               <Row label="체크 포인트" value="남은 개월 수가 줄수록 월 페이스가 급격히 상승" tone="danger" />
             </div>
-            <p className="mt-3 text-xs font-semibold text-[#6B5642]">
+            <p className="mt-3 text-xs font-semibold text-[#7f7f7f]">
               ※ 세액공제/한도 판단은 별도 기준이 있습니다. 이 계산기는 “납입 페이스”만 제공합니다.
             </p>
           </div>
@@ -102,13 +102,13 @@ export default function PensionPacePage() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/calculators/fee-accumulator"
-              className="rounded-2xl bg-[#F97316] px-4 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+              className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
             >
               다음: 수수료 누적 →
             </Link>
             <Link
               href="/calculators"
-              className="rounded-2xl border border-[#F2E4B6] bg-white px-4 py-2 text-center text-sm font-semibold text-[#6B5642] hover:border-[#FB923C]"
+              className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
             >
               계산기 모음으로
             </Link>
