@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import SiteFooter from "@/components/layout/SiteFooter";
 
 const BRAND_BLUE = "#5bbbf3";
 
@@ -123,7 +124,7 @@ function AwningCard({
 function HeroSection() {
   return (
     <section className="relative overflow-hidden">
-      <div className="absolute inset-0 bg-[#b7d6f1] sm:bg-gradient-to-b sm:from-[#8fd7ff] sm:via-[#b9e8ff] sm:to-[#f5fbff]" />
+      <div className="absolute inset-0 bg-[#b9e8ff] sm:bg-gradient-to-b sm:from-[#8fd7ff] sm:via-[#b9e8ff] sm:to-[#f5fbff]" />
 
       <div className="absolute left-0 right-0 bottom-0 h-[88px] bg-[radial-gradient(circle_at_12%_100%,white_0,white_19%,transparent_20%),radial-gradient(circle_at_32%_100%,white_0,white_22%,transparent_23%),radial-gradient(circle_at_54%_100%,white_0,white_19%,transparent_20%),radial-gradient(circle_at_74%_100%,white_0,white_22%,transparent_23%),radial-gradient(circle_at_92%_100%,white_0,white_18%,transparent_19%)] opacity-95 sm:h-[150px]" />
 
@@ -391,7 +392,7 @@ export default function HomePage() {
   const goSignIn = () => router.push("/sign-in");
 
   return (
-    <main className="min-h-screen w-full overflow-x-hidden bg-[#efefef] text-slate-900">
+    <main className="w-full overflow-x-hidden bg-[#efefef] text-slate-900">
       {/* 모바일: 히어로만 노출 */}
       <div className="block md:hidden">
         <HeroSection />

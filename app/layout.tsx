@@ -6,6 +6,7 @@ import "./globals.css";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { ToasterHost } from "@/components/ui/toaster-host";
+import SiteFooter from "@/components/layout/SiteFooter";
 
 const pretendard = localFont({
   src: "./fonts/SCDream6.otf",
@@ -156,6 +157,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SiteHeader />
         {children}
         <ToasterHost />
+        
+      <SiteFooter />
       </body>
     </html>
   );

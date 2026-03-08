@@ -111,14 +111,14 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center bg-gradient-to-b from-[#FFF8EC] via-[#FFFDFC] to-[#F7FAFF] px-4">
+    <main className="relative flex min-h-screen items-center justify-center bg-gradient-to-b from-[#ecf4ff] via-[#fcfdff] to-[#F7FAFF] px-4">
       <div className="pointer-events-none fixed left-[-80px] top-[40%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,184,108,0.25)] blur-3xl" />
       <div className="pointer-events-none fixed right-[-60px] bottom-[8%] -z-10 h-52 w-52 rounded-full bg-[rgba(86,115,231,0.18)] blur-3xl" />
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: "easeOut" }}
-        className="w-full max-w-md rounded-3xl bg-white/95 p-6 shadow-lg shadow-blue-100"
+        className="w-full max-w-md rounded-3xl bg-white/95 p-6 shadow-lg shadow-blue-100 mt-[12rem]"
       >
         <div className="mb-4 flex flex-col gap-1">
           <div className="inline-flex items-center gap-2">
