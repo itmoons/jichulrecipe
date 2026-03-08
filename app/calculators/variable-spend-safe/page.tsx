@@ -12,7 +12,7 @@ function cn(...xs: Array<string | false | null | undefined>) {
 const UI = {
   paperBg: "bg-[#ffffff]",
   paperDots:
-    "bg-[radial-gradient(circle,rgba(251,146,60,0.14)_1px,transparent_1px)] bg-[size:16px_16px]",
+    "bg-[radial-gradient(circle,rgba(251,146,60,0.14)_1px,transparent_1px)] bg-[size:16px_16px] mx-auto w-full max-w-[1340px] px-3 py-4 sm:px-4 sm:py-6",
   ink: "text-[#3B2F1E]",
   inkSoft: "text-[#7f7f7f]",
   card: "bg-[#f2fbff] border-[#e8f8ff]",
@@ -164,7 +164,7 @@ export default function VariableSpendSafePage() {
   return (
     <div className={cn("min-h-screen", UI.paperBg)}>
       <div className={cn("min-h-screen", UI.paperDots)}>
-        <div className="mx-auto w-[1240px] px-4 py-7 sm:py-10">
+        <div className="mx-auto px-2 py-2 sm:py-2">
           {/* 상단 네비 */}
           <div className="mb-5 flex items-center justify-between gap-3">
             <Link

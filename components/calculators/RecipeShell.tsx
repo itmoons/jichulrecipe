@@ -21,7 +21,7 @@ export function RecipeShell({
   return (
     <div className={cn("min-h-screen", UI.paperBg)}>
       <div className={cn("min-h-screen", UI.paperDots)}>
-        <div className="mx-auto w-[1240px] px-4 py-7 sm:py-10">
+        <div className="mx-auto px-2 py-2 sm:py-2">
           <div className="mb-5 flex items-center justify-between gap-3">
             <Link
               href={backHref}
