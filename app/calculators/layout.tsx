@@ -159,7 +159,7 @@ export default function CalculatorsLayout({ children }: { children: React.ReactN
         </header>
 
         {/* Main grid */}
-        <div className="mx-auto grid max-w-[1280px] gap-4 px-1  lg:gap-6">
+        <div className="mx-auto grid max-w-7xl gap-4 px-1  lg:gap-6">
           {/* Content */}
           <main className={cn("min-w-0", "pb-24 lg:pb-6")}>{children}</main>
 
@@ -168,7 +168,7 @@ export default function CalculatorsLayout({ children }: { children: React.ReactN
 
         {/* Footer */}
         <footer className="border-t border-[#e8f8ff] bg-white">
-          <div className="mx-auto w-[1240px] px-4 py-6">
+          <div className="mx-auto px-4 py-6">
             <div className={cn("text-[12px] font-semibold", UI.ink)}>지출레시피</div>
             <p className={cn("mt-1 text-xs leading-relaxed", UI.inkSoft)}>
               계산기는 의사결정을 돕는 도구입니다. 실제 결제·계약·수수료는 각 서비스/금융기관 기준을 확인하세요.

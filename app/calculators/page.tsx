@@ -284,7 +284,7 @@ export default function CalculatorsHubPage() {
     <div className={cn("min-h-screen", UI.paperBg)}>
       {/* 배경 질감 */}
       <div className={cn("min-h-screen", UI.paperDots)}>
-        <div className="mx-auto w-[1280px] px-0 py-8 sm:py-10">
+        <div className="mx-auto px-0 py-8 sm:py-10">
 
           {/* 검색 + 필터(모바일 최적) */}
           <div className="mb-8 sm:mb-10">
@@ -314,7 +314,7 @@ export default function CalculatorsHubPage() {
                   </div>
 
                   {/* ✅ 카테고리 칩(모바일 가로 스크롤) */}
-                  <div className="mt-2 -mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  <div className="hidden mt-2 -mx-1 sm:flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     <button
                       onClick={() => setActiveCat("all")}
                       className={cn(
