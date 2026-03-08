@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -95,10 +95,10 @@ function TabButton({
       type="button"
       onClick={onClick}
       className={cx(
-        "inline-flex items-center gap-2 rounded-[10px] px-4 py-2 text-[13px] font-medium transition-all duration-200",
+        "inline-flex shrink-0 items-center gap-1 rounded-[12px] px-4 py-2.5 text-[10px] font-medium transition-all duration-200",
         active
-          ? "border border-[#aadffe] bg-[#edf7ff] text-[#aadffe] shadow-sm"
-          : "border border-slate-200 bg-white text-slate-600 hover:border-[#aadffe] hover:bg-[#edf7ff] hover:text-[#aadffe]"
+          ? "border border-[#aadffe] bg-[#edf7ff] text-[#0c86ea] shadow-sm"
+          : "border border-slate-200 bg-white text-slate-600 hover:border-[#aadffe] hover:bg-[#edf7ff] hover:text-[#0c86ea]"
       )}
     >
       <span className="text-[14px]">{icon}</span>
@@ -117,7 +117,7 @@ function Surface({
   return (
     <section
       className={cx(
-        "rounded-[24px] border border-[#F3F4F6] bg-white shadow-[0_8px_24px_rgba(15,23,42,0.04)]",
+        "rounded-[20px] md:rounded-[24px] border border-[#F3F4F6] bg-white shadow-[0_8px_24px_rgba(15,23,42,0.04)]",
         className
       )}
     >
@@ -136,9 +136,11 @@ function DataCard({
   subtle?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-[20px] border border-[#d5f9ff] bg-[#f9fdff] px-4 py-4">
+    <div className="rounded-[18px] border border-[#d5f9ff] bg-[#f9fdff] px-4 py-4">
       <div className="text-[11px] font-medium text-slate-500">{label}</div>
-      <div className="mt-1 text-[15px] font-semibold text-slate-900">{value}</div>
+      <div className="mt-1 text-[14px] md:text-[15px] font-semibold text-slate-900">
+        {value}
+      </div>
       {subtle ? <div className="mt-1 text-[11px] text-slate-500">{subtle}</div> : null}
     </div>
   );
@@ -160,16 +162,16 @@ function RecipeField({
 }
 
 const inputBaseClass =
-  "mt-1.5 w-full rounded-[18px] border border-[#E5E7EB] bg-white px-3.5 py-2.5 text-[14px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#FDBA74] focus:ring-4 focus:ring-[#edf7ff]";
+  "mt-1.5 w-full rounded-[16px] border border-[#E5E7EB] bg-white px-3.5 py-2.5 text-[14px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#FDBA74] focus:ring-4 focus:ring-[#edf7ff]";
 
 const primaryButtonClass =
-  "inline-flex items-center justify-center rounded-[10px] bg-[#69b6ff] px-4 py-2.5 text-[13px] font-medium text-white transition hover:bg-[#0c86ea] disabled:opacity-60";
+  "inline-flex items-center justify-center rounded-[12px] bg-[#69b6ff] px-4 py-2.5 text-[13px] font-medium text-white transition hover:bg-[#0c86ea] disabled:opacity-60";
 
 const secondaryButtonClass =
-  "inline-flex items-center justify-center rounded-[10px] border border-[#aadffe] bg-white px-4 py-2.5 text-[13px] font-medium text-[#aadffe] transition hover:bg-[#edf7ff]";
+  "inline-flex items-center justify-center rounded-[12px] border border-[#aadffe] bg-white px-4 py-2.5 text-[13px] font-medium text-[#0c86ea] transition hover:bg-[#edf7ff]";
 
 const neutralButtonClass =
-  "inline-flex items-center justify-center rounded-[10px] border border-slate-200 bg-white px-4 py-2.5 text-[13px] font-medium text-slate-700 transition hover:bg-slate-50";
+  "inline-flex items-center justify-center rounded-[12px] border border-slate-200 bg-white px-4 py-2.5 text-[10px] font-medium text-slate-700 transition hover:bg-slate-50";
 
 export default function CoupleLedgerUI() {
   const [checking, setChecking] = useState(true);
@@ -222,6 +224,9 @@ export default function CoupleLedgerUI() {
   const [editMemo, setEditMemo] = useState("");
   const [editExpenseDate, setEditExpenseDate] = useState("");
   const [updating, setUpdating] = useState(false);
+
+  const [showMobileAddForm, setShowMobileAddForm] = useState(false);
+  const addFormRef = useRef<HTMLDivElement | null>(null);
 
   const showToast = (message: string, type: ToastType = "info") => {
     setToast({ message, type });
@@ -370,6 +375,13 @@ export default function CoupleLedgerUI() {
     return () => subscription.unsubscribe();
   }, []);
 
+  const openMobileAddForm = () => {
+    setShowMobileAddForm(true);
+    setTimeout(() => {
+      addFormRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 80);
+  };
+
   const addShared = async () => {
     if (!ctx?.couple_link_id) return;
 
@@ -403,6 +415,7 @@ export default function CoupleLedgerUI() {
 
       setAmount("");
       setMemo("");
+      setShowMobileAddForm(false);
       showToast("지출 레시피가 저장되었습니다.", "success");
       await refreshAll();
     } catch (e: any) {
@@ -422,6 +435,10 @@ export default function CoupleLedgerUI() {
     setEditCategory(item.category || "데이트");
     setEditMemo(item.memo || "");
     setEditExpenseDate(item.expense_date);
+
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, 50);
   };
 
   const cancelEdit = () => {
@@ -525,9 +542,9 @@ export default function CoupleLedgerUI() {
 
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-white p-6">
-        <Surface className="mx-auto max-w-xl p-6">
-          <div className="text-[20px] font-semibold tracking-[-0.02em] text-slate-900">
+      <div className="min-h-screen bg-white p-4 md:p-6">
+        <Surface className="mx-auto max-w-xl p-5 md:p-6">
+          <div className="text-[18px] md:text-[20px] font-semibold tracking-[-0.02em] text-slate-900">
             우리의 지출 레시피
           </div>
           <div className="mt-2 text-[14px] leading-6 text-slate-600">
@@ -546,11 +563,11 @@ export default function CoupleLedgerUI() {
   if (!ctx?.couple_link_id) {
     return (
       <div className="min-h-screen bg-white">
-        <div className="mx-auto max-w-5xl px-4 py-8 md:px-6">
-          <Surface className="p-6">
-            <div className="flex items-start justify-between gap-4">
+        <div className="mx-auto max-w-5xl px-4 py-6 md:px-6 md:py-8">
+          <Surface className="p-5 md:p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <div className="text-[22px] font-semibold tracking-[-0.02em] text-slate-900">
+                <div className="text-[20px] md:text-[22px] font-semibold tracking-[-0.02em] text-slate-900">
                   우리의 지출 레시피
                 </div>
                 <div className="mt-2 text-[14px] leading-6 text-slate-600">
@@ -590,20 +607,20 @@ export default function CoupleLedgerUI() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="mx-auto max-w-[1280px] px-4 py-8 md:px-6">
+    <div className="min-h-screen bg-white pb-24 md:pb-10">
+      <div className="mx-auto max-w-[1280px] px-4 py-5 md:px-6 md:py-8">
         <Surface className="overflow-hidden">
-          <div className="border-b border-[#F3F4F6] bg-white px-6 py-6">
+          <div className="border-b border-[#F3F4F6] bg-white px-4 py-5 md:px-6 md:py-6">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
               <div className="min-w-0">
-                <div className="text-[20px] font-semibold tracking-[-0.03em] text-slate-900">
+                <div className="text-[18px] md:text-[20px] font-semibold tracking-[-0.03em] text-slate-900">
                   우리의 지출 레시피
                 </div>
-                <div className="mt-2 max-w-2xl text-[14px] leading-6 text-slate-600">
-                  함께 쓴 돈을 한 장에 정리하고, 정산까지 자연스럽게 이어지는 커플 가계부입니다.
+                <div className="mt-2 max-w-2xl text-[10px] md:text-[14px] leading-6 text-slate-600">
+                  함께 쓴 돈을 한 장에 정리하고, 정산까지 이어지는 커플 가계부
                 </div>
 
-                <div className="mt-4 flex flex-wrap gap-2">
+                <div className="mt-4 flex flex-wrap gap-1 text-[6px]">
                   <Pill tone="accent">함께 기록 중</Pill>
                   <Pill tone={sharedLocked ? "muted" : "soft"}>
                     공동 공유 {sharedLocked ? "OFF" : "ON"}
@@ -625,7 +642,7 @@ export default function CoupleLedgerUI() {
             </div>
           </div>
 
-          <div className="grid gap-3 px-6 py-5 md:grid-cols-3">
+          <div className="grid gap-3 px-4 py-4 md:grid-cols-3 md:px-6 md:py-5">
             <DataCard
               label="이번달 함께 쓴 금액"
               value={`${money(thisMonthSharedTotal)}원`}
@@ -649,13 +666,13 @@ export default function CoupleLedgerUI() {
           </div>
         </Surface>
 
-        <Surface className="mt-5 p-6">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <Surface className="mt-4 md:mt-5 p-4 md:p-6">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <div className="text-[18px] font-semibold tracking-[-0.02em] text-slate-900">
+              <div className="text-[17px] md:text-[18px] font-semibold tracking-[-0.02em] text-slate-900">
                 정산 레시피
               </div>
-              <div className="mt-2 text-[14px] leading-6 text-slate-600">
+              <div className="mt-2 text-[10px] md:text-[14px] leading-6 text-slate-600">
                 공동 지출 기준으로 부담 비율에 맞춰 자동 계산됩니다.
               </div>
             </div>
@@ -664,7 +681,7 @@ export default function CoupleLedgerUI() {
               type="button"
               onClick={() => calcSettlement(undefined, false)}
               disabled={settling || sharedLocked}
-              className={primaryButtonClass}
+              className={cx("w-full sm:w-auto", primaryButtonClass)}
             >
               {settling ? "계산 중…" : "정산 다시 계산"}
             </button>
@@ -676,8 +693,8 @@ export default function CoupleLedgerUI() {
             </div>
           ) : (
             <>
-              <div className="mt-6 grid gap-4 xl:grid-cols-[1.05fr_0.9fr_1.15fr]">
-                <div className="rounded-[24px] border border-[#d5f9ff] bg-[#f9fdff] p-4">
+              <div className="mt-5 grid gap-4 xl:grid-cols-[1.05fr_0.9fr_1.15fr]">
+                <div className="rounded-[20px] md:rounded-[24px] border border-[#d5f9ff] bg-[#f9fdff] p-4">
                   <div className="text-[12px] font-medium text-slate-500">기간 설정</div>
 
                   <div className="mt-3 flex flex-wrap gap-2">
@@ -698,7 +715,7 @@ export default function CoupleLedgerUI() {
                       className={cx(
                         "rounded-[10px] px-3 py-1.5 text-[12px] font-medium transition",
                         period === "all"
-                          ? "bg-[#edf7ff] text-[#aadffe]"
+                          ? "bg-[#edf7ff] text-[#0c86ea]"
                           : "border border-slate-200 bg-white text-slate-600"
                       )}
                       onClick={() => setPeriod("all")}
@@ -710,7 +727,7 @@ export default function CoupleLedgerUI() {
                       className={cx(
                         "rounded-[10px] px-3 py-1.5 text-[12px] font-medium transition",
                         period === "custom"
-                          ? "bg-[#edf7ff] text-[#aadffe]"
+                          ? "bg-[#edf7ff] text-[#0c86ea]"
                           : "border border-slate-200 bg-white text-slate-600"
                       )}
                       onClick={() => setPeriod("custom")}
@@ -720,7 +737,7 @@ export default function CoupleLedgerUI() {
                   </div>
 
                   {period === "custom" && (
-                    <div className="mt-4 grid grid-cols-2 gap-2">
+                    <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
                       <input
                         type="date"
                         value={from}
@@ -737,7 +754,7 @@ export default function CoupleLedgerUI() {
                   )}
                 </div>
 
-                <div className="rounded-[24px] border border-[#d5f9ff] bg-white p-4">
+                <div className="rounded-[20px] md:rounded-[24px] border border-[#d5f9ff] bg-white p-4">
                   <div className="text-[12px] font-medium text-slate-500">내 부담 비율</div>
                   <div className="mt-2 text-[12px] leading-5 text-slate-500">
                     50이면 반반, 60이면 내가 60% 부담합니다.
@@ -752,7 +769,7 @@ export default function CoupleLedgerUI() {
                       onChange={(e) => setMySharePct(Number(e.target.value))}
                       className="w-full accent-[#69b6ff]"
                     />
-                    <div className="min-w-[68px] rounded-[16px] border border-[#aadffe] bg-[#edf7ff] px-3 py-2 text-center text-[14px] font-semibold text-[#aadffe]">
+                    <div className="min-w-[68px] rounded-[16px] border border-[#aadffe] bg-[#edf7ff] px-3 py-2 text-center text-[14px] font-semibold text-[#0c86ea]">
                       {mySharePct}%
                     </div>
                   </div>
@@ -762,16 +779,16 @@ export default function CoupleLedgerUI() {
                   </div>
                 </div>
 
-                <div className="rounded-[24px] border border-[#aadffe] bg-[#f9fdff] p-4">
+                <div className="rounded-[20px] md:rounded-[24px] border border-[#aadffe] bg-[#f9fdff] p-4">
                   <div className="text-[12px] font-medium text-slate-500">정산 결과</div>
 
                   {settlement ? (
                     <>
-                      <div className="mt-3 rounded-[20px] border border-[#d5f9ff] bg-white px-4 py-4">
+                      <div className="mt-3 rounded-[18px] md:rounded-[20px] border border-[#d5f9ff] bg-white px-4 py-4">
                         <div className="text-[11px] font-medium text-slate-500">
                           정산 문장
                         </div>
-                        <div className="mt-1 text-[17px] font-semibold leading-7 tracking-[-0.02em] text-slate-900">
+                        <div className="mt-1 text-[14px] md:text-[16px] font-semibold leading-7 tracking-[-0.02em] text-slate-900">
                           {settlement.who_pays_to === "even" && "이번 기간은 정산 없음"}
                           {settlement.who_pays_to === "me->partner" &&
                             `내가 상대에게 ${money(settlement.amount)}원 보내기`}
@@ -780,7 +797,7 @@ export default function CoupleLedgerUI() {
                         </div>
                       </div>
 
-                      <div className="mt-3 grid grid-cols-2 gap-2">
+                      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                         <DataCard
                           label="총 공동지출"
                           value={`${money(settlement.total_amount)}원`}
@@ -814,43 +831,57 @@ export default function CoupleLedgerUI() {
           )}
         </Surface>
 
-        <div className="mt-6 flex flex-wrap gap-2">
-          <TabButton
-            active={tab === "shared"}
-            onClick={() => setTab("shared")}
-            icon="🧾"
-            label="함께"
-          />
-          <TabButton
-            active={tab === "mine"}
-            onClick={() => setTab("mine")}
-            icon="✍️"
-            label="내 레시피"
-          />
-          <TabButton
-            active={tab === "partner"}
-            onClick={() => setTab("partner")}
-            icon="💌"
-            label="상대 레시피"
-          />
-        </div>
+        <div className="mt-5 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+  <div className="flex w-max min-w-max gap-2 px-0">
+    <TabButton
+      active={tab === "shared"}
+      onClick={() => setTab("shared")}
+      icon="🧾"
+      label="함께"
+    />
+    <TabButton
+      active={tab === "mine"}
+      onClick={() => setTab("mine")}
+      icon="✍️"
+      label="내 레시피"
+    />
+    <TabButton
+      active={tab === "partner"}
+      onClick={() => setTab("partner")}
+      icon="💌"
+      label="상대 레시피"
+    />
+  </div>
+</div>
 
-        <Surface className="mt-4 p-6">
-          <div className="flex items-start justify-between gap-3">
+        <Surface className="mt-4 p-4 md:p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <div className="text-[18px] font-semibold tracking-[-0.02em] text-slate-900">
+              <div className="text-[17px] md:text-[18px] font-semibold tracking-[-0.02em] text-slate-900">
                 {listTitle}
               </div>
-              <div className="mt-2 text-[13px] leading-5 text-slate-600">
+              <div className="mt-2 text-[10px] leading-5 text-slate-600">
                 {tab === "shared" && "둘이 함께 사용한 지출을 레시피처럼 남깁니다."}
                 {tab === "mine" && "내 개인 지출입니다. 개인 공유가 켜져 있어야 보입니다."}
                 {tab === "partner" && "상대 개인 지출입니다. 개인 공유가 켜져 있어야 보입니다."}
               </div>
             </div>
 
-            <button type="button" onClick={refreshAll} className={neutralButtonClass}>
-              새로고침
-            </button>
+            <div className="flex gap-2">
+              <button type="button" onClick={refreshAll} className={neutralButtonClass}>
+                새로고침
+              </button>
+
+              {tab === "shared" && !sharedLocked && (
+                <button
+                  type="button"
+                  onClick={openMobileAddForm}
+                  className="inline-flex md:hidden items-center justify-center rounded-[12px] bg-[#69b6ff] px-4 py-2.5 text-[10px] font-medium text-white"
+                >
+                  새 레시피
+                </button>
+              )}
+            </div>
           </div>
 
           {tab === "shared" && sharedLocked && (
@@ -866,20 +897,36 @@ export default function CoupleLedgerUI() {
           )}
 
           {tab === "shared" && !sharedLocked && (
-            <div className="mt-5 rounded-[24px] border border-[#aadffe] bg-[#f9fdff] p-5">
-              <div className="flex items-center justify-between gap-3">
+            <div
+              ref={addFormRef}
+              className={cx(
+                "mt-5 rounded-[20px] md:rounded-[24px] border border-[#aadffe] bg-[#f9fdff] p-4 md:p-5",
+                "block",
+                !showMobileAddForm && "hidden md:block"
+              )}
+            >
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <div className="text-[16px] font-semibold text-slate-900">
+                  <div className="text-[15px] md:text-[16px] font-semibold text-slate-900">
                     새 지출 레시피 적기
                   </div>
                   <div className="mt-1 text-[13px] text-slate-600">
                     오늘 함께 사용한 지출을 간단히 남겨보세요.
                   </div>
                 </div>
-                <Pill tone="accent">Recipe Note</Pill>
+                <div className="flex items-center gap-2">
+                  <Pill tone="accent">Recipe Note</Pill>
+                  <button
+                    type="button"
+                    onClick={() => setShowMobileAddForm(false)}
+                    className="inline-flex md:hidden rounded-[10px] border border-slate-200 bg-white px-3 py-1.5 text-[12px] text-slate-700"
+                  >
+                    닫기
+                  </button>
+                </div>
               </div>
 
-              <div className="mt-5 grid gap-3 md:grid-cols-5">
+              <div className="mt-5 grid gap-3 grid-cols-1 md:grid-cols-2 xl:grid-cols-5">
                 <RecipeField label="날짜">
                   <input
                     type="date"
@@ -925,7 +972,7 @@ export default function CoupleLedgerUI() {
                   />
                 </RecipeField>
 
-                <div className="md:col-span-1 flex items-end">
+                <div className="flex items-end">
                   <button
                     type="button"
                     onClick={addShared}
@@ -944,7 +991,7 @@ export default function CoupleLedgerUI() {
           )}
 
           {tab === "shared" && editingId && canEdit && (
-            <div className="mt-5 rounded-[24px] border border-[#aadffe] bg-[#f9fdff] p-5">
+            <div className="mt-5 rounded-[20px] md:rounded-[24px] border border-[#aadffe] bg-[#f9fdff] p-4 md:p-5">
               <div className="text-[15px] font-semibold text-slate-900">
                 지출 레시피 수정
               </div>
@@ -952,7 +999,7 @@ export default function CoupleLedgerUI() {
                 선택한 항목을 다시 정리합니다.
               </div>
 
-              <div className="mt-4 grid gap-3 md:grid-cols-4">
+              <div className="mt-4 grid gap-3 grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
                 <RecipeField label="날짜">
                   <input
                     type="date"
@@ -997,16 +1044,20 @@ export default function CoupleLedgerUI() {
                 </RecipeField>
               </div>
 
-              <div className="mt-5 flex gap-2">
+              <div className="mt-5 flex flex-col gap-2 sm:flex-row">
                 <button
                   type="button"
                   onClick={saveEdit}
                   disabled={updating}
-                  className={primaryButtonClass}
+                  className={cx("w-full sm:w-auto", primaryButtonClass)}
                 >
                   {updating ? "저장 중…" : "수정 저장"}
                 </button>
-                <button type="button" onClick={cancelEdit} className={neutralButtonClass}>
+                <button
+                  type="button"
+                  onClick={cancelEdit}
+                  className={cx("w-full sm:w-auto", neutralButtonClass)}
+                >
                   취소
                 </button>
               </div>
@@ -1015,7 +1066,7 @@ export default function CoupleLedgerUI() {
 
           <div className="mt-6 grid gap-3">
             {list.length === 0 ? (
-              <div className="rounded-[22px] border border-slate-200 bg-slate-50 p-8 text-center text-[14px] text-slate-600">
+              <div className="rounded-[20px] md:rounded-[22px] border border-slate-200 bg-slate-50 p-8 text-center text-[14px] text-slate-600">
                 아직 항목이 없습니다.{" "}
                 {tab === "shared" ? "공동 지출을 추가해 보세요." : "공유 설정을 확인하세요."}
               </div>
@@ -1023,16 +1074,16 @@ export default function CoupleLedgerUI() {
               list.map((e: any) => (
                 <div
                   key={e.id}
-                  className="group rounded-[22px] border border-[#F3F4F6] bg-white px-4 py-4 shadow-[0_8px_20px_rgba(27,22,17,0.03)] transition hover:shadow-[0_14px_28px_rgba(27,22,17,0.05)]"
+                  className="group rounded-[18px] md:rounded-[22px] border border-[#F3F4F6] bg-white px-4 py-4 shadow-[0_8px_20px_rgba(27,22,17,0.03)] transition hover:shadow-[0_14px_28px_rgba(27,22,17,0.05)]"
                 >
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="truncate text-[15px] font-semibold text-slate-900">
+                        <span className="truncate text-[14px] md:text-[15px] font-semibold text-slate-900">
                           {e.memo?.trim() ? e.memo : "지출"}
                         </span>
 
-                        <span className="rounded-[10px] bg-[#edf7ff] px-2.5 py-1 text-[11px] font-medium text-[#aadffe]">
+                        <span className="rounded-[10px] bg-[#edf7ff] px-2.5 py-1 text-[11px] font-medium text-[#0c86ea]">
                           {e.category || "기타"}
                         </span>
 
@@ -1056,17 +1107,17 @@ export default function CoupleLedgerUI() {
                       </div>
                     </div>
 
-                    <div className="flex shrink-0 items-center gap-3">
-                      <div className="text-[15px] font-semibold text-[#aadffe]">
+                    <div className="flex flex-col items-stretch gap-2 sm:items-end sm:text-right">
+                      <div className="text-[15px] font-semibold text-[#0c86ea]">
                         {money(e.amount)}원
                       </div>
 
                       {tab === "shared" && canEdit && (
-                        <div className="flex items-center gap-2 opacity-100 md:opacity-0 md:transition md:group-hover:opacity-100">
+                        <div className="flex flex-wrap items-center gap-2 opacity-100 md:opacity-0 md:transition md:group-hover:opacity-100">
                           <button
                             type="button"
                             onClick={() => startEdit(e as CoupleExpense)}
-                            className="rounded-[10px] border border-[#aadffe] bg-white px-3 py-1.5 text-[11px] font-medium text-[#aadffe] hover:bg-[#edf7ff]"
+                            className="rounded-[10px] border border-[#aadffe] bg-white px-3 py-1.5 text-[11px] font-medium text-[#0c86ea] hover:bg-[#edf7ff]"
                             title="수정"
                           >
                             수정
@@ -1088,17 +1139,28 @@ export default function CoupleLedgerUI() {
             )}
           </div>
 
-          <div className="mt-5 rounded-[22px] border border-[#d5f9ff] bg-[#f9fdff] p-4 text-[11px] leading-5 text-slate-600">
+          <div className="mt-5 rounded-[20px] md:rounded-[22px] border border-[#d5f9ff] bg-[#f9fdff] p-4 text-[11px] leading-5 text-slate-600">
             <b className="text-slate-900">운영 원칙</b>
-            <div className="mt-1">
-              - 개인 지출 공유는 정보는 늘리지만 갈등 비용도 높일 수 있으므로 기본 OFF가 합리적입니다.
+            <div className="mt-1 text-[8px] sm:text-[8px]">
+              - 개인 지출 공유는 갈등도 높일 수 있으므로 OFF가 합리적입니다.
             </div>
-            <div className="mt-1">
-              - 공동 지출은 정산의 기준이 되므로, 날짜와 메모를 정확히 남길수록 거래비용이 줄어듭니다.
+            <div className="mt-1 text-[8px] sm:text-[8px]">
+              - 날짜와 메모를 정확히 남길수록 거래비용이 줄어듭니다.
             </div>
           </div>
         </Surface>
       </div>
+
+      {tab === "shared" && !sharedLocked && (
+        <button
+          type="button"
+          onClick={openMobileAddForm}
+          className="fixed bottom-5 right-4 z-40 inline-flex md:hidden items-center gap-2 rounded-full bg-[#69b6ff] px-4 py-3 text-[13px] font-semibold text-white shadow-[0_14px_30px_rgba(12,134,234,0.28)]"
+        >
+          <span className="text-[16px]">＋</span>
+          <span>새 레시피</span>
+        </button>
+      )}
 
       {toast && (
         <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 px-4">

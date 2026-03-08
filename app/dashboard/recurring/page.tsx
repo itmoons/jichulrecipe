@@ -864,7 +864,7 @@ export default function RecurringManagerPage() {
                 <div>
                   <div className={styles.cardTitle}>{editingId ? "정기 규칙 수정" : "정기 규칙 추가"}</div>
                   <div className={styles.cardDesc}>
-                    여기서는 <b>정기 규칙(템플릿)</b>만 관리합니다. (달력 반영은 ‘선택 월에 적용(동기화)’)
+                    여기서는 <b>정기 규칙</b>만 관리합니다.
                   </div>
                 </div>
               </div>

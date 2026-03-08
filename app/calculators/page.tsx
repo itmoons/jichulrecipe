@@ -18,16 +18,15 @@ type Category = {
   items: CalcItem[];
 };
 
-/** ✅ 레시피북 톤(연노랑 + 주황) */
 const UI = {
-  paperBg: "bg-[#ffffff]", // 연노랑 종이
+  paperBg: "bg-[#fffdf8]",
   paperDots:
-    "bg-[radial-gradient(circle,rgba(251,146,60,0.14)_1px,transparent_1px)] bg-[size:16px_16px]", // 은은한 점무늬
-  ink: "text-[#3B2F1E]", // 잉크색(진한 브라운)
+    "bg-[radial-gradient(circle,rgba(91,187,243,0.12)_1px,transparent_1px)] bg-[size:16px_16px]",
+  ink: "text-[#3B2F1E]",
   inkSoft: "text-[#7f7f7f]",
   blue: "#5bbbf3",
-  blueDark: "#5bbbf3",
-  card: "bg-[#f2fbff] border-[#e8f8ff]",
+  blueDark: "#3da8ff",
+  card: "bg-[#f8fdff] border-[#dff4ff]",
 };
 
 const categories: Category[] = [
@@ -252,7 +251,13 @@ export default function CalculatorsHubPage() {
   const allItems = useMemo(() => {
     const list: Array<CalcItem & { categoryKey: string; categoryTitle: string }> = [];
     for (const c of categories) {
-      for (const it of c.items) list.push({ ...it, categoryKey: c.key, categoryTitle: c.title });
+      for (const it of c.items) {
+        list.push({
+          ...it,
+          categoryKey: c.key,
+          categoryTitle: c.title,
+        });
+      }
     }
     return list;
   }, []);
@@ -281,17 +286,54 @@ export default function CalculatorsHubPage() {
   const totalCount = allItems.length;
 
   return (
-    <div className={cn("min-h-screen", UI.paperBg)}>
-      {/* 배경 질감 */}
+    <div className={cn("min-h-screen", UI.paperBg, UI.ink)}>
       <div className={cn("min-h-screen", UI.paperDots)}>
-        <div className="mx-auto w-[1240px] px-4 py-8 sm:py-10">
+        <div className="mx-auto w-full max-w-[1280px] px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
+          {/* 모바일 상단 히어로 */}
+          <div className="mb-5 sm:mb-8">
+            <div className="overflow-hidden rounded-[28px] border border-[#dff4ff] bg-white shadow-[0_12px_30px_rgba(91,187,243,0.10)]">
+              <div className="bg-[linear-gradient(135deg,#f2fbff_0%,#ffffff_55%,#fff7ed_100%)] px-4 py-5 sm:px-6 sm:py-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="inline-flex items-center rounded-full border border-[#dff4ff] bg-[#f8fdff] px-2.5 py-1 text-[11px] font-semibold text-[#3da8ff]">
+                      지출레시피 계산기 모음
+                    </div>
+                    <h1 className="mt-3 text-[18px] font-bold leading-tight text-[#3B2F1E] sm:text-[20px]">
+                      생활비부터 대출까지
+                      <br className="sm:hidden" /> 한 번에 계산하세요
+                    </h1>
+                    <p className="mt-2 max-w-[720px] text-[13px] leading-6 text-[#7f7f7f] sm:text-[14px]">
+                      모바일에서도 보기 편하게, 자주 쓰는 가계 계산기를 한곳에 모았습니다.
+                    </p>
+                  </div>
 
-          {/* 검색 + 필터(모바일 최적) */}
-          <div className="mb-8 sm:mb-10">
-            <div className="grid gap-3 sm:gap-4">
-              <div className={cn("rounded-2xl border p-4 sm:p-5 shadow-sm", UI.card)}>
-                <div className="flex flex-col gap-2">
-                  <label className={cn("text-[12px] font-semibold", UI.ink)}>검색</label>
+                  <div className="hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#5bbbf3] text-2xl text-white shadow-sm">
+                    🧾
+                  </div>
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+                  <div className="rounded-2xl border border-[#dff4ff] bg-white px-3 py-2">
+                    <div className="text-[11px] text-[#7f7f7f]">전체 계산기</div>
+                    <div className="mt-1 text-[16px] font-bold text-[#3B2F1E]">{totalCount}개</div>
+                  </div>
+                  <div className="rounded-2xl border border-[#dff4ff] bg-white px-3 py-2">
+                    <div className="text-[11px] text-[#7f7f7f]">현재 결과</div>
+                    <div className="mt-1 text-[16px] font-bold text-[#3B2F1E]">{filtered.length}개</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 검색 + 카테고리 */}
+          <div className="mb-6 sm:mb-8">
+            <div className={cn("rounded-[28px] border p-4 shadow-sm sm:p-5", UI.card)}>
+              <div className="flex flex-col gap-4">
+                <div>
+                  <label className="mb-2 block text-[12px] font-semibold text-[#3B2F1E]">
+                    검색
+                  </label>
 
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9C7A55]">
@@ -300,28 +342,30 @@ export default function CalculatorsHubPage() {
                     <input
                       value={q}
                       onChange={(e) => setQ(e.target.value)}
-                      placeholder="예: 구독, 고정비, DSR, 실수령…"
+                      placeholder="예: 구독, 고정비, DSR, 실수령"
                       className={cn(
-                        "h-11 w-full rounded-xl border bg-white pl-9 pr-3 text-[12px] outline-none",
-                        "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
+                        "h-12 w-full rounded-2xl border bg-white pl-10 pr-4 text-[13px] outline-none",
+                        "border-[#dff4ff] placeholder:text-[#b0b0b0]",
+                        "focus:border-[#5bbbf3] focus:ring-4 focus:ring-[#5bbbf3]/15"
                       )}
                     />
                   </div>
+                </div>
 
-                  <div className={cn("text-xs", UI.inkSoft)}>
-                    현재 표시: <span className={cn("font-semibold", UI.ink)}>{filtered.length}</span> /{" "}
-                    {totalCount}
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-[12px] font-semibold text-[#3B2F1E]">카테고리</span>
+                    <span className="text-[11px] text-[#7f7f7f]">좌우로 밀어서 보기</span>
                   </div>
 
-                  {/* ✅ 카테고리 칩(모바일 가로 스크롤) */}
-                  <div className="mt-2 -mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     <button
                       onClick={() => setActiveCat("all")}
                       className={cn(
-                        "shrink-0 rounded-[10px] border px-4 py-2 text-[12px] font-medium transition",
+                        "shrink-0 rounded-full border px-4 py-2 text-[12px] font-semibold transition",
                         activeCat === "all"
                           ? "border-[#5bbbf3] bg-[#5bbbf3] text-white shadow-sm"
-                          : "border-[#e8f8ff] bg-white text-[#7f7f7f] hover:border-[#5bbbf3]"
+                          : "border-[#dff4ff] bg-white text-[#666] hover:border-[#5bbbf3]"
                       )}
                     >
                       전체
@@ -332,10 +376,10 @@ export default function CalculatorsHubPage() {
                         key={c.key}
                         onClick={() => setActiveCat(c.key)}
                         className={cn(
-                          "shrink-0 rounded-[10px] border px-4 py-2 text-[12px] font-medium transition",
+                          "shrink-0 rounded-full border px-4 py-2 text-[12px] font-semibold transition",
                           activeCat === c.key
                             ? "border-[#5bbbf3] bg-[#5bbbf3] text-white shadow-sm"
-                            : "border-[#e8f8ff] bg-white text-[#7f7f7f] hover:border-[#5bbbf3]"
+                            : "border-[#dff4ff] bg-white text-[#666] hover:border-[#5bbbf3]"
                         )}
                       >
                         {c.title}
@@ -348,7 +392,7 @@ export default function CalculatorsHubPage() {
           </div>
 
           {/* 카테고리별 섹션 */}
-          <div className="space-y-8 sm:space-y-10">
+          <div className="space-y-6 sm:space-y-8">
             {categories.map((cat) => {
               const items = grouped.get(cat.key) ?? [];
               if (activeCat !== "all" && activeCat !== cat.key) return null;
@@ -358,61 +402,55 @@ export default function CalculatorsHubPage() {
                 <section
                   key={cat.key}
                   className={cn(
-                    "rounded-3xl border p-4 sm:p-6 shadow-[0_10px_30px_rgba(251,146,60,0.10)]",
+                    "overflow-hidden rounded-[28px] border shadow-[0_10px_30px_rgba(91,187,243,0.08)]",
                     UI.card
                   )}
                 >
-                  {/* 섹션 헤더 */}
-                  <div className="mb-4">
+                  <div className="border-b border-[#e9f7ff] bg-[linear-gradient(180deg,#ffffff_0%,#f6fcff_100%)] px-4 py-4 sm:px-6 sm:py-5">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-[#5bbbf3] text-[#ffffff]">
+                          <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-[#5bbbf3] text-white shadow-sm">
                             🍊
                           </span>
-                          <h2 className={cn("text-lg sm:text-xl font-semibold", UI.ink)}>
+                          <h2 className="text-[17px] font-bold leading-tight text-[#3B2F1E] sm:text-[20px]">
                             {cat.title}
                           </h2>
                         </div>
-                        <p className={cn("mt-2 text-[12px] leading-relaxed", UI.inkSoft)}>{cat.subtitle}</p>
+                        <p className="mt-2 text-[12px] leading-5 text-[#7f7f7f] sm:text-[13px]">
+                          {cat.subtitle}
+                        </p>
                       </div>
 
-                      <div className="shrink-0">
-                        <div className="rounded-[10px] bg-[#5bbbf3] px-3 py-1 text-[12px] font-semibold text-[#ffffff]">
-                          {items.length}개
-                        </div>
+                      <div className="shrink-0 rounded-full bg-[#eaf9ff] px-3 py-1 text-[12px] font-semibold text-[#3da8ff]">
+                        {items.length}개
                       </div>
                     </div>
                   </div>
 
-                  {/* 카드 그리드(모바일/태블릿 최적) */}
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-3 lg:p-6">
                     {items.map((it) => (
                       <Link
                         key={it.slug}
                         href={`/calculators/${it.slug}`}
                         className={cn(
-                          "group rounded-2xl border bg-white p-4 transition",
-                          "border-[#e8f8ff] hover:border-[#5bbbf3] hover:shadow-[0_12px_30px_rgba(249,115,22,0.12)]"
+                          "group rounded-[24px] border bg-white p-4 transition",
+                          "border-[#dff4ff]",
+                          "hover:-translate-y-[1px] hover:border-[#5bbbf3] hover:shadow-[0_12px_26px_rgba(91,187,243,0.14)]"
                         )}
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
-                            <div className={cn("text-base font-semibold", UI.ink)}>
+                            <div className="text-[15px] font-bold leading-6 text-[#3B2F1E] sm:text-[16px]">
                               {it.title}
                             </div>
-                            <div className={cn("mt-1 line-clamp-2 text-[12px]", UI.inkSoft)}>
+                            <div className="mt-1 line-clamp-2 text-[12px] leading-5 text-[#7f7f7f]">
                               {it.desc}
                             </div>
                           </div>
 
-                          <div
-                            className={cn(
-                              "shrink-0 rounded-[10px] border px-3 py-1 text-xs font-semibold",
-                              "border-[#5bbbf3] bg-[#5bbbf3] text-[#ffffff]"
-                            )}
-                          >
-                            열기 →
+                          <div className="shrink-0 rounded-full border border-[#dff4ff] bg-[#f6fcff] px-3 py-1 text-[11px] font-semibold text-[#3da8ff]">
+                            열기
                           </div>
                         </div>
 
@@ -420,10 +458,7 @@ export default function CalculatorsHubPage() {
                           {it.tags.map((t) => (
                             <span
                               key={t}
-                              className={cn(
-                                "rounded-[10px] px-2 py-1 text-xs font-medium",
-                                "bg-[#f2fbff] text-[#7f7f7f] border border-[#e8f8ff]"
-                              )}
+                              className="rounded-full border border-[#e8f6ff] bg-[#f8fdff] px-2.5 py-1 text-[11px] font-medium text-[#6f6f6f]"
                             >
                               #{t}
                             </span>
@@ -437,40 +472,41 @@ export default function CalculatorsHubPage() {
             })}
 
             {filtered.length === 0 && (
-              <div className={cn("rounded-3xl border p-8 sm:p-10 text-center shadow-sm", UI.card)}>
-                <div className={cn("text-lg font-semibold", UI.ink)}>검색 결과가 없습니다.</div>
-                <div className={cn("mt-2 text-[12px]", UI.inkSoft)}>다른 키워드로 다시 시도해 보세요.</div>
+              <div className={cn("rounded-[28px] border p-8 text-center shadow-sm", UI.card)}>
+                <div className="text-[18px] font-bold text-[#3B2F1E]">
+                  검색 결과가 없습니다
+                </div>
+                <div className="mt-2 text-[12px] text-[#7f7f7f]">
+                  다른 키워드로 다시 검색해 보세요.
+                </div>
               </div>
             )}
           </div>
 
           {/* 하단 CTA */}
-          <div className={cn("mt-10 sm:mt-12 rounded-3xl border p-5 sm:p-6 shadow-sm", UI.card)}>
-            <div className="flex flex-col gap-4  sm:items-center sm:justify-between">
+          <div className={cn("mt-8 rounded-[28px] border p-4 shadow-sm sm:mt-10 sm:p-6", UI.card)}>
+            <div className="flex flex-col gap-4">
               <div className="min-w-0">
-                <div className={cn("text-lg font-semibold", UI.ink)}>다음 단계</div>
-                <p className={cn("mt-1 text-[12px] leading-relaxed", UI.inkSoft)}>
-                  계산 결과를 바탕으로 <span className="font-semibold text-[#3da8ff]">“고정비 점검 → 구독 정리 → 예산 배분”</span>{" "}
+                <div className="text-[18px] font-bold text-[#3B2F1E]">다음 단계</div>
+                <p className="mt-2 text-[12px] leading-6 text-[#7f7f7f] sm:text-[13px]">
+                  계산 결과를 바탕으로{" "}
+                  <span className="font-semibold text-[#3da8ff]">
+                    고정비 점검 → 구독 정리 → 예산 배분
+                  </span>{" "}
                   순서로 정리하면 효과가 빠릅니다.
                 </p>
               </div>
 
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
                 <Link
                   href="/"
-                  className={cn(
-                    "rounded-2xl border bg-white px-4 py-2 text-[12px] font-semibold transition",
-                    "border-[#f2fbff] text-[#7f7f7f] hover:border-[#5bbbf3]"
-                  )}
+                  className="inline-flex items-center justify-center rounded-2xl border border-[#dff4ff] bg-white px-4 py-3 text-[12px] font-semibold text-[#666] transition hover:border-[#5bbbf3]"
                 >
                   지출레시피 홈으로
                 </Link>
                 <Link
                   href="/calculators/subscription-total"
-                  className={cn(
-                    "rounded-2xl px-4 py-2 text-[12px] font-semibold text-white transition shadow-sm",
-                    "bg-[#5bbbf3] hover:bg-[#EA580C]"
-                  )}
+                  className="inline-flex items-center justify-center rounded-2xl bg-[#5bbbf3] px-4 py-3 text-[12px] font-semibold text-white transition hover:bg-[#3da8ff]"
                 >
                   구독 총액 계산부터
                 </Link>
@@ -478,8 +514,7 @@ export default function CalculatorsHubPage() {
             </div>
           </div>
 
-          {/* 하단 여백 */}
-          <div className="h-6" />
+          <div className="h-8" />
         </div>
       </div>
     </div>

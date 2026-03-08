@@ -69,7 +69,7 @@ body {
 
 /* 지출레시피 Theme (네가 추가했던 오렌지 변수/배경은 그대로 유지 가능) */
 :root {
-  --background: #f0fcff;
+  --background: #eef6ff;
   --foreground: #171717;
 
   --recipe-blue: #3dd8ff;

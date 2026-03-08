@@ -7,10 +7,9 @@ import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import NotificationsPanel from "@/components/NotificationsPanel";
 
-const BRAND_blue = "#4cbcff";
+const BRAND_BLUE = "#4cbcff";
 const BRAND_SKY = "#BCE6FF";
 
-// 공개 라우트
 const PUBLIC_ROUTES = ["/", "/calculators"];
 
 function isPublicRoute(target: string) {
@@ -143,6 +142,11 @@ export function SiteHeader() {
     return () => window.removeEventListener("mousedown", onDown);
   }, [isNotifOpen]);
 
+  useEffect(() => {
+    setIsNavOpen(false);
+    setIsNotifOpen(false);
+  }, [pathname]);
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setIsNavOpen(false);
@@ -174,54 +178,95 @@ export function SiteHeader() {
     return isLoggedIn ? target : "/sign-in";
   };
 
+  const mobileMenuItems = [
+    {
+      href: "/dashboard/calendar",
+      label: "레시피 달력",
+      active: pathname?.startsWith("/dashboard/calendar"),
+    },
+    {
+      href: "/dashboard",
+      label: "레시피 분석",
+      active: pathname === "/dashboard" || pathname?.startsWith("/dashboard/yearly"),
+    },
+    {
+      href: "/dashboard/recurring",
+      label: "정기 등록",
+      active: pathname?.startsWith("/dashboard/recurring"),
+    },
+    {
+      href: "/saving",
+      label: "적금 저장",
+      active: pathname?.startsWith("/saving"),
+    },
+    {
+      href: "/dashboard/gifts",
+      label: "경조사비",
+      active: pathname?.startsWith("/dashboard/gifts"),
+    },
+    {
+      href: "/calculators",
+      label: "계산기",
+      active: pathname?.startsWith("/calculators"),
+    },
+    {
+      href: "/couple-ledger",
+      label: "커플 장부",
+      active: pathname?.startsWith("/couple-ledger"),
+    },
+  ];
+
   return (
     <header className="sticky top-0 z-40 w-full">
       {/* 1차 헤더 */}
-      <div className="border-b border-slate-200 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex h-[72px] w-full max-w-[1280px] items-center justify-between px-4 sm:px-6">
+      <div className="border-b border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+        <div className="mx-auto flex h-[64px] w-full max-w-[1280px] items-center justify-between px-3 sm:h-[72px] sm:px-6">
           {/* 좌측 */}
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             <button
               type="button"
               onClick={toggleNav}
-              className="flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-700 shadow-sm md:hidden"
+              className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-[6px] border border-slate-200 bg-white text-slate-700 shadow-sm md:hidden"
               aria-label="메뉴 열기"
               aria-expanded={isNavOpen}
             >
-              <span className="text-lg">{isNavOpen ? "✕" : "☰"}</span>
+              <span className="text-[14px] leading-none">{isNavOpen ? "✕" : "☰"}</span>
             </button>
 
             <Link
               href="/"
-              className="flex items-center gap-3"
+              className="flex min-w-0 items-center gap-2.5 sm:gap-3"
               onClick={() => {
                 closeNav();
                 closeNotif();
               }}
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 bg-white shadow-sm">
-                <Image
-                  src="/logo/logo.png"
-                  alt="지출레시피 로고"
-                  width={26}
-                  height={26}
-                  priority
-                />
+              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[6px] border border-slate-200 bg-white p-1.5 shadow-sm sm:h-12 sm:w-12 sm:p-2">
+                <div className="relative h-full w-full">
+                  <Image
+                    src="/logo/logo.png"
+                    alt="지출레시피 로고"
+                    fill
+                    priority
+                    className="object-contain"
+                    sizes="(max-width: 640px) 44px, 48px"
+                  />
+                </div>
               </div>
 
-              <div className="flex flex-col leading-tight">
-                <span className="text-[22px] font-black tracking-[-0.04em] text-slate-700">
-                  지출<span className="text-blue-400">recipe</span>
-                </span>
-                <span className="text-[11px] text-slate-400">
+              <div className="min-w-0 leading-tight">
+                <div className="truncate text-[14px] font-black tracking-[-0.04em] text-slate-800 sm:text-[20px]">
+                  지출<span className="text-sky-400">recipe</span>
+                </div>
+                <div className="hidden text-[14px] text-slate-400 sm:block">
                   프리미엄 무료 가계부 사이트
-                </span>
+                </div>
               </div>
             </Link>
           </div>
 
-          {/* 가운데 메뉴 */}
-          <nav className="hidden items-center gap-2 text-[13px] font-semibold text-slate-600 lg:flex">
+          {/* 가운데 메뉴 - 데스크탑 */}
+          <nav className="hidden items-center gap-2 text-[14px] font-semibold text-slate-600 lg:flex">
             <Link
               href={guardedHref("/dashboard/calendar")}
               className={[
@@ -315,22 +360,23 @@ export function SiteHeader() {
           </nav>
 
           {/* 우측 */}
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             {!checking && isLoggedIn && (
-              <div className="relative" ref={notifWrapRef}>
+              <div className="relative hidden md:block" ref={notifWrapRef}>
                 <button
                   type="button"
                   onClick={toggleNotif}
-                  className="relative rounded-md border border-slate-200 bg-white px-3 py-2 text-[12px] font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+                  className="relative inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-3 text-[14px] font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
                   aria-label="알림"
                   aria-expanded={isNotifOpen}
                 >
-                  <span className="mr-1">🔔</span>
-                  <span className="hidden sm:inline">알림</span>
+                  <span className="text-[14px] leading-none">🔔</span>
+                  <span className="ml-1">알림</span>
+
                   {unreadCount > 0 && (
                     <span
-                      className="ml-2 inline-flex min-w-[18px] items-center justify-center rounded-full bg-[color:var(--brand-blue)] px-1.5 py-0.5 text-[10px] font-bold text-white"
-                      style={{ ["--brand-blue" as any]: BRAND_blue }}
+                      className="absolute -right-1 -top-1 inline-flex min-w-[18px] items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold text-white"
+                      style={{ backgroundColor: BRAND_BLUE }}
                     >
                       {unreadCount > 99 ? "99+" : unreadCount}
                     </span>
@@ -338,21 +384,21 @@ export function SiteHeader() {
                 </button>
 
                 {isNotifOpen && (
-                  <div className="absolute right-0 mt-2 w-[560px] max-w-[92vw]">
+                  <div className="absolute right-0 mt-2 w-[min(560px,92vw)]">
                     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
                       <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-                        <div className="text-[12px] font-extrabold text-slate-900">
+                        <div className="text-[14px] font-extrabold text-slate-900">
                           알림 센터
                         </div>
                         <button
                           type="button"
                           onClick={closeNotif}
-                          className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-50"
+                          className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[14px] font-semibold text-slate-700 hover:bg-slate-50"
                         >
                           닫기
                         </button>
                       </div>
-                      <div className="p-3">
+                      <div className="max-h-[70vh] overflow-y-auto p-3">
                         <NotificationsPanel onClose={closeNotif} />
                       </div>
                     </div>
@@ -366,14 +412,14 @@ export function SiteHeader() {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="rounded-md border border-slate-200 bg-white px-3 py-2 text-[12px] font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+                  className="inline-flex h-10 items-center justify-center rounded-[10px] border border-slate-200 bg-white px-3 text-[10px] font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
                 >
                   로그아웃
                 </button>
               ) : (
                 <Link
                   href="/sign-in"
-                  className="rounded-md bg-slate-900 px-3 py-2 text-[12px] font-semibold text-white shadow-sm transition hover:bg-black"
+                  className="inline-flex h-10 items-center justify-center rounded-[10px] bg-slate-900 px-3 text-[10px] font-semibold text-white shadow-sm transition hover:bg-black"
                 >
                   로그인
                 </Link>
@@ -382,161 +428,78 @@ export function SiteHeader() {
         </div>
       </div>
 
-      {/* 2차 프로모션 탭 */}
-      <div className="border-b border-slate-200 bg-[#fafafa]">
-        <div className="mx-auto hidden w-full max-w-[980px] items-center justify-center px-4 md:flex">
-          {[
-            { label: "지출관리 필수 계산기", active: false, dark: true },
-            { label: "적금 관리", active: false, dark: true },
-            { label: "사회초년생 가계부", active: true, dark: false },
-            { label: "경조사비 관리", active: false, dark: true },
-          ].map((item) => (
-            <div
-              key={item.label}
-              className={[
-                "flex h-12 flex-1 items-center justify-center border-x border-slate-200 text-center text-[13px] font-bold",
-                item.active
-                  ? "bg-[color:var(--brand-sky)] text-slate-900"
-                  : item.dark
-                  ? "bg-[#242424] text-white"
-                  : "bg-white text-slate-700",
-              ].join(" ")}
-              style={{ ["--brand-sky" as any]: BRAND_SKY }}
-            >
-              {item.label}
-            </div>
-          ))}
-        </div>
+      
 
-        {/* 모바일용 작은 보조 탭 */}
-        <div className="px-4 py-2 text-center text-[11px] font-semibold text-slate-600 md:hidden">
-          <span className="rounded-full bg-[#BCE6FF] px-3 py-1 text-slate-800">
-            첫 기록 혜택 진행 중
-          </span>
-        </div>
+        {/* 2차 프로모션 탭 */}
+<div className="border-b border-slate-200 bg-[#fafafa]">
+  <div className="mx-auto hidden w-full max-w-[980px] items-center justify-center px-4 md:flex">
+    {[
+      { label: "지출관리 필수 계산기", active: false, dark: true },
+      { label: "적금 관리", active: false, dark: true },
+      { label: "사회초년생 가계부", active: true, dark: false },
+      { label: "경조사비 관리", active: false, dark: true },
+    ].map((item) => (
+      <div
+        key={item.label}
+        className={[
+          "flex h-12 flex-1 items-center justify-center border-x border-slate-200 text-center text-[14px] font-bold",
+          item.active
+            ? "text-slate-900"
+            : item.dark
+            ? "bg-[#242424] text-white"
+            : "bg-white text-slate-700",
+        ].join(" ")}
+        style={{
+          backgroundColor: item.active ? BRAND_SKY : undefined,
+        }}
+      >
+        {item.label}
       </div>
+    ))}
+  </div>
+</div>
 
       {/* 모바일 메뉴 */}
       {isNavOpen && (
-        <div className="border-t border-slate-200 bg-white md:hidden">
-          <nav className="mx-auto flex w-full max-w-full flex-col gap-1 px-4 py-3 text-[12px] font-medium text-slate-700">
-            <Link
-              href={guardedHref("/dashboard/calendar")}
-              className={[
-                "rounded-md px-3 py-2",
-                pathname?.startsWith("/dashboard/calendar")
-                  ? "bg-slate-100 text-slate-900"
-                  : "hover:bg-slate-50",
-              ].join(" ")}
-              onClick={() => {
-                closeNav();
-                closeNotif();
-              }}
-            >
-              레시피 달력
-            </Link>
+        <div className="border-b border-slate-200 bg-white/95 px-3 py-3 shadow-sm md:hidden">
+          <div className="mx-auto max-w-[1280px]">
+            <nav className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div className="border-b border-slate-100 px-4 py-3">
+                <div className="text-[14px] font-extrabold text-slate-900">메뉴</div>
+                <div className="mt-1 text-[10px] leading-5 text-slate-500">
+                  원하는 가계부 기능으로 바로 이동하세요.
+                </div>
+              </div>
 
-            <Link
-              href={guardedHref("/dashboard")}
-              className={[
-                "rounded-md px-3 py-2",
-                pathname === "/dashboard" || pathname?.startsWith("/dashboard/yearly")
-                  ? "bg-slate-100 text-slate-900"
-                  : "hover:bg-slate-50",
-              ].join(" ")}
-              onClick={() => {
-                closeNav();
-                closeNotif();
-              }}
-            >
-              레시피 분석
-            </Link>
+              <div className="grid grid-cols-2 gap-2 p-3">
+                {mobileMenuItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={guardedHref(item.href)}
+                    className={[
+                      "rounded-xl border px-3 py-3 text-[10px] font-semibold transition",
+                      item.active
+                        ? "border-slate-300 bg-slate-100 text-slate-900"
+                        : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
+                    ].join(" ")}
+                    onClick={() => {
+                      closeNav();
+                      closeNotif();
+                    }}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
 
-            <Link
-              href={guardedHref("/dashboard/recurring")}
-              className={[
-                "rounded-md px-3 py-2",
-                pathname?.startsWith("/dashboard/recurring")
-                  ? "bg-slate-100 text-slate-900"
-                  : "hover:bg-slate-50",
-              ].join(" ")}
-              onClick={() => {
-                closeNav();
-                closeNotif();
-              }}
-            >
-              정기레시피 등록
-            </Link>
-
-            <Link
-              href={guardedHref("/saving")}
-              className={[
-                "rounded-md px-3 py-2",
-                pathname?.startsWith("/saving")
-                  ? "bg-slate-100 text-slate-900"
-                  : "hover:bg-slate-50",
-              ].join(" ")}
-              onClick={() => {
-                closeNav();
-                closeNotif();
-              }}
-            >
-              재료 저장(적금)
-            </Link>
-
-            <Link
-              href={guardedHref("/dashboard/gifts")}
-              className={[
-                "rounded-md px-3 py-2",
-                pathname?.startsWith("/dashboard/gifts")
-                  ? "bg-slate-100 text-slate-900"
-                  : "hover:bg-slate-50",
-              ].join(" ")}
-              onClick={() => {
-                closeNav();
-                closeNotif();
-              }}
-            >
-              경조사비
-            </Link>
-
-            <Link
-              href={guardedHref("/calculators")}
-              className={[
-                "rounded-md px-3 py-2",
-                pathname?.startsWith("/calculators")
-                  ? "bg-slate-100 text-slate-900"
-                  : "hover:bg-slate-50",
-              ].join(" ")}
-              onClick={() => {
-                closeNav();
-                closeNotif();
-              }}
-            >
-              계산기
-            </Link>
-
-            <Link
-              href={guardedHref("/couple-ledger")}
-              className={[
-                "rounded-md px-3 py-2",
-                pathname?.startsWith("/couple-ledger")
-                  ? "bg-slate-100 text-slate-900"
-                  : "hover:bg-slate-50",
-              ].join(" ")}
-              onClick={() => {
-                closeNav();
-                closeNotif();
-              }}
-            >
-              커플 장부
-            </Link>
-
-            <div className="mt-3 rounded-xl bg-[#f8fbff] px-3 py-3 text-[12px] text-slate-600">
-              <div className="font-bold text-slate-800">첫 기록 혜택</div>
-              <div className="mt-1">오늘의 지출을 기록하고 달력 프리뷰를 바로 확인해보세요.</div>
-            </div>
-          </nav>
+              <div className="border-t border-slate-100 bg-sky-50/60 px-4 py-3">
+                <div className="text-[10px] font-bold text-slate-800">첫 기록 혜택</div>
+                <div className="mt-1 text-[10px] leading-6 text-slate-600">
+                  오늘의 지출을 기록하고 소비 달력을 확인해보세요.
+                </div>
+              </div>
+            </nav>
+          </div>
         </div>
       )}
     </header>
