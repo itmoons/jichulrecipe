@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
+import CoupleLedgerNav from "@/components/couple-ledger/CoupleLedgerNav";
 
 type CoupleContext = {
   couple_link_id: string;
@@ -66,12 +67,9 @@ function Pill({
     <span
       className={cx(
         "inline-flex items-center gap-1 rounded-[10px] px-3 py-1 text-[11px] font-medium",
-        tone === "accent" &&
-          "border border-[#aadffe] bg-[#edf7ff] text-[#0c86ea]",
-        tone === "soft" &&
-          "border border-[#E5E7EB] bg-white text-[#0c86ea]",
-        tone === "muted" &&
-          "border border-slate-200 bg-slate-50 text-slate-600"
+        tone === "accent" && "border border-[#aadffe] bg-[#edf7ff] text-[#0c86ea]",
+        tone === "soft" && "border border-[#E5E7EB] bg-white text-[#0c86ea]",
+        tone === "muted" && "border border-slate-200 bg-slate-50 text-slate-600"
       )}
     >
       {children}
@@ -167,13 +165,10 @@ const inputBaseClass =
 const primaryButtonClass =
   "inline-flex items-center justify-center rounded-[12px] bg-[#69b6ff] px-4 py-2.5 text-[13px] font-medium text-white transition hover:bg-[#0c86ea] disabled:opacity-60";
 
-const secondaryButtonClass =
-  "inline-flex items-center justify-center rounded-[12px] border border-[#aadffe] bg-white px-4 py-2.5 text-[13px] font-medium text-[#0c86ea] transition hover:bg-[#edf7ff]";
-
 const neutralButtonClass =
   "inline-flex items-center justify-center rounded-[12px] border border-slate-200 bg-white px-4 py-2.5 text-[10px] font-medium text-slate-700 transition hover:bg-slate-50";
 
-export default function CoupleLedgerUI() {
+export default function CoupleLedgerEntryUI() {
   const [checking, setChecking] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -508,11 +503,7 @@ export default function CoupleLedgerUI() {
   }, [tab, sharedList, myList, partnerList]);
 
   const listTitle =
-    tab === "shared"
-      ? "함께 쓴 레시피"
-      : tab === "mine"
-      ? "내가 적은 레시피"
-      : "상대가 적은 레시피";
+    tab === "shared" ? "함께 쓴 레시피" : tab === "mine" ? "내가 적은 레시피" : "상대가 적은 레시피";
 
   const sharedLocked = ctx?.shared_ledger_on !== true;
   const personalLocked = ctx?.personal_share_on !== true;
@@ -533,11 +524,7 @@ export default function CoupleLedgerUI() {
   }, [sharedList, ctx?.partner_user_id]);
 
   if (checking) {
-    return (
-      <div className="min-h-screen bg-white p-6 text-[14px] text-slate-600">
-        불러오는 중…
-      </div>
-    );
+    return <div className="mx-auto max-w-[1180px] min-h-screen bg-white p-6 text-[14px] text-slate-600">불러오는 중…</div>;
   }
 
   if (!isLoggedIn) {
@@ -547,9 +534,7 @@ export default function CoupleLedgerUI() {
           <div className="text-[18px] md:text-[20px] font-semibold tracking-[-0.02em] text-slate-900">
             우리의 지출 레시피
           </div>
-          <div className="mt-2 text-[14px] leading-6 text-slate-600">
-            로그인 후 사용할 수 있습니다.
-          </div>
+          <div className="mt-2 text-[14px] leading-6 text-slate-600">로그인 후 사용할 수 있습니다.</div>
           <div className="mt-5">
             <Link href="/sign-in" className={primaryButtonClass}>
               로그인하기
@@ -586,21 +571,6 @@ export default function CoupleLedgerUI() {
               </Link>
             </div>
           </Surface>
-
-          {toast && (
-            <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 px-4">
-              <div
-                className={cx(
-                  "min-w-[220px] rounded-[10px] px-4 py-2.5 text-[12px] font-medium text-white shadow-[0_10px_25px_rgba(0,0,0,0.15)]",
-                  toast.type === "success" && "bg-[#69b6ff]",
-                  toast.type === "error" && "bg-[#4b65d8]",
-                  toast.type === "info" && "bg-slate-900"
-                )}
-              >
-                {toast.message}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     );
@@ -634,33 +604,23 @@ export default function CoupleLedgerUI() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2">
-                <Link href="/couple-settings" className={secondaryButtonClass}>
-                  설정
-                </Link>
-              </div>
+              <CoupleLedgerNav active="entry" />
             </div>
           </div>
 
           <div className="grid gap-3 px-4 py-4 md:grid-cols-3 md:px-6 md:py-5">
-            <DataCard
-              label="이번달 함께 쓴 금액"
-              value={`${money(thisMonthSharedTotal)}원`}
-            />
-            <DataCard
-              label="내가 결제한 금액"
-              value={`${money(mySharedPaidTotal)}원`}
-            />
+            <DataCard label="이번달 함께 쓴 금액" value={`${money(thisMonthSharedTotal)}원`} />
+            <DataCard label="내가 결제한 금액" value={`${money(mySharedPaidTotal)}원`} />
             <DataCard
               label="현재 정산 메모"
               value={
                 settlement?.who_pays_to === "even"
                   ? "정산 없음"
                   : settlement?.who_pays_to === "me->partner"
-                  ? `내가 ${money(settlement?.amount || 0)}원 보내기`
-                  : settlement?.who_pays_to === "partner->me"
-                  ? `상대가 ${money(settlement?.amount || 0)}원 보내기`
-                  : "아직 계산 전"
+                    ? `내가 ${money(settlement?.amount || 0)}원 보내기`
+                    : settlement?.who_pays_to === "partner->me"
+                      ? `상대가 ${money(settlement?.amount || 0)}원 보내기`
+                      : "아직 계산 전"
               }
             />
           </div>
@@ -785,9 +745,7 @@ export default function CoupleLedgerUI() {
                   {settlement ? (
                     <>
                       <div className="mt-3 rounded-[18px] md:rounded-[20px] border border-[#d5f9ff] bg-white px-4 py-4">
-                        <div className="text-[11px] font-medium text-slate-500">
-                          정산 문장
-                        </div>
+                        <div className="text-[11px] font-medium text-slate-500">정산 문장</div>
                         <div className="mt-1 text-[14px] md:text-[16px] font-semibold leading-7 tracking-[-0.02em] text-slate-900">
                           {settlement.who_pays_to === "even" && "이번 기간은 정산 없음"}
                           {settlement.who_pays_to === "me->partner" &&
@@ -798,22 +756,10 @@ export default function CoupleLedgerUI() {
                       </div>
 
                       <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                        <DataCard
-                          label="총 공동지출"
-                          value={`${money(settlement.total_amount)}원`}
-                        />
-                        <DataCard
-                          label="내가 낸 돈"
-                          value={`${money(settlement.my_paid)}원`}
-                        />
-                        <DataCard
-                          label="내가 부담할 돈"
-                          value={`${money(settlement.my_should_pay)}원`}
-                        />
-                        <DataCard
-                          label="상대가 낸 돈"
-                          value={`${money(settlement.partner_paid)}원`}
-                        />
+                        <DataCard label="총 공동지출" value={`${money(settlement.total_amount)}원`} />
+                        <DataCard label="내가 낸 돈" value={`${money(settlement.my_paid)}원`} />
+                        <DataCard label="내가 부담할 돈" value={`${money(settlement.my_should_pay)}원`} />
+                        <DataCard label="상대가 낸 돈" value={`${money(settlement.partner_paid)}원`} />
                       </div>
                     </>
                   ) : (
@@ -832,27 +778,12 @@ export default function CoupleLedgerUI() {
         </Surface>
 
         <div className="mt-5 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-  <div className="flex w-max min-w-max gap-2 px-0">
-    <TabButton
-      active={tab === "shared"}
-      onClick={() => setTab("shared")}
-      icon="🧾"
-      label="함께"
-    />
-    <TabButton
-      active={tab === "mine"}
-      onClick={() => setTab("mine")}
-      icon="✍️"
-      label="내 레시피"
-    />
-    <TabButton
-      active={tab === "partner"}
-      onClick={() => setTab("partner")}
-      icon="💌"
-      label="상대 레시피"
-    />
-  </div>
-</div>
+          <div className="flex w-max min-w-max gap-2 px-0">
+            <TabButton active={tab === "shared"} onClick={() => setTab("shared")} icon="🧾" label="함께" />
+            <TabButton active={tab === "mine"} onClick={() => setTab("mine")} icon="✍️" label="내 레시피" />
+            <TabButton active={tab === "partner"} onClick={() => setTab("partner")} icon="💌" label="상대 레시피" />
+          </div>
+        </div>
 
         <Surface className="mt-4 p-4 md:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -992,12 +923,8 @@ export default function CoupleLedgerUI() {
 
           {tab === "shared" && editingId && canEdit && (
             <div className="mt-5 rounded-[20px] md:rounded-[24px] border border-[#aadffe] bg-[#f9fdff] p-4 md:p-5">
-              <div className="text-[15px] font-semibold text-slate-900">
-                지출 레시피 수정
-              </div>
-              <div className="mt-2 text-[13px] text-slate-600">
-                선택한 항목을 다시 정리합니다.
-              </div>
+              <div className="text-[15px] font-semibold text-slate-900">지출 레시피 수정</div>
+              <div className="mt-2 text-[13px] text-slate-600">선택한 항목을 다시 정리합니다.</div>
 
               <div className="mt-4 grid gap-3 grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
                 <RecipeField label="날짜">
@@ -1067,8 +994,7 @@ export default function CoupleLedgerUI() {
           <div className="mt-6 grid gap-3">
             {list.length === 0 ? (
               <div className="rounded-[20px] md:rounded-[22px] border border-slate-200 bg-slate-50 p-8 text-center text-[14px] text-slate-600">
-                아직 항목이 없습니다.{" "}
-                {tab === "shared" ? "공동 지출을 추가해 보세요." : "공유 설정을 확인하세요."}
+                아직 항목이 없습니다. {tab === "shared" ? "공동 지출을 추가해 보세요." : "공유 설정을 확인하세요."}
               </div>
             ) : (
               list.map((e: any) => (
@@ -1087,9 +1013,7 @@ export default function CoupleLedgerUI() {
                           {e.category || "기타"}
                         </span>
 
-                        <span className="text-[11px] text-slate-500">
-                          {dayK(e.expense_date)}
-                        </span>
+                        <span className="text-[11px] text-slate-500">{dayK(e.expense_date)}</span>
 
                         {tab === "shared" && (
                           <span className="text-[11px] text-slate-400">
@@ -1102,15 +1026,13 @@ export default function CoupleLedgerUI() {
                         {tab === "shared"
                           ? "공동 기록"
                           : tab === "mine"
-                          ? "개인(나) 기록"
-                          : "개인(상대) 기록"}
+                            ? "개인(나) 기록"
+                            : "개인(상대) 기록"}
                       </div>
                     </div>
 
                     <div className="flex flex-col items-stretch gap-2 sm:items-end sm:text-right">
-                      <div className="text-[15px] font-semibold text-[#0c86ea]">
-                        {money(e.amount)}원
-                      </div>
+                      <div className="text-[15px] font-semibold text-[#0c86ea]">{money(e.amount)}원</div>
 
                       {tab === "shared" && canEdit && (
                         <div className="flex flex-wrap items-center gap-2 opacity-100 md:opacity-0 md:transition md:group-hover:opacity-100">
