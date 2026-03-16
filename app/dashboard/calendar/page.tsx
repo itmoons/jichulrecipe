@@ -1234,7 +1234,7 @@ export default function SpendingCalendarPage() {
                 <button
                   type="submit"
                   disabled={memoSubmitting}
-                  className="rounded-full bg-[color:var(--brand-blue)] px-4 py-1.5 text-[11px] font-semibold text-white shadow-sm hover:bg-[#f27422] disabled:opacity-60"
+                  className="rounded-full bg-[color:var(--brand-blue)] px-4 py-1.5 text-[11px] font-semibold text-white shadow-sm hover:bg-[#0c86ea] disabled:opacity-60"
                   style={{ ["--brand-blue" as any]: BRAND_blue }}
                 >
                   {memoSubmitting

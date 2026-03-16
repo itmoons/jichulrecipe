@@ -1,37 +1,65 @@
 // src/app/sign-in/page.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { Suspense } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
-const BRAND_blue = "#5bbbf3";
+const BRAND_BLUE = "#5bbbf3";
+
+type AuthMode = "login" | "register";
+
+function isValidEmail(value: string) {
+  const email = value.trim().toLowerCase();
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
 
 /**
- * ✅ 실제 로그인/회원가입 로직이 들어 있는 컴포넌트
- *   - 여기에서 useSearchParams()를 사용
+ * redirect 취약점 방지
+ * - 내부 경로만 허용
+ * - //, http:, https:, javascript: 등 차단
  */
+function getSafeRedirectPath(raw: string | null) {
+  if (!raw) return "/";
+  const value = raw.trim();
+
+  if (!value.startsWith("/")) return "/";
+  if (value.startsWith("//")) return "/";
+  if (value.includes("\r") || value.includes("\n")) return "/";
+
+  return value;
+}
+
+/**
+ * Supabase signUp 응답에서
+ * "이미 가입된 이메일" 가능성을 최대한 안전하게 판별
+ */
+function isExistingEmailSignUpResult(data: any) {
+  const identities = data?.user?.identities;
+  return Array.isArray(identities) && identities.length === 0;
+}
+
 function SignInInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // ?mode=register 로 들어오면 회원가입 탭부터
-  const initialMode =
+  const initialMode: AuthMode =
     searchParams.get("mode") === "register" ? "register" : "login";
 
-  // 로그인 후 되돌아갈 경로 (?redirect=...)
-  const redirectPath = searchParams.get("redirect") || "/";
+  const redirectPath = useMemo(
+    () => getSafeRedirectPath(searchParams.get("redirect")),
+    [searchParams]
+  );
 
-  const [mode, setMode] = useState<"login" | "register">(initialMode);
+  const [mode, setMode] = useState<AuthMode>(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordCheck, setPasswordCheck] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [successMsg, setSuccessMsg] = useState<string | null>(null); // 회원가입 축하 메시지
-  const [resetMsg, setResetMsg] = useState<string | null>(null); // 비밀번호 재설정 안내
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [resetMsg, setResetMsg] = useState<string | null>(null);
 
   const title = mode === "login" ? "로그인" : "회원가입";
   const subtitle =
@@ -39,181 +67,184 @@ function SignInInner() {
       ? "이메일과 비밀번호로 지출레시피에 로그인하세요."
       : "이메일만으로 간단히 가입하고, 나만의 지출 레시피를 시작해 보세요.";
 
+  const resetMessages = () => {
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    setResetMsg(null);
+  };
+
   const validate = () => {
-    if (!email.trim()) {
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedEmail) {
       setErrorMsg("이메일을 입력해 주세요.");
       return false;
     }
-    if (!email.includes("@")) {
+
+    if (!isValidEmail(normalizedEmail)) {
       setErrorMsg("올바른 이메일 형식을 입력해 주세요.");
       return false;
     }
+
     if (!password) {
       setErrorMsg("비밀번호를 입력해 주세요.");
       return false;
     }
-    if (password.length < 6) {
-      setErrorMsg("비밀번호는 6자 이상이어야 합니다.");
+
+    if (password.length < 8) {
+      setErrorMsg("비밀번호는 8자 이상이어야 합니다.");
       return false;
     }
+
     if (mode === "register") {
       if (!passwordCheck) {
         setErrorMsg("비밀번호 확인을 입력해 주세요.");
         return false;
       }
+
       if (password !== passwordCheck) {
         setErrorMsg("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
         return false;
       }
     }
+
     setErrorMsg(null);
     return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     if (!validate()) return;
 
     setIsSubmitting(true);
-    setErrorMsg(null);
-    setSuccessMsg(null);
-    setResetMsg(null);
+    resetMessages();
 
-    // 이메일은 항상 trim + 소문자 처리해서 사용
     const normalizedEmail = email.trim().toLowerCase();
 
     try {
       if (mode === "register") {
-        // =========================
-        // 1) 회원가입
-        // =========================
         const { data, error } = await supabase.auth.signUp({
           email: normalizedEmail,
           password,
         });
 
-        console.log("signUp result:", { data, error });
-
         if (error) {
-          setErrorMsg(error.message || "회원가입에 실패했습니다.");
+          setErrorMsg("회원가입에 실패했습니다. 입력 정보를 다시 확인해 주세요.");
           return;
         }
 
-        // 회원가입 성공
-        setSuccessMsg(
-          "쉐프가 된것을 축하합니다! 이제 로그인하고 나만의 지출 레시피를 시작해 보세요."
-        );
-        setMode("login");
-
-        // =========================
-        // 2) 바로 로그인 시도 (자동 로그인)
-        // =========================
-        const { data: signInData, error: signInError } =
-          await supabase.auth.signInWithPassword({
-            email: normalizedEmail,
-            password,
-          });
-
-        console.log("auto signIn after signUp:", {
-          signInData,
-          signInError,
-        });
-
-        if (signInError) {
-          if (signInError.message === "Invalid login credentials") {
-            setErrorMsg(
-              "가입은 완료되었지만, 로그인 정보가 올바르지 않습니다. 다시 한 번 이메일/비밀번호를 확인해 주세요."
-            );
-          } else {
-            setErrorMsg(
-              signInError.message ||
-                "가입은 완료되었지만 자동 로그인에는 실패했습니다. 다시 로그인해 주세요."
-            );
-          }
+        /**
+         * 이미 존재하는 이메일일 수 있는 경우
+         * - 성공 배너를 띄우지 않음
+         * - 사용자에게는 안전한 일반 메시지 제공
+         */
+        if (isExistingEmailSignUpResult(data)) {
+          setErrorMsg(
+            "이미 사용 중인 이메일이거나 가입을 진행할 수 없습니다. 로그인 또는 비밀번호 재설정을 이용해 주세요."
+          );
           return;
         }
 
-        // 자동 로그인 성공 → redirectPath 이동
-        router.push(redirectPath);
-      } else {
-        // =========================
-        // 로그인
-        // =========================
-        const { data, error } = await supabase.auth.signInWithPassword({
+        /**
+         * 이메일 인증이 필요한 설정이라면 자동 로그인보다 안내가 우선
+         */
+        const needsEmailVerification =
+          !!data?.user &&
+          data?.session == null &&
+          !!data?.user?.email_confirmed_at === false;
+
+        if (needsEmailVerification) {
+          setSuccessMsg(
+            "회원가입이 완료되었습니다. 이메일 인증 후 로그인해 주세요."
+          );
+          setMode("login");
+          return;
+        }
+
+        /**
+         * 회원가입 직후 자동 로그인 시도
+         * - 여기서 실패해도 회원가입 성공 배너는 유지
+         */
+        const { error: signInError } = await supabase.auth.signInWithPassword({
           email: normalizedEmail,
           password,
         });
 
-        console.log("signIn result:", { data, error });
-
-        if (error) {
-          if (error.message === "Invalid login credentials") {
-            setErrorMsg(
-              "이메일 또는 비밀번호가 올바르지 않습니다. 가입한 이메일/비밀번호와 동일한지 확인해 주세요."
-            );
-          } else {
-            setErrorMsg(error.message || "로그인에 실패했습니다.");
-          }
+        if (signInError) {
+          setSuccessMsg(
+            "회원가입이 완료되었습니다. 이제 로그인하고 나만의 지출 레시피를 시작해 보세요."
+          );
+          setMode("login");
+          setPassword("");
+          setPasswordCheck("");
           return;
         }
 
-        // 로그인 성공 → redirectPath 이동
-        router.push(redirectPath);
+        router.replace(redirectPath);
+        return;
       }
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password,
+      });
+
+      if (error) {
+        setErrorMsg(
+          "이메일 또는 비밀번호가 올바르지 않습니다. 다시 확인해 주세요."
+        );
+        return;
+      }
+
+      router.replace(redirectPath);
     } catch (err) {
       console.error("Auth error:", err);
       setErrorMsg(
-        "처리 중 오류가 발생했습니다. Supabase 설정(.env)이나 네트워크 상태를 한 번 확인해 주세요."
+        "처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
       );
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // 비밀번호 재설정 메일 보내기
   const handleSendResetEmail = async () => {
+    if (isSubmitting) return;
+
     const normalizedEmail = email.trim().toLowerCase();
+
     if (!normalizedEmail) {
       setErrorMsg("비밀번호를 재설정하려면 먼저 이메일을 입력해 주세요.");
       return;
     }
-    if (!normalizedEmail.includes("@")) {
+
+    if (!isValidEmail(normalizedEmail)) {
       setErrorMsg("올바른 이메일 형식을 입력해 주세요.");
       return;
     }
 
     setIsSubmitting(true);
-    setErrorMsg(null);
-    setSuccessMsg(null);
-    setResetMsg(null);
+    resetMessages();
 
     try {
       const origin =
         typeof window !== "undefined" ? window.location.origin : "";
 
-      const { error } = await supabase.auth.resetPasswordForEmail(
-        normalizedEmail,
-        {
-          redirectTo: `${origin}/reset-password`,
-        }
-      );
+      await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+        redirectTo: `${origin}/reset-password`,
+      });
 
-      if (error) {
-        console.error("resetPasswordForEmail error:", error);
-        setErrorMsg(
-          error.message ||
-            "비밀번호 재설정 메일 전송에 실패했습니다. 잠시 후 다시 시도해 주세요."
-        );
-        return;
-      }
-
+      /**
+       * 계정 존재 여부 노출 방지
+       * - 성공/실패 여부를 너무 자세히 구분하지 않음
+       */
       setResetMsg(
-        "비밀번호 재설정 링크를 이메일로 보냈습니다. 메일함(및 스팸함)을 확인해 주세요."
+        "입력한 이메일로 비밀번호 재설정 안내를 보냈습니다. 메일함과 스팸함을 확인해 주세요."
       );
     } catch (err) {
-      console.error("reset password error:", err);
-      setErrorMsg(
-        "비밀번호 재설정 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
+      console.error("Reset password error:", err);
+      setResetMsg(
+        "입력한 이메일로 비밀번호 재설정 안내를 보냈습니다. 메일함과 스팸함을 확인해 주세요."
       );
     } finally {
       setIsSubmitting(false);
@@ -222,7 +253,6 @@ function SignInInner() {
 
   return (
     <main className="relative flex min-h-screen items-center justify-center bg-gradient-to-b from-[#ecf4ff] via-[#fcfdff] to-[#F7FAFF] px-4">
-      {/* 배경 장식 */}
       <div className="pointer-events-none fixed left-[-80px] top-[40%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,184,108,0.25)] blur-3xl" />
       <div className="pointer-events-none fixed right-[-60px] bottom-[8%] -z-10 h-52 w-52 rounded-full bg-[rgba(86,115,231,0.18)] blur-3xl" />
 
@@ -230,9 +260,8 @@ function SignInInner() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: "easeOut" }}
-        className="w-full max-w-md rounded-3xl bg-white/95 p-6 shadow-lg shadow-blue-100 mt-[-14rem]"
+        className="mt-[-14rem] w-full max-w-md rounded-3xl bg-white/95 p-6 shadow-lg shadow-blue-100"
       >
-        {/* 로고 + 인사말 */}
         <div className="mb-5 flex flex-col gap-1">
           <div className="inline-flex items-center gap-2">
             <span className="text-xl">🥕</span>
@@ -244,15 +273,12 @@ function SignInInner() {
           <p className="text-xs text-slate-600">{subtitle}</p>
         </div>
 
-        {/* 로그인 / 회원가입 탭 */}
         <div className="mb-3 flex rounded-full bg-slate-50 p-1">
           <button
             type="button"
             onClick={() => {
               setMode("login");
-              setErrorMsg(null);
-              setSuccessMsg(null);
-              setResetMsg(null);
+              resetMessages();
             }}
             className={`flex-1 rounded-full px-3 py-1.5 text-xs font-medium transition ${
               mode === "login"
@@ -266,9 +292,7 @@ function SignInInner() {
             type="button"
             onClick={() => {
               setMode("register");
-              setErrorMsg(null);
-              setSuccessMsg(null);
-              setResetMsg(null);
+              resetMessages();
             }}
             className={`flex-1 rounded-full px-3 py-1.5 text-xs font-medium transition ${
               mode === "register"
@@ -280,24 +304,19 @@ function SignInInner() {
           </button>
         </div>
 
-        {/* 회원가입 성공 메시지 배너 */}
         {successMsg && (
           <div className="mb-3 rounded-xl border border-blue-200 bg-[#FFF7EB] px-3 py-2 text-[11px] text-blue-700">
-            <strong className="mr-1">🎉 쉐프가 된것을 축하합니다!</strong>
-            <span>
-              이제 로그인하고 나만의 지출 레시피를 시작해 보세요.
-            </span>
+            <strong className="mr-1">🎉 안내 🎉</strong>
+            <span>{successMsg}</span>
           </div>
         )}
 
-        {/* 비밀번호 재설정 안내 메시지 */}
         {resetMsg && (
           <div className="mb-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] text-slate-700">
             {resetMsg}
           </div>
         )}
 
-        {/* 이메일 전용 폼 */}
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="space-y-1.5">
             <label className="block text-xs font-semibold text-slate-700">
@@ -310,6 +329,7 @@ function SignInInner() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               autoComplete="email"
+              maxLength={254}
             />
           </div>
 
@@ -320,10 +340,13 @@ function SignInInner() {
             <input
               type="password"
               className="w-full rounded-xl border border-slate-200 px-3 py-2 text-[12px] outline-none focus:border-slate-400"
-              placeholder="6자 이상 입력해 주세요"
+              placeholder="8자 이상 입력해 주세요"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              autoComplete={mode === "login" ? "current-password" : "new-password"}
+              autoComplete={
+                mode === "login" ? "current-password" : "new-password"
+              }
+              maxLength={128}
             />
           </div>
 
@@ -339,19 +362,18 @@ function SignInInner() {
                 value={passwordCheck}
                 onChange={(e) => setPasswordCheck(e.target.value)}
                 autoComplete="new-password"
+                maxLength={128}
               />
             </div>
           )}
 
-          {errorMsg && (
-            <p className="pt-1 text-xs text-red-500">{errorMsg}</p>
-          )}
+          {errorMsg && <p className="pt-1 text-xs text-red-500">{errorMsg}</p>}
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="mt-1 flex w-full items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-white shadow-md shadow-blue-200 transition hover:bg-[#f27422] disabled:cursor-not-allowed disabled:opacity-70"
-            style={{ ["--brand-blue" as any]: BRAND_blue }}
+            className="mt-1 flex w-full items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-white shadow-md shadow-blue-200 transition hover:bg-[#0c86ea] disabled:cursor-not-allowed disabled:opacity-70"
+            style={{ ["--brand-blue" as any]: BRAND_BLUE }}
           >
             {isSubmitting
               ? "처리 중..."
@@ -361,7 +383,6 @@ function SignInInner() {
           </button>
         </form>
 
-        {/* 하단 안내 + 비밀번호 찾기 */}
         <div className="mt-4 space-y-1 text-[10px] text-slate-500">
           <p>• 이메일 계정만 지원합니다. 소셜 로그인은 추후 확장 가능합니다.</p>
           <button
@@ -378,11 +399,6 @@ function SignInInner() {
   );
 }
 
-/**
- * ✅ 페이지 컴포넌트
- *   - 여기서 SignInInner를 Suspense로 감싸서
- *     `useSearchParams must be wrapped in Suspense` 에러를 해결
- */
 export default function SignInPage() {
   return (
     <Suspense

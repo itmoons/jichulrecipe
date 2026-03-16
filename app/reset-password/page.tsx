@@ -1,76 +1,163 @@
 // src/app/reset-password/page.tsx
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabaseClient";
 
-const BRAND_blue = "#5bbbf3";
+const BRAND_BLUE = "#5bbbf3";
+
+function validatePassword(value: string) {
+  if (!value) {
+    return "비밀번호를 입력해 주세요.";
+  }
+
+  if (value.length < 8) {
+    return "비밀번호는 8자 이상이어야 합니다.";
+  }
+
+  if (value.length > 128) {
+    return "비밀번호는 128자 이하여야 합니다.";
+  }
+
+  return null;
+}
 
 export default function ResetPasswordPage() {
   const router = useRouter();
+
   const [loading, setLoading] = useState(true);
-  const [hasSession, setHasSession] = useState(false);
+  const [hasRecoverySession, setHasRecoverySession] = useState(false);
   const [password, setPassword] = useState("");
   const [passwordCheck, setPasswordCheck] = useState("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 메일 링크로 들어왔을 때 Supabase가 세션을 붙여줬는지 확인
+  const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mountedRef = useRef(true);
+
   useEffect(() => {
-    const checkSession = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      if (error) {
-        console.error("getSession error on reset-password:", error);
+    mountedRef.current = true;
+
+    const bootstrap = async () => {
+      try {
+        /**
+         * 초기 세션 확인
+         * - recovery 링크로 이미 세션이 생성되었는지 확인
+         */
+        const { data } = await supabase.auth.getSession();
+
+        if (!mountedRef.current) return;
+
+        if (data?.session) {
+          setHasRecoverySession(true);
+          setLoading(false);
+          return;
+        }
+
+        setHasRecoverySession(false);
+        setLoading(false);
+      } catch (err) {
+        console.error("reset-password session bootstrap error:", err);
+        if (!mountedRef.current) return;
+        setHasRecoverySession(false);
+        setLoading(false);
       }
-      setHasSession(!!data.session);
-      setLoading(false);
     };
-    checkSession();
+
+    bootstrap();
+
+    /**
+     * PASSWORD_RECOVERY 또는 세션 변경 감지
+     * - 일부 환경에서는 첫 진입 직후 세션 반영 타이밍 이슈를 보완
+     */
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!mountedRef.current) return;
+
+      if (event === "PASSWORD_RECOVERY" || !!session) {
+        setHasRecoverySession(true);
+        setLoading(false);
+      }
+    });
+
+    return () => {
+      mountedRef.current = false;
+      subscription.unsubscribe();
+
+      if (redirectTimerRef.current) {
+        clearTimeout(redirectTimerRef.current);
+      }
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!password || password.length < 6) {
-      setErrorMsg("비밀번호는 6자 이상이어야 합니다.");
+    if (isSubmitting) return;
+
+    setErrorMsg(null);
+    setSuccessMsg(null);
+
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      setErrorMsg(passwordError);
       return;
     }
+
+    if (!passwordCheck) {
+      setErrorMsg("비밀번호 확인을 입력해 주세요.");
+      return;
+    }
+
     if (password !== passwordCheck) {
       setErrorMsg("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
       return;
     }
 
+    if (!hasRecoverySession) {
+      setErrorMsg(
+        "유효한 비밀번호 재설정 세션이 없습니다. 다시 비밀번호 재설정을 진행해 주세요."
+      );
+      return;
+    }
+
     setIsSubmitting(true);
-    setErrorMsg(null);
-    setSuccessMsg(null);
 
     try {
-      const { data, error } = await supabase.auth.updateUser({
+      const { error } = await supabase.auth.updateUser({
         password,
       });
 
-      console.log("updateUser (reset-password) result:", { data, error });
-
       if (error) {
         setErrorMsg(
-          error.message ||
-            "비밀번호 변경에 실패했습니다. 링크 유효시간이 지났을 수도 있습니다."
+          "비밀번호 변경에 실패했습니다. 링크가 만료되었거나 이미 사용되었을 수 있습니다."
         );
         return;
       }
 
+      /**
+       * 변경 성공 후 재설정 세션 정리
+       */
+      await supabase.auth.signOut();
+
+      if (!mountedRef.current) return;
+
       setSuccessMsg("비밀번호가 성공적으로 변경되었습니다. 다시 로그인해 주세요.");
-      // 잠시 메시지 보여주고 로그인 페이지로 이동
-      setTimeout(() => {
-        router.push("/sign-in");
-      }, 1500);
+
+      redirectTimerRef.current = setTimeout(() => {
+        router.replace("/sign-in");
+      }, 1200);
     } catch (err) {
       console.error("reset-password updateUser error:", err);
-      setErrorMsg("비밀번호 변경 처리 중 오류가 발생했습니다.");
+      if (!mountedRef.current) return;
+      setErrorMsg("비밀번호 변경 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
     } finally {
-      setIsSubmitting(false);
+      if (mountedRef.current) {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -84,8 +171,7 @@ export default function ResetPasswordPage() {
     );
   }
 
-  if (!hasSession) {
-    // 세션이 없다면: 잘못된/만료된 링크
+  if (!hasRecoverySession) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#FFF8EC] via-[#FFFDFC] to-[#F7FAFF] px-4">
         <div className="w-full max-w-md rounded-3xl bg-white/95 p-6 text-center shadow-lg shadow-blue-100">
@@ -99,9 +185,9 @@ export default function ResetPasswordPage() {
           </p>
           <button
             type="button"
-            onClick={() => router.push("/sign-in")}
-            className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-white shadow-md shadow-blue-200 hover:bg-[#f27422]"
-            style={{ ["--brand-blue" as any]: BRAND_blue }}
+            onClick={() => router.replace("/sign-in")}
+            className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-white shadow-md shadow-blue-200 hover:bg-[#0c86ea]"
+            style={{ ["--brand-blue" as any]: BRAND_BLUE }}
           >
             로그인 페이지로 이동
           </button>
@@ -114,11 +200,12 @@ export default function ResetPasswordPage() {
     <main className="relative flex min-h-screen items-center justify-center bg-gradient-to-b from-[#ecf4ff] via-[#fcfdff] to-[#F7FAFF] px-4">
       <div className="pointer-events-none fixed left-[-80px] top-[40%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,184,108,0.25)] blur-3xl" />
       <div className="pointer-events-none fixed right-[-60px] bottom-[8%] -z-10 h-52 w-52 rounded-full bg-[rgba(86,115,231,0.18)] blur-3xl" />
+
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: "easeOut" }}
-        className="w-full max-w-md rounded-3xl bg-white/95 p-6 shadow-lg shadow-blue-100 mt-[12rem]"
+        className="mt-[12rem] w-full max-w-md rounded-3xl bg-white/95 p-6 shadow-lg shadow-blue-100"
       >
         <div className="mb-4 flex flex-col gap-1">
           <div className="inline-flex items-center gap-2">
@@ -140,9 +227,8 @@ export default function ResetPasswordPage() {
             {successMsg}
           </div>
         )}
-        {errorMsg && (
-          <p className="mb-3 text-xs text-red-500">{errorMsg}</p>
-        )}
+
+        {errorMsg && <p className="mb-3 text-xs text-red-500">{errorMsg}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="space-y-1.5">
@@ -152,11 +238,14 @@ export default function ResetPasswordPage() {
             <input
               type="password"
               className="w-full rounded-xl border border-slate-200 px-3 py-2 text-[12px] outline-none focus:border-slate-400"
-              placeholder="6자 이상 입력해 주세요"
+              placeholder="8자 이상 입력해 주세요"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
+              maxLength={128}
             />
           </div>
+
           <div className="space-y-1.5">
             <label className="block text-xs font-semibold text-slate-700">
               새 비밀번호 확인
@@ -167,14 +256,16 @@ export default function ResetPasswordPage() {
               placeholder="한 번 더 입력해 주세요"
               value={passwordCheck}
               onChange={(e) => setPasswordCheck(e.target.value)}
+              autoComplete="new-password"
+              maxLength={128}
             />
           </div>
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="mt-2 flex w-full items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-white shadow-md shadow-blue-200 transition hover:bg-[#f27422] disabled:cursor-not-allowed disabled:opacity-70"
-            style={{ ["--brand-blue" as any]: BRAND_blue }}
+            className="mt-2 flex w-full items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-white shadow-md shadow-blue-200 transition hover:bg-[#0c86ea] disabled:cursor-not-allowed disabled:opacity-70"
+            style={{ ["--brand-blue" as any]: BRAND_BLUE }}
           >
             {isSubmitting ? "변경 중..." : "비밀번호 변경하기"}
           </button>

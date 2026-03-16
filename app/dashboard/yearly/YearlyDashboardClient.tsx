@@ -444,7 +444,7 @@ export default function YearlyDashboardClient() {
           <button
             type="button"
             onClick={handleGoSetup}
-            className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-white shadow-md shadow-blue-200 hover:bg-[#f27422] transition"
+            className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-white shadow-md shadow-blue-200 hover:bg-[#0c86ea] transition"
             style={{ ["--brand-blue" as any]: BRAND_blue }}
           >
             🍽 기본 레시피 입력하러 가기
