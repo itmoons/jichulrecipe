@@ -389,16 +389,29 @@ export default function NotificationsPanel({
 
           return (
             <div
-              key={n.id}
-              className={[
-                "relative rounded-2xl border p-4 transition",
-                isUnread
-                  ? "border-blue-200 bg-gradient-to-br from-blue-50 to-blue-50 shadow-sm"
-                  : "border-zinc-200 bg-white",
-              ].join(" ")}
-              onClick={stopBubble}
-              onPointerDown={stopBubble}
-            >
+  key={n.id}
+  className={[
+    "relative rounded-2xl border p-4 transition",
+    isUnread
+      ? "border-blue-200 bg-gradient-to-br from-blue-50 to-blue-50 shadow-sm"
+      : "border-zinc-200 bg-white",
+  ].join(" ")}
+  onClick={stopBubble}
+  onPointerDown={stopBubble}
+>
+  <button
+    type="button"
+    aria-label="알림 숨기기"
+    className="absolute right-3 top-3 inline-flex h-7 w-7 items-center justify-center rounded-full text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700"
+    onClick={(e) => {
+      e.stopPropagation();
+      dismissOnlyOneCard(n.id);
+      void tryDeleteInBackground(n.id);
+    }}
+    onPointerDown={(e) => e.stopPropagation()}
+  >
+    ✕
+  </button>
 
               <div className="flex items-start justify-between gap-3 pr-8">
                 <div className="min-w-0">
@@ -469,15 +482,6 @@ export default function NotificationsPanel({
                 disabled={loadingAction === "markAllRead" || unreadCount === 0}
               >
                 모두 읽음
-              </RecipeButton>
-              <RecipeButton
-                variant="outline"
-                onClick={(e: any) => {
-                  e.stopPropagation();
-                  onClose?.();
-                }}
-              >
-                닫기
               </RecipeButton>
             </div>
           )

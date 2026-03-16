@@ -23,6 +23,7 @@ type CoupleExpense = {
   memo: string | null;
   expense_date: string;
   created_at: string;
+  receipt_url?: string | null;
 };
 
 type PersonalExpense = {
@@ -159,6 +160,74 @@ function RecipeField({
   );
 }
 
+function InlineReceiptField({
+  preview,
+  hasExisting,
+  onPick,
+  onClear,
+}: {
+  preview: string | null;
+  hasExisting?: boolean;
+  onPick: (file: File | null) => void;
+  onClear?: () => void;
+}) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  return (
+    <div className="mt-1.5">
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => onPick(e.target.files?.[0] || null)}
+      />
+
+      <div className="flex min-h-[46px] items-center gap-2 rounded-[16px] border border-[#E5E7EB] bg-white px-3 py-2">
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          className="inline-flex shrink-0 items-center rounded-[10px] border border-[#cfe9ff] bg-[#f4fbff] px-3 py-1.5 text-[12px] font-medium text-[#0c86ea] transition hover:bg-[#eaf6ff]"
+        >
+          {preview || hasExisting ? "변경" : "첨부"}
+        </button>
+
+        <div className="min-w-0 flex-1">
+          {preview ? (
+            <div className="flex items-center gap-2">
+              <img
+                src={preview}
+                alt="영수증 미리보기"
+                className="h-8 w-8 rounded-[8px] object-cover ring-1 ring-black/5"
+              />
+              <span className="truncate text-[12px] text-slate-600">새 영수증 이미지 선택됨</span>
+            </div>
+          ) : hasExisting ? (
+            <div className="flex items-center gap-2">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-[8px] bg-[#edf7ff] text-[13px]">
+                🧾
+              </span>
+              <span className="truncate text-[12px] text-slate-600">기존 영수증 있음</span>
+            </div>
+          ) : (
+            <span className="truncate text-[12px] text-slate-400">영수증 이미지 없음</span>
+          )}
+        </div>
+
+        {(preview || hasExisting) && onClear && (
+          <button
+            type="button"
+            onClick={onClear}
+            className="inline-flex shrink-0 items-center rounded-[10px] border border-slate-200 bg-white px-2.5 py-1.5 text-[12px] text-slate-600 transition hover:bg-slate-50"
+          >
+            제거
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 const inputBaseClass =
   "mt-1.5 w-full rounded-[16px] border border-[#E5E7EB] bg-white px-3.5 py-2.5 text-[14px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#FDBA74] focus:ring-4 focus:ring-[#edf7ff]";
 
@@ -223,6 +292,14 @@ export default function CoupleLedgerEntryUI() {
   const [showMobileAddForm, setShowMobileAddForm] = useState(false);
   const addFormRef = useRef<HTMLDivElement | null>(null);
 
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
+
+  const [editReceiptFile, setEditReceiptFile] = useState<File | null>(null);
+  const [editReceiptPreview, setEditReceiptPreview] = useState<string | null>(null);
+  const [editReceiptUrl, setEditReceiptUrl] = useState<string | null>(null);
+  const [editRemoveReceipt, setEditRemoveReceipt] = useState(false);
+
   const showToast = (message: string, type: ToastType = "info") => {
     setToast({ message, type });
   };
@@ -232,6 +309,95 @@ export default function CoupleLedgerEntryUI() {
     const timer = setTimeout(() => setToast(null), 2400);
     return () => clearTimeout(timer);
   }, [toast]);
+
+  useEffect(() => {
+    return () => {
+      if (receiptPreview) URL.revokeObjectURL(receiptPreview);
+      if (editReceiptPreview) URL.revokeObjectURL(editReceiptPreview);
+    };
+  }, [receiptPreview, editReceiptPreview]);
+
+  const validateReceiptFile = (file: File | null) => {
+    if (!file) return null;
+
+    const allowed = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+    if (!allowed.includes(file.type)) {
+      return "jpg, png, webp 이미지만 업로드할 수 있습니다.";
+    }
+
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      return "이미지는 5MB 이하만 업로드할 수 있습니다.";
+    }
+
+    return null;
+  };
+
+  const uploadReceiptImage = async (file: File, uid: string) => {
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const fileName = `${uid}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("receipt-images")
+      .upload(fileName, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase.storage.from("receipt-images").getPublicUrl(fileName);
+    return data.publicUrl;
+  };
+
+  const clearReceiptPreview = () => {
+    if (receiptPreview) URL.revokeObjectURL(receiptPreview);
+    setReceiptPreview(null);
+    setReceiptFile(null);
+  };
+
+  const clearEditReceiptPreview = () => {
+    if (editReceiptPreview) URL.revokeObjectURL(editReceiptPreview);
+    setEditReceiptPreview(null);
+    setEditReceiptFile(null);
+  };
+
+  const handleReceiptChange = (file: File | null) => {
+    const err = validateReceiptFile(file);
+    if (err) {
+      showToast(err, "error");
+      return;
+    }
+
+    if (receiptPreview) URL.revokeObjectURL(receiptPreview);
+
+    setReceiptFile(file);
+
+    if (file) {
+      setReceiptPreview(URL.createObjectURL(file));
+    } else {
+      setReceiptPreview(null);
+    }
+  };
+
+  const handleEditReceiptChange = (file: File | null) => {
+    const err = validateReceiptFile(file);
+    if (err) {
+      showToast(err, "error");
+      return;
+    }
+
+    if (editReceiptPreview) URL.revokeObjectURL(editReceiptPreview);
+
+    setEditReceiptFile(file);
+    setEditRemoveReceipt(false);
+
+    if (file) {
+      setEditReceiptPreview(URL.createObjectURL(file));
+    } else {
+      setEditReceiptPreview(null);
+    }
+  };
 
   const loadContext = async (): Promise<CoupleContext> => {
     const { data: u } = await supabase.auth.getUser();
@@ -397,6 +563,12 @@ export default function CoupleLedgerEntryUI() {
       const uid = u.user?.id;
       if (!uid) throw new Error("로그인이 필요합니다.");
 
+      let receiptUrl: string | null = null;
+
+      if (receiptFile) {
+        receiptUrl = await uploadReceiptImage(receiptFile, uid);
+      }
+
       const { error } = await supabase.from("couple_expenses").insert({
         couple_link_id: ctx.couple_link_id,
         created_by: uid,
@@ -404,12 +576,21 @@ export default function CoupleLedgerEntryUI() {
         category,
         memo,
         expense_date: expenseDate,
+        receipt_url: receiptUrl,
       });
 
       if (error) throw error;
 
       setAmount("");
       setMemo("");
+      setCategory("데이트");
+      setExpenseDate(() => {
+        const d = new Date();
+        const mm = String(d.getMonth() + 1).padStart(2, "0");
+        const dd = String(d.getDate()).padStart(2, "0");
+        return `${d.getFullYear()}-${mm}-${dd}`;
+      });
+      clearReceiptPreview();
       setShowMobileAddForm(false);
       showToast("지출 레시피가 저장되었습니다.", "success");
       await refreshAll();
@@ -430,6 +611,14 @@ export default function CoupleLedgerEntryUI() {
     setEditCategory(item.category || "데이트");
     setEditMemo(item.memo || "");
     setEditExpenseDate(item.expense_date);
+    setEditReceiptUrl(item.receipt_url || null);
+    setEditReceiptFile(null);
+    setEditRemoveReceipt(false);
+
+    if (editReceiptPreview) {
+      URL.revokeObjectURL(editReceiptPreview);
+      setEditReceiptPreview(null);
+    }
 
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -442,6 +631,14 @@ export default function CoupleLedgerEntryUI() {
     setEditCategory("데이트");
     setEditMemo("");
     setEditExpenseDate("");
+    setEditReceiptUrl(null);
+    setEditReceiptFile(null);
+    setEditRemoveReceipt(false);
+
+    if (editReceiptPreview) {
+      URL.revokeObjectURL(editReceiptPreview);
+      setEditReceiptPreview(null);
+    }
   };
 
   const saveEdit = async () => {
@@ -455,6 +652,20 @@ export default function CoupleLedgerEntryUI() {
 
     setUpdating(true);
     try {
+      const { data: u } = await supabase.auth.getUser();
+      const uid = u.user?.id;
+      if (!uid) throw new Error("로그인이 필요합니다.");
+
+      let nextReceiptUrl = editReceiptUrl;
+
+      if (editRemoveReceipt) {
+        nextReceiptUrl = null;
+      }
+
+      if (editReceiptFile) {
+        nextReceiptUrl = await uploadReceiptImage(editReceiptFile, uid);
+      }
+
       const { error } = await supabase
         .from("couple_expenses")
         .update({
@@ -462,6 +673,7 @@ export default function CoupleLedgerEntryUI() {
           category: editCategory,
           memo: editMemo,
           expense_date: editExpenseDate,
+          receipt_url: nextReceiptUrl,
         })
         .eq("id", editingId);
 
@@ -857,7 +1069,7 @@ export default function CoupleLedgerEntryUI() {
                 </div>
               </div>
 
-              <div className="mt-5 grid gap-3 grid-cols-1 md:grid-cols-2 xl:grid-cols-5">
+              <div className="mt-5 grid gap-3 grid-cols-1 md:grid-cols-2 xl:grid-cols-6">
                 <RecipeField label="날짜">
                   <input
                     type="date"
@@ -903,6 +1115,15 @@ export default function CoupleLedgerEntryUI() {
                   />
                 </RecipeField>
 
+                <RecipeField label="영수증">
+                  <InlineReceiptField
+                    preview={receiptPreview}
+                    hasExisting={false}
+                    onPick={handleReceiptChange}
+                    onClear={clearReceiptPreview}
+                  />
+                </RecipeField>
+
                 <div className="flex items-end">
                   <button
                     type="button"
@@ -926,7 +1147,7 @@ export default function CoupleLedgerEntryUI() {
               <div className="text-[15px] font-semibold text-slate-900">지출 레시피 수정</div>
               <div className="mt-2 text-[13px] text-slate-600">선택한 항목을 다시 정리합니다.</div>
 
-              <div className="mt-4 grid gap-3 grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
+              <div className="mt-4 grid gap-3 grid-cols-1 md:grid-cols-2 xl:grid-cols-5">
                 <RecipeField label="날짜">
                   <input
                     type="date"
@@ -969,6 +1190,18 @@ export default function CoupleLedgerEntryUI() {
                     className={inputBaseClass}
                   />
                 </RecipeField>
+
+                <RecipeField label="영수증">
+                  <InlineReceiptField
+                    preview={editRemoveReceipt ? null : editReceiptPreview}
+                    hasExisting={!!editReceiptUrl && !editRemoveReceipt && !editReceiptPreview}
+                    onPick={handleEditReceiptChange}
+                    onClear={() => {
+                      setEditRemoveReceipt(true);
+                      clearEditReceiptPreview();
+                    }}
+                  />
+                </RecipeField>
               </div>
 
               <div className="mt-5 flex flex-col gap-2 sm:flex-row">
@@ -1002,7 +1235,7 @@ export default function CoupleLedgerEntryUI() {
                   key={e.id}
                   className="group rounded-[18px] md:rounded-[22px] border border-[#F3F4F6] bg-white px-4 py-4 shadow-[0_8px_20px_rgba(27,22,17,0.03)] transition hover:shadow-[0_14px_28px_rgba(27,22,17,0.05)]"
                 >
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="truncate text-[14px] md:text-[15px] font-semibold text-slate-900">
@@ -1020,6 +1253,17 @@ export default function CoupleLedgerEntryUI() {
                             {e.created_by === ctx.partner_user_id ? "상대 결제" : "내 결제"}
                           </span>
                         )}
+
+                        <span
+                          className={cx(
+                            "inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium",
+                            e.receipt_url
+                              ? "border border-[#bfe4ff] bg-[#eef8ff] text-[#0c86ea]"
+                              : "border border-slate-200 bg-slate-50 text-slate-500"
+                          )}
+                        >
+                          {e.receipt_url ? "🧾 영수증 있음" : "영수증 없음"}
+                        </span>
                       </div>
 
                       <div className="mt-1 text-[12px] text-slate-500">
@@ -1033,6 +1277,17 @@ export default function CoupleLedgerEntryUI() {
 
                     <div className="flex flex-col items-stretch gap-2 sm:items-end sm:text-right">
                       <div className="text-[15px] font-semibold text-[#0c86ea]">{money(e.amount)}원</div>
+
+                      {e.receipt_url && (
+                        <a
+                          href={e.receipt_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-[11px] text-slate-500 underline underline-offset-2 hover:text-[#0c86ea]"
+                        >
+                          영수증 보기
+                        </a>
+                      )}
 
                       {tab === "shared" && canEdit && (
                         <div className="flex flex-wrap items-center gap-2 opacity-100 md:opacity-0 md:transition md:group-hover:opacity-100">

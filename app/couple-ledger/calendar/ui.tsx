@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 
-
 type CoupleContext = {
   couple_link_id: string;
   couple_ledger_id: string;
@@ -23,6 +22,7 @@ type CoupleExpense = {
   memo: string | null;
   expense_date: string;
   created_at: string;
+  receipt_url?: string | null;
 };
 
 type ToastType = "success" | "error" | "info";
@@ -67,7 +67,7 @@ function getMonthEnd(date: Date) {
 
 function getCalendarStart(date: Date) {
   const first = getMonthStart(date);
-  const day = first.getDay(); // 0: Sun
+  const day = first.getDay();
   const start = new Date(first);
   start.setDate(first.getDate() - day);
   return start;
@@ -163,6 +163,7 @@ export default function CoupleLedgerCalendarUI() {
   const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(
     null
   );
+  const [receiptPreviewUrl, setReceiptPreviewUrl] = useState<string | null>(null);
 
   const showToast = (message: string, type: ToastType = "info") => {
     setToast({ message, type });
@@ -390,19 +391,19 @@ export default function CoupleLedgerCalendarUI() {
                 </div>
 
                 <div className="mt-4 flex flex-wrap gap-2">
-  <Link href="/couple-ledger" className={secondaryButtonClass}>
-    기록
-  </Link>
-  <Link href="/couple-ledger/calendar" className={primaryButtonClass}>
-    달력
-  </Link>
-  <Link href="/couple-ledger/analytics" className={secondaryButtonClass}>
-    분석
-  </Link>
-  <Link href="/couple-settings" className={neutralButtonClass}>
-    설정
-  </Link>
-</div>
+                  <Link href="/couple-ledger" className={secondaryButtonClass}>
+                    기록
+                  </Link>
+                  <Link href="/couple-ledger/calendar" className={primaryButtonClass}>
+                    달력
+                  </Link>
+                  <Link href="/couple-ledger/analytics" className={secondaryButtonClass}>
+                    분석
+                  </Link>
+                  <Link href="/couple-settings" className={neutralButtonClass}>
+                    설정
+                  </Link>
+                </div>
               </div>
 
               <div className="flex flex-wrap gap-2">
@@ -689,7 +690,29 @@ export default function CoupleLedgerCalendarUI() {
                                 ? "상대 결제"
                                 : "내 결제"}
                             </span>
+                            <span
+                              className={cx(
+                                "inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium",
+                                item.receipt_url
+                                  ? "border border-[#bfe4ff] bg-[#eef8ff] text-[#0c86ea]"
+                                  : "border border-slate-200 bg-slate-50 text-slate-500"
+                              )}
+                            >
+                              {item.receipt_url ? "🧾 영수증 있음" : "영수증 없음"}
+                            </span>
                           </div>
+
+                          {item.receipt_url && (
+                            <div className="mt-3">
+                              <button
+                                type="button"
+                                onClick={() => setReceiptPreviewUrl(item.receipt_url || null)}
+                                className="inline-flex items-center rounded-[10px] border border-[#aadffe] bg-white px-3 py-1.5 text-[12px] font-medium text-[#0c86ea] transition hover:bg-[#edf7ff]"
+                              >
+                                영수증 보기
+                              </button>
+                            </div>
+                          )}
                         </div>
 
                         <div className="text-[15px] font-semibold text-[#0c86ea]">
@@ -706,6 +729,49 @@ export default function CoupleLedgerCalendarUI() {
               <Link href="/couple-ledger" className={secondaryButtonClass}>
                 가계부로 돌아가기
               </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {receiptPreviewUrl && (
+        <div
+          className="fixed inset-0 z-[70] bg-black/55 p-4"
+          onClick={() => setReceiptPreviewUrl(null)}
+        >
+          <div className="flex min-h-full items-center justify-center">
+            <div
+              className="w-full max-w-3xl rounded-[20px] bg-white p-4 shadow-[0_20px_60px_rgba(15,23,42,0.25)]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="text-[16px] font-semibold text-slate-900">영수증 보기</div>
+                <div className="flex items-center gap-2">
+                  <a
+                    href={receiptPreviewUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={secondaryButtonClass}
+                  >
+                    새 창에서 보기
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => setReceiptPreviewUrl(null)}
+                    className={neutralButtonClass}
+                  >
+                    닫기
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-4 overflow-hidden rounded-[16px] border border-slate-200 bg-slate-50">
+                <img
+                  src={receiptPreviewUrl}
+                  alt="영수증 미리보기"
+                  className="max-h-[70vh] w-full object-contain"
+                />
+              </div>
             </div>
           </div>
         </div>

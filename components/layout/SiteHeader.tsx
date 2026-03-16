@@ -361,6 +361,28 @@ export function SiteHeader() {
 
           {/* 우측 */}
           <div className="flex shrink-0 items-center gap-2">
+            {/* 모바일 알림 내역 바로가기 */}
+            {!checking && isLoggedIn && (
+              <Link
+                href="/notifications"
+                onClick={() => {
+                  closeNav();
+                  closeNotif();
+                }}
+                className="relative inline-flex h-10 items-center justify-center rounded-[10px] border border-slate-200 bg-white px-3 text-[10px] font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 md:hidden"
+              >
+                알림
+                {unreadCount > 0 && (
+                  <span
+                    className="ml-1 inline-flex min-w-[18px] items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold text-white"
+                    style={{ backgroundColor: BRAND_BLUE }}
+                  >
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
+              </Link>
+            )}
+
             {!checking && isLoggedIn && (
               <div className="relative hidden md:block" ref={notifWrapRef}>
                 <button
@@ -390,14 +412,26 @@ export function SiteHeader() {
                         <div className="text-[14px] font-extrabold text-slate-900">
                           알림 센터
                         </div>
-                        <button
-                          type="button"
-                          onClick={closeNotif}
-                          className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[14px] font-semibold text-slate-700 hover:bg-slate-50"
-                        >
-                          닫기
-                        </button>
+
+                        <div className="flex items-center gap-2">
+                          <Link
+                            href="/notifications"
+                            onClick={closeNotif}
+                            className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[13px] font-semibold text-slate-700 hover:bg-slate-50"
+                          >
+                            전체보기
+                          </Link>
+
+                          <button
+                            type="button"
+                            onClick={closeNotif}
+                            className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[14px] font-semibold text-slate-700 hover:bg-slate-50"
+                          >
+                            닫기
+                          </button>
+                        </div>
                       </div>
+
                       <div className="max-h-[70vh] overflow-y-auto p-3">
                         <NotificationsPanel onClose={closeNotif} />
                       </div>
@@ -428,36 +462,34 @@ export function SiteHeader() {
         </div>
       </div>
 
-      
-
-        {/* 2차 프로모션 탭 */}
-<div className="border-b border-slate-200 bg-[#fafafa]">
-  <div className="mx-auto hidden w-full max-w-[980px] items-center justify-center px-4 md:flex">
-    {[
-      { label: "지출관리 필수 계산기", active: false, dark: true },
-      { label: "적금 관리", active: false, dark: true },
-      { label: "사회초년생 가계부", active: true, dark: false },
-      { label: "경조사비 관리", active: false, dark: true },
-    ].map((item) => (
-      <div
-        key={item.label}
-        className={[
-          "flex h-12 flex-1 items-center justify-center border-x border-slate-200 text-center text-[14px] font-bold",
-          item.active
-            ? "text-slate-900"
-            : item.dark
-            ? "bg-[#242424] text-white"
-            : "bg-white text-slate-700",
-        ].join(" ")}
-        style={{
-          backgroundColor: item.active ? BRAND_SKY : undefined,
-        }}
-      >
-        {item.label}
+      {/* 2차 프로모션 탭 */}
+      <div className="border-b border-slate-200 bg-[#fafafa]">
+        <div className="mx-auto hidden w-full max-w-[980px] items-center justify-center px-4 md:flex">
+          {[
+            { label: "지출관리 필수 계산기", active: false, dark: true },
+            { label: "적금 관리", active: false, dark: true },
+            { label: "사회초년생 가계부", active: true, dark: false },
+            { label: "경조사비 관리", active: false, dark: true },
+          ].map((item) => (
+            <div
+              key={item.label}
+              className={[
+                "flex h-12 flex-1 items-center justify-center border-x border-slate-200 text-center text-[14px] font-bold",
+                item.active
+                  ? "text-slate-900"
+                  : item.dark
+                  ? "bg-[#242424] text-white"
+                  : "bg-white text-slate-700",
+              ].join(" ")}
+              style={{
+                backgroundColor: item.active ? BRAND_SKY : undefined,
+              }}
+            >
+              {item.label}
+            </div>
+          ))}
+        </div>
       </div>
-    ))}
-  </div>
-</div>
 
       {/* 모바일 메뉴 */}
       {isNavOpen && (
@@ -491,6 +523,29 @@ export function SiteHeader() {
                   </Link>
                 ))}
               </div>
+
+              {isLoggedIn && (
+                <div className="border-t border-slate-100 px-3 py-3">
+                  <Link
+                    href="/notifications"
+                    className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-[12px] font-semibold text-slate-700"
+                    onClick={() => {
+                      closeNav();
+                      closeNotif();
+                    }}
+                  >
+                    <span>알림 내역 보기</span>
+                    {unreadCount > 0 && (
+                      <span
+                        className="inline-flex min-w-[20px] items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold text-white"
+                        style={{ backgroundColor: BRAND_BLUE }}
+                      >
+                        {unreadCount > 99 ? "99+" : unreadCount}
+                      </span>
+                    )}
+                  </Link>
+                </div>
+              )}
 
               <div className="border-t border-slate-100 bg-sky-50/60 px-4 py-3">
                 <div className="text-[10px] font-bold text-slate-800">첫 기록 혜택</div>
