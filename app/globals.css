@@ -1,64 +1,3 @@
-/* @import "tailwindcss";
-
-:root {
-  --background: #5bbbf3;
-  --foreground: #171717;
-}
-
-@layer base {
-  :root {
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
-    --font-sans: var(--font-geist-sans);
-    --font-mono: var(--font-geist-mono);
-  }
-}
-
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-} */
-/* @import "tailwindcss";
-
-:root {
-  --background: #5bbbf3;
-  --foreground: #171717;
-}
-
-@layer base {
-  :root {
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
-    --font-sans: var(--font-geist-sans);
-    --font-mono: var(--font-geist-mono);
-  }
-}
-
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-} */
-
-/* (여기 위에 사용자가 준 주석 블록 그대로 유지) */
-
 /* ✅ Tailwind v4: 가장 안전한 방식 */
 @import "tailwindcss";
 
@@ -69,7 +8,7 @@ body {
 
 /* 지출레시피 Theme (네가 추가했던 오렌지 변수/배경은 그대로 유지 가능) */
 :root {
-  --background: #eef6ff;
+  --background: #ffffff;
   --foreground: #171717;
 
   --recipe-blue: #3dd8ff;

@@ -1145,7 +1145,7 @@ export default function CoupleLedgerEntryUI() {
           {tab === "shared" && editingId && canEdit && (
             <div className="mt-5 rounded-[20px] md:rounded-[24px] border border-[#aadffe] bg-[#f9fdff] p-4 md:p-5">
               <div className="text-[15px] font-semibold text-slate-900">지출 레시피 수정</div>
-              <div className="mt-2 text-[13px] text-slate-600">선택한 항목을 다시 정리합니다.</div>
+              <div className="mt-2 text-[10px] text-slate-600">선택한 항목을 다시 정리합니다.</div>
 
               <div className="mt-4 grid gap-3 grid-cols-1 md:grid-cols-2 xl:grid-cols-5">
                 <RecipeField label="날짜">

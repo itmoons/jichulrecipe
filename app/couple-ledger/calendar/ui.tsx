@@ -445,7 +445,7 @@ export default function CoupleLedgerCalendarUI() {
               <div className="text-[17px] md:text-[18px] font-semibold tracking-[-0.02em] text-slate-900">
                 월별 달력
               </div>
-              <div className="mt-2 text-[13px] leading-6 text-slate-600">
+              <div className="mt-2 text-[10px] leading-6 text-slate-600">
                 날짜를 누르면 그날의 지출 상세를 볼 수 있습니다.
               </div>
             </div>
@@ -627,7 +627,7 @@ export default function CoupleLedgerCalendarUI() {
                 <div className="text-[18px] font-semibold text-slate-900">
                   {formatDateLabel(selectedDateKey)}
                 </div>
-                <div className="mt-2 text-[13px] text-slate-600">
+                <div className="mt-2 text-[10px] text-slate-600">
                   총 {money(selectedDateSummary.total)}원 · {selectedDateSummary.count}건
                 </div>
               </div>

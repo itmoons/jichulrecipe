@@ -172,6 +172,7 @@ export function SiteHeader() {
   const isDashboard = pathname === "/dashboard";
   const isYearly = pathname?.startsWith("/dashboard/yearly");
   const isCouple = pathname?.startsWith("/couple-ledger");
+  const isMainPage = pathname === "/";
 
   const guardedHref = (target: string) => {
     if (isPublicRoute(target)) return target;
@@ -255,10 +256,10 @@ export function SiteHeader() {
               </div>
 
               <div className="min-w-0 leading-tight">
-                <div className="truncate text-[14px] font-black tracking-[-0.04em] text-slate-800 sm:text-[20px]">
+                <div className="truncate text-[14px] font-black tracking-[-0.04em] text-slate-800 sm:text-[18px]">
                   지출<span className="text-sky-400">recipe</span>
                 </div>
-                <div className="hidden text-[14px] text-slate-400 sm:block">
+                <div className="hidden text-[12px] text-slate-400 sm:block">
                   프리미엄 무료 가계부 사이트
                 </div>
               </div>
@@ -361,7 +362,6 @@ export function SiteHeader() {
 
           {/* 우측 */}
           <div className="flex shrink-0 items-center gap-2">
-            {/* 모바일 알림 내역 바로가기 */}
             {!checking && isLoggedIn && (
               <Link
                 href="/notifications"
@@ -369,7 +369,7 @@ export function SiteHeader() {
                   closeNav();
                   closeNotif();
                 }}
-                className="relative inline-flex h-10 items-center justify-center rounded-[10px] border border-slate-200 bg-white px-3 text-[10px] font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 md:hidden"
+                className="relative inline-flex h-7 items-center justify-center rounded-[10px] border border-slate-200 bg-white px-3 text-[10px] font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 md:hidden"
               >
                 알림
                 {unreadCount > 0 && (
@@ -393,7 +393,7 @@ export function SiteHeader() {
                   aria-expanded={isNotifOpen}
                 >
                   <span className="text-[14px] leading-none">🔔</span>
-                  <span className="ml-1">알림</span>
+                  {/* <span className="ml-1">알림</span> */}
 
                   {unreadCount > 0 && (
                     <span
@@ -446,7 +446,7 @@ export function SiteHeader() {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="inline-flex h-10 items-center justify-center rounded-[10px] border border-slate-200 bg-white px-3 text-[10px] font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+                  className="inline-flex h-7 sm:h-10 items-center justify-center rounded-[10px] border border-slate-200 bg-white px-3 text-[10px] sm:text-[12px] font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
                 >
                   로그아웃
                 </button>
@@ -462,34 +462,36 @@ export function SiteHeader() {
         </div>
       </div>
 
-      {/* 2차 프로모션 탭 */}
-      <div className="border-b border-slate-200 bg-[#fafafa]">
-        <div className="mx-auto hidden w-full max-w-[980px] items-center justify-center px-4 md:flex">
-          {[
-            { label: "지출관리 필수 계산기", active: false, dark: true },
-            { label: "적금 관리", active: false, dark: true },
-            { label: "사회초년생 가계부", active: true, dark: false },
-            { label: "경조사비 관리", active: false, dark: true },
-          ].map((item) => (
-            <div
-              key={item.label}
-              className={[
-                "flex h-12 flex-1 items-center justify-center border-x border-slate-200 text-center text-[14px] font-bold",
-                item.active
-                  ? "text-slate-900"
-                  : item.dark
-                  ? "bg-[#242424] text-white"
-                  : "bg-white text-slate-700",
-              ].join(" ")}
-              style={{
-                backgroundColor: item.active ? BRAND_SKY : undefined,
-              }}
-            >
-              {item.label}
-            </div>
-          ))}
+      {/* 2차 프로모션 탭 - 메인 페이지에서만 노출 */}
+      {isMainPage && (
+        <div className="border-b border-slate-200 bg-[#fafafa]">
+          <div className="mx-auto hidden w-full max-w-[980px] items-center justify-center px-4 md:flex">
+            {[
+              { label: "지출관리 필수 계산기", active: false, dark: true },
+              { label: "적금 관리", active: false, dark: true },
+              { label: "사회초년생 가계부", active: true, dark: false },
+              { label: "경조사비 관리", active: false, dark: true },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className={[
+                  "flex h-12 flex-1 items-center justify-center border-x border-slate-200 text-center text-[14px] font-bold",
+                  item.active
+                    ? "text-slate-900"
+                    : item.dark
+                    ? "bg-[#242424] text-white"
+                    : "bg-white text-slate-700",
+                ].join(" ")}
+                style={{
+                  backgroundColor: item.active ? BRAND_SKY : undefined,
+                }}
+              >
+                {item.label}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* 모바일 메뉴 */}
       {isNavOpen && (

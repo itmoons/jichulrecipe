@@ -526,7 +526,7 @@ export default function CoupleLedgerAnalyticsUI() {
                 <div className="text-[17px] md:text-[18px] font-semibold tracking-[-0.02em] text-slate-900">
                   월별 분석
                 </div>
-                <div className="mt-2 text-[13px] leading-6 text-slate-600">
+                <div className="mt-2 text-[10px] leading-6 text-slate-600">
                   {formatMonthLabel(baseMonth)} 기준 공동 지출을 분석합니다.
                 </div>
               </div>
@@ -589,7 +589,7 @@ export default function CoupleLedgerAnalyticsUI() {
                 <div className="text-[17px] font-semibold text-slate-900">
                   카테고리별 지출 그래프
                 </div>
-                <div className="mt-2 text-[13px] text-slate-600">
+                <div className="mt-2 text-[10px] text-slate-600">
                   카테고리별 공동 지출 금액을 막대 그래프로 보여줍니다.
                 </div>
 
@@ -632,7 +632,7 @@ export default function CoupleLedgerAnalyticsUI() {
                 <div className="text-[17px] font-semibold text-slate-900">
                   결제 비중 그래프
                 </div>
-                <div className="mt-2 text-[13px] text-slate-600">
+                <div className="mt-2 text-[10px] text-slate-600">
                   내 결제와 상대 결제 비중을 도넛 차트로 보여줍니다.
                 </div>
 
@@ -686,7 +686,7 @@ export default function CoupleLedgerAnalyticsUI() {
               <div className="text-[17px] font-semibold text-slate-900">
                 일자별 지출 추이 그래프
               </div>
-              <div className="mt-2 text-[13px] text-slate-600">
+              <div className="mt-2 text-[10px] text-slate-600">
                 날짜별 총 지출 흐름을 라인 차트로 보여줍니다.
               </div>
 
@@ -727,7 +727,7 @@ export default function CoupleLedgerAnalyticsUI() {
 
             <Surface className="mt-4 p-4 md:p-6">
               <div className="text-[17px] font-semibold text-slate-900">상세 테이블</div>
-              <div className="mt-2 text-[13px] text-slate-600">
+              <div className="mt-2 text-[10px] text-slate-600">
                 카테고리별 합계를 표 형태로 확인합니다.
               </div>
 
