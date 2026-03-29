@@ -400,10 +400,10 @@ export default function HomePage() {
         <AwningCard color="purple">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4 sm:gap-4">
             {[
-              { name: "레시피 달력 서비스", price: "1,000원", color: "#ffd166" },
-              { name: "레시피 분석 서비스", price: "1,000원", color: "#caa77a" },
-              { name: "정기레시피 서비스", price: "1,900원", color: "#9ad59b" },
-              { name: "적금관리 서비스", price: "1,900원", color: "#ffb38a" },
+              { name: "레시피 달력 서비스", price: "0원", color: "#ffd166" },
+              { name: "레시피 분석 서비스", price: "0원", color: "#caa77a" },
+              { name: "정기레시피 서비스", price: "0원", color: "#9ad59b" },
+              { name: "적금관리 서비스", price: "0원", color: "#ffb38a" },
             ].map((item) => (
               <div
                 key={item.name}
