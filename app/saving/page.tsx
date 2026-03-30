@@ -391,7 +391,7 @@ export default function SavingPage() {
             {/* 헤더 */}
             <section className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div className="min-w-0">
-                <h1 className="text-[18px] font-bold text-slate-900 sm:text-[20px]">
+                <h1 className="text-[16px] font-bold text-slate-900 sm:text-[20px]">
                   💰 적금 · 목표 저축
                 </h1>
                 <p className="mt-1 text-[10px] text-slate-600 sm:text-[8px]">
@@ -408,7 +408,7 @@ export default function SavingPage() {
                 <button
                   type="button"
                   onClick={openCreateModal}
-                  className="ml-auto rounded-[10px] px-4 py-2 text-[10px] font-semibold shadow-sm sm:ml-0 sm:text-[8px]"
+                  className="w-full m-auto rounded-[10px] px-4 py-2 text-[10px] font-semibold shadow-sm sm:ml-0 sm:text-[8px]"
                   style={{ backgroundColor: BRAND_BLUE, color: "#fff" }}
                   disabled={saving}
                 >
@@ -444,7 +444,7 @@ export default function SavingPage() {
             <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
               <div className="flex flex-col gap-3 border-b border-slate-100 px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4">
                 <div className="min-w-0">
-                  <h2 className="text-[10px] font-semibold text-slate-900 sm:text-[8px]">
+                  <h2 className="text-[10px] font-semibold text-slate-900 sm:text-[16px]">
                     적금 목록
                   </h2>
                   <p className="mt-0.5 text-[10px] text-slate-500">
@@ -853,7 +853,7 @@ function SummaryCard({ label, value }: { label: string; value: string }) {
       <div className="text-[10px] font-medium text-slate-500 sm:text-xs">
         {label}
       </div>
-      <div className="mt-2 text-[18px] font-bold text-slate-900 sm:text-xl">
+      <div className="mt-2 text-[14px] font-bold text-slate-900 sm:text-xl">
         {value}
       </div>
     </div>

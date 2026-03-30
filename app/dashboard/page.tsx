@@ -663,7 +663,7 @@ function DashboardInner() {
               <span>{ymToText(monthParam)} 지출 레시피</span>
             </div>
             <h1 className="mt-1 text-lg font-semibold text-slate-900 sm:text-xl">이번 달 소비 분석 대시보드</h1>
-            <p className="mt-0.5 text-[11px] text-slate-600">달력에 기록한 하루 레시피를 모아서, 한 달 전체의 흐름을 한 번에 확인합니다.</p>
+            <p className="mt-0.5 text-[8px] text-slate-600">달력에 기록한 하루 레시피를 모아서, 한 달 전체의 흐름을 한 번에 확인합니다.</p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -710,9 +710,9 @@ function DashboardInner() {
         </section>
 
         {/* 메인 2컬럼 */}
-        <section className="grid gap-4 lg:grid-cols-[minmax(280px,340px)_minmax(0,1fr)] ">
+        <section className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           {/* 좌측: 파이 + 카테고리 */}
-          <div className="flex flex-col gap-3 rounded-3xl bg-white/95 border border-blue-100 p-3.5 shadow-sm shadow-blue-100/70  w-fit sm:w-auto">
+          <div className="flex flex-col gap-3 rounded-2xl bg-white/95 border border-blue-100 p-3.5 shadow-sm shadow-blue-100/70  w-fit sm:w-auto">
             {/* 건강도 + 요약 */}
             <div className="flex items-start justify-between gap-2 ">
               <div>
@@ -720,7 +720,7 @@ function DashboardInner() {
                   <span>{health.emoji}</span>
                   <span>{health.title}</span>
                 </div>
-                <p className="text-[11px] text-slate-600 max-w-[230px]">{health.subtitle}</p>
+                <p className="text-[8px] text-slate-600">{health.subtitle}</p>
               </div>
               <div className="text-right text-[11px] text-slate-500">
                 <p className="whitespace-nowrap">
@@ -781,10 +781,10 @@ function DashboardInner() {
           {/* 우측: 그래프 + 테이블 + 분석 */}
           <div className="flex flex-col gap-4">
             {/* ✅ 지출 전체 “선 그래프” */}
-            <div className="rounded-3xl bg-white/95 border border-slate-200 p-3.5 shadow-sm shadow-slate-100 w-fit sm:w-auto">
+            <div className="">
               <div className="mb-2 flex items-center justify-between">
                 <span className="text-xs font-semibold text-slate-900">지출 전체 추이</span>
-                <span className="text-[10px] text-slate-500">일자별 지출 합계 (원)</span>
+                <span className="text-[8px] text-slate-500 sm:text-[10px]">일자별 지출 합계 (원)</span>
               </div>
 
               <LineChartCard series={dailySeries.map((d) => ({ xLabel: formatKoreanDate(d.date), date: d.date, y: d.expense }))} />
@@ -802,16 +802,16 @@ function DashboardInner() {
             </div>
 
             {/* 하단: 테이블 + 분석 카드 */}
-            <div className="grid gap-4 lg:grid-cols-[1.3fr_0.7fr]">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               {/* 일자별 요약 테이블 */}
-              <div className="rounded-3xl bg-white/95 border border-slate-200 p-3.5 shadow-sm shadow-slate-100 w-fit sm:w-auto">
+              <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="mb-2 flex items-center justify-between">
                   <span className="text-xs font-semibold text-slate-900">일자별 레시피 요약</span>
-                  <span className="text-[10px] text-slate-500">수입·지출·저축을 한 줄로 정리했습니다</span>
+                  <span className="text-[8px] text-slate-500 sm:text-[10px]">수입·지출·저축을 한 줄로 정리했습니다</span>
                 </div>
 
                 <div className="overflow-x-auto rounded-2xl border border-slate-200 max-h-64">
-                  <table className="min-w-full text-[11px]">
+                  <table className="min-w-full text-[8px] sm:text-[11px]">
                     <thead className="bg-slate-50 text-slate-500">
                       <tr>
                         <th className="px-2 py-2 text-left w-1/6">날짜</th>
@@ -860,7 +860,7 @@ function DashboardInner() {
 
               {/* 셰프 분석 카드 */}
               <div className="space-y-3">
-                <div className="rounded-3xl bg-white/95 border border-slate-200 p-3.5 shadow-sm shadow-slate-100 w-fit sm:w-auto">
+                <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="mb-2 flex items-center gap-2">
                     <span className="text-lg">👨‍🍳</span>
                     <h2 className="text-xs font-semibold text-slate-900">이번 달 셰프 노트</h2>
