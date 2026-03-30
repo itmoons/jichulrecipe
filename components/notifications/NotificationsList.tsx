@@ -172,10 +172,10 @@ export default function NotificationsList({
 
               <div className="flex items-start justify-between gap-3 pr-8">
                 <div className="min-w-0">
-                  <div className="text-sm font-bold text-zinc-900">
+                  <div className="text-[10px] font-bold text-zinc-900 sm:text-sm">
                     {getNotificationTitle(n.type)}
                   </div>
-                  <div className="mt-1 text-xs text-zinc-500">
+                  <div className="mt-1 text-[10px] text-zinc-500 sm:text-xs">
                     {new Date(n.created_at).toLocaleString()}
                   </div>
                 </div>

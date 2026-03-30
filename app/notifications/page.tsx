@@ -60,14 +60,14 @@ export default function NotificationsPage() {
         <div className="mb-5 flex items-center justify-between gap-3">
           <div>
             <h1 className="text-xl font-bold text-zinc-900">알림 내역</h1>
-            <p className="mt-1 text-sm text-zinc-500">
+            <p className="mt-1 text-[10px] text-zinc-500 sm:text-sm">
               최근 받은 알림을 한곳에서 확인할 수 있습니다.
             </p>
           </div>
 
           <Link
             href="/"
-            className="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700"
+            className="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[10px] sm:text-sm font-medium text-zinc-700"
           >
             홈으로
           </Link>
