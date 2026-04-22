@@ -280,7 +280,7 @@ export default function CoupleLedgerPage() {
 
   if (checking) {
     return (
-      <div className="mx-auto max-w-[1280px] min-h-screen bg-[#ffffff] p-6 text-[14px] text-slate-600">
+      <div className="mx-auto max-w-[1320px] min-h-screen bg-[#ffffff] p-6 text-[14px] text-slate-600">
         불러오는 중…
       </div>
     );
@@ -289,7 +289,7 @@ export default function CoupleLedgerPage() {
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-[#ffffff] px-4 py-10 sm:px-6">
-        <div className="mx-auto max-w-[1280px]">
+        <div className="mx-auto max-w-[1320px]">
           <Surface className="p-6 sm:p-8">
             <div className="text-[24px] font-semibold tracking-[-0.03em] text-slate-900">
               커플 가계부
@@ -314,7 +314,7 @@ export default function CoupleLedgerPage() {
   if (!ctx?.couple_link_id) {
     return (
       <div className="min-h-screen bg-[#ffffff] px-4 py-10 sm:px-6">
-        <div className="mx-auto max-w-[1280px]">
+        <div className="mx-auto max-w-[1320px]">
           <Surface className="p-6 sm:p-8">
             <div className="text-[24px] font-semibold tracking-[-0.03em] text-slate-900">
               커플 가계부
@@ -344,7 +344,7 @@ export default function CoupleLedgerPage() {
 
   return (
     <div className="min-h-screen bg-[#ffffff] px-4 py-8 sm:px-6 sm:py-6">
-      <div className="mx-auto max-w-[1230px]">
+      <div className="mx-auto max-w-[1320px]">
         <Surface className="px-5 py-8 sm:px-8 sm:py-4">
           <div className="flex flex-col items-center justify-center gap-6 sm:flex-row sm:gap-10">
             <ProfileCircle

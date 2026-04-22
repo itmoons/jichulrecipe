@@ -494,7 +494,7 @@ export default function CoupleLedgerAnalyticsUI() {
 
   return (
     <div className="min-h-screen bg-white pb-10">
-      <div className="mx-auto max-w-[1280px] px-4 py-5 md:px-6 md:py-8">
+      <div className="mx-auto max-w-[1320px] px-4 py-5 md:px-6 md:py-8">
         <Surface className="overflow-hidden">
           <div className="border-b border-[#F3F4F6] bg-white px-4 py-5 md:px-6 md:py-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">

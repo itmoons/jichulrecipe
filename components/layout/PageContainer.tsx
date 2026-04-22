@@ -9,7 +9,7 @@ type Props = {
 export function PageContainer({ title, children }: Props) {
   return (
     <main className="min-h-screen bg-slate-50">
-      <div className="min-h-screen px-3 pb-7 pt-3 sm:px-6 mx-auto w-full lg:max-w-[68%]">
+      <div className="min-h-screen px-3 pb-7 pt-3 sm:px-6 mx-auto w-full lg:max-w-[1360px]">
         {title && (
           <h1 className="mb-4 text-2xl font-semibold text-slate-900">
             {title}

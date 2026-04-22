@@ -651,19 +651,24 @@ function DashboardInner() {
   const topCat = topExpenseItems[0];
 
   return (
-    <PageContainer title="">
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-[#FFF7EB] via-[#FFFDFC] to-[#F3F4FF]" />
+  <PageContainer title="">
+    <div className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-[#FFF7EB] via-[#FFFDFC] to-[#F3F4FF]" />
 
-      <main className=" min-h-screen pb-7 pt-3 ">
+    <main className="min-h-screen pb-7 pt-3 lg:pb-10 lg:pt-5">
+      <div className="mx-auto w-full max-w-[1320px]">
         {/* 상단 헤더 */}
-        <section className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <section className="mb-4 flex flex-col gap-3 lg:mb-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <div className="inline-flex items-center gap-1 rounded-full bg-white/80 border border-blue-100 px-2 py-1 text-[10px] text-blue-700 shadow-sm">
               <span>🍲</span>
               <span>{ymToText(monthParam)} 지출 레시피</span>
             </div>
-            <h1 className="mt-1 text-lg font-semibold text-slate-900 sm:text-xl">이번 달 소비 분석 대시보드</h1>
-            <p className="mt-0.5 text-[8px] text-slate-600">달력에 기록한 하루 레시피를 모아서, 한 달 전체의 흐름을 한 번에 확인합니다.</p>
+            <h1 className="mt-1 text-lg font-semibold text-slate-900 sm:text-xl lg:text-2xl">
+              이번 달 소비 분석 대시보드
+            </h1>
+            <p className="mt-0.5 text-[8px] text-slate-600 lg:mt-1 lg:text-xs">
+              달력에 기록한 하루 레시피를 모아서, 한 달 전체의 흐름을 한 번에 확인합니다.
+            </p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -696,33 +701,33 @@ function DashboardInner() {
         </section>
 
         {/* 요약칩 */}
-        <section className="mb-4 grid gap-3 md:grid-cols-3">
+        <section className="mb-4 grid gap-3 md:grid-cols-3 lg:mb-5">
           {summaryChips.map((chip) => (
             <div
               key={chip.label}
-              className="rounded-2xl border border-blue-100 bg-white/95 px-3.5 py-3 shadow-sm shadow-blue-100/60 flex flex-col justify-between w-auto "
+              className="rounded-2xl border border-blue-100 bg-white/95 px-3.5 py-3 shadow-sm shadow-blue-100/60 flex flex-col justify-between w-auto lg:min-h-[108px] lg:px-5 lg:py-4"
             >
-              <span className="text-[11px] text-slate-500">{chip.label}</span>
-              <span className="mt-1 text-base font-semibold text-slate-900">{chip.value}</span>
-              <span className="mt-1 text-[10px] text-slate-500">{chip.sub}</span>
+              <span className="text-[11px] text-slate-500 lg:text-xs">{chip.label}</span>
+              <span className="mt-1 text-base font-semibold text-slate-900 lg:text-[22px]">{chip.value}</span>
+              <span className="mt-1 text-[10px] text-slate-500 lg:text-[11px]">{chip.sub}</span>
             </div>
           ))}
         </section>
 
-        {/* 메인 2컬럼 */}
-        <section className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        {/* 메인 2컬럼 - 모바일은 그대로 세로, 웹만 2단 */}
+        <section className="mb-4 flex flex-col gap-3 lg:grid lg:grid-cols-12 lg:gap-5">
           {/* 좌측: 파이 + 카테고리 */}
-          <div className="flex flex-col gap-3 rounded-2xl bg-white/95 border border-blue-100 p-3.5 shadow-sm shadow-blue-100/70  w-fit sm:w-auto">
+          <div className="flex flex-col gap-3 rounded-2xl bg-white/95 border border-blue-100 p-3.5 shadow-sm shadow-blue-100/70 w-auto lg:col-span-4 lg:rounded-3xl lg:p-5 lg:sticky lg:top-6">
             {/* 건강도 + 요약 */}
-            <div className="flex items-start justify-between gap-2 ">
-              <div>
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
                 <div className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-[10px] text-blue-800 border border-blue-100 mb-1">
                   <span>{health.emoji}</span>
                   <span>{health.title}</span>
                 </div>
-                <p className="text-[8px] text-slate-600">{health.subtitle}</p>
+                <p className="text-[8px] text-slate-600 lg:text-xs">{health.subtitle}</p>
               </div>
-              <div className="text-right text-[11px] text-slate-500">
+              <div className="text-right text-[11px] text-slate-500 lg:text-xs">
                 <p className="whitespace-nowrap">
                   지출 합계 <span className="font-semibold text-slate-900">{totalExpense.toLocaleString()}원</span>
                 </p>
@@ -732,34 +737,45 @@ function DashboardInner() {
                     {totalSaving.toLocaleString()}원
                   </span>
                 </p>
-                {baseIncome && <p className="mt-0.5 text-[10px] text-slate-500 whitespace-nowrap">기준 소득 {baseIncome.toLocaleString()}원</p>}
+                {baseIncome && (
+                  <p className="mt-0.5 text-[10px] text-slate-500 whitespace-nowrap lg:text-[11px]">
+                    기준 소득 {baseIncome.toLocaleString()}원
+                  </p>
+                )}
               </div>
             </div>
 
-            {/* 파이 차트(구분 기준) */}
             <PieChartCard items={topExpenseItems} total={totalExpense} />
 
             {/* 카테고리 리스트 */}
-            <div className="mt-2 rounded-2xl bg-blue-50/40 border border-blue-100 px-3 py-2.5">
+            <div className="mt-2 rounded-2xl bg-blue-50/40 border border-blue-100 px-3 py-2.5 lg:px-4 lg:py-3">
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[11px] text-slate-700">지출 구분 요약</span>
+                <span className="text-[11px] text-slate-700 lg:text-xs">지출 구분 요약</span>
                 <span className="text-[10px] text-slate-500">{topExpenseItems.length}개 항목</span>
               </div>
 
-              <div className="space-y-1.5 text-[11px] max-h-52 overflow-auto pr-1">
+              <div className="space-y-1.5 text-[11px] max-h-52 overflow-auto pr-1 lg:max-h-[360px] lg:text-xs">
                 {topExpenseItems.length === 0 && (
                   <p className="text-slate-500">달력에서 지출 “구분”을 선택해 두면, 여기서 구분별 비율을 볼 수 있습니다.</p>
                 )}
 
                 {topExpenseItems.map((item, idx) => {
                   const ratio = totalExpense > 0 ? (item.amount / totalExpense) * 100 : 0;
-                  const chipColors = ["bg-blue-500", "bg-blue-400", "bg-lime-400", "bg-emerald-400", "bg-sky-400", "bg-fuchsia-400", "bg-slate-400"];
+                  const chipColors = [
+                    "bg-blue-500",
+                    "bg-blue-400",
+                    "bg-lime-400",
+                    "bg-emerald-400",
+                    "bg-sky-400",
+                    "bg-fuchsia-400",
+                    "bg-slate-400",
+                  ];
                   const chipColor = chipColors[idx % chipColors.length] ?? "bg-slate-400";
 
                   return (
                     <div
                       key={`${item.label}-${idx}`}
-                      className="flex items-center justify-between gap-2 rounded-xl bg-white/80 px-2 py-1 hover:bg-blue-50"
+                      className="flex items-center justify-between gap-2 rounded-xl bg-white/80 px-2 py-1 hover:bg-blue-50 lg:px-3 lg:py-2"
                     >
                       <div className="flex items-center gap-2 min-w-0">
                         <span className={`h-4 w-4 flex items-center justify-center rounded-full text-[10px] text-white font-semibold ${chipColor}`}>
@@ -779,17 +795,23 @@ function DashboardInner() {
           </div>
 
           {/* 우측: 그래프 + 테이블 + 분석 */}
-          <div className="flex flex-col gap-4">
-            {/* ✅ 지출 전체 “선 그래프” */}
-            <div className="">
-              <div className="mb-2 flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-900">지출 전체 추이</span>
-                <span className="text-[8px] text-slate-500 sm:text-[10px]">일자별 지출 합계 (원)</span>
+          <div className="flex flex-col gap-4 lg:col-span-8">
+            {/* 지출 전체 선 그래프 */}
+            <div className="rounded-2xl lg:rounded-3xl lg:border lg:border-slate-200 lg:bg-white/90 lg:p-5 lg:shadow-sm">
+              <div className="mb-2 flex items-center justify-between lg:mb-3">
+                <span className="text-xs font-semibold text-slate-900 lg:text-base">지출 전체 추이</span>
+                <span className="text-[8px] text-slate-500 sm:text-[10px] lg:text-[11px]">일자별 지출 합계 (원)</span>
               </div>
 
-              <LineChartCard series={dailySeries.map((d) => ({ xLabel: formatKoreanDate(d.date), date: d.date, y: d.expense }))} />
+              <LineChartCard
+                series={dailySeries.map((d) => ({
+                  xLabel: formatKoreanDate(d.date),
+                  date: d.date,
+                  y: d.expense,
+                }))}
+              />
 
-              <div className="mt-2 text-[10px] text-slate-600">
+              <div className="mt-2 text-[10px] text-slate-600 lg:mt-3 lg:text-xs">
                 {stats.maxExpenseDay ? (
                   <>
                     가장 많이 쓴 날은 <span className="font-semibold">{formatKoreanDate(stats.maxExpenseDay.date)}</span>로,{" "}
@@ -801,24 +823,24 @@ function DashboardInner() {
               </div>
             </div>
 
-            {/* 하단: 테이블 + 분석 카드 */}
-            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            {/* 하단: 웹에서만 2단 */}
+            <div className="flex flex-col gap-3 lg:grid lg:grid-cols-[1.25fr_0.95fr] lg:gap-4">
               {/* 일자별 요약 테이블 */}
-              <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-slate-900">일자별 레시피 요약</span>
-                  <span className="text-[8px] text-slate-500 sm:text-[10px]">수입·지출·저축을 한 줄로 정리했습니다</span>
+              <div className="lg:rounded-3xl lg:border lg:border-slate-200 lg:bg-white/90 lg:p-5 lg:shadow-sm">
+                <div className="mb-2 flex items-center justify-between lg:mb-3">
+                  <span className="text-xs font-semibold text-slate-900 lg:text-base">일자별 레시피 요약</span>
+                  <span className="text-[8px] text-slate-500 sm:text-[10px] lg:text-[11px]">수입·지출·저축을 한 줄로 정리했습니다</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-2xl border border-slate-200 max-h-64">
-                  <table className="min-w-full text-[8px] sm:text-[11px]">
+                <div className="overflow-x-auto rounded-2xl border border-slate-200 max-h-64 lg:max-h-[420px]">
+                  <table className="min-w-full text-[8px] sm:text-[11px] lg:text-xs">
                     <thead className="bg-slate-50 text-slate-500">
                       <tr>
-                        <th className="px-2 py-2 text-left w-1/6">날짜</th>
-                        <th className="px-2 py-2 text-right w-1/6">수입</th>
-                        <th className="px-2 py-2 text-right w-1/6">지출</th>
-                        <th className="px-2 py-2 text-right w-1/6">저축</th>
-                        <th className="px-2 py-2 text-left">대표 항목</th>
+                        <th className="px-2 py-2 text-left w-1/6 lg:px-3 lg:py-2.5">날짜</th>
+                        <th className="px-2 py-2 text-right w-1/6 lg:px-3 lg:py-2.5">수입</th>
+                        <th className="px-2 py-2 text-right w-1/6 lg:px-3 lg:py-2.5">지출</th>
+                        <th className="px-2 py-2 text-right w-1/6 lg:px-3 lg:py-2.5">저축</th>
+                        <th className="px-2 py-2 text-left lg:px-3 lg:py-2.5">대표 항목</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -845,11 +867,11 @@ function DashboardInner() {
                             key={d.date}
                             className={"border-t border-slate-200 " + (isOdd ? "bg-slate-50/70" : "bg-white")}
                           >
-                            <td className="px-2 py-1.5 text-slate-800 whitespace-nowrap">{formatKoreanDate(d.date)}</td>
-                            <td className="px-2 py-1.5 text-right text-sky-700">{d.incomeTotal ? d.incomeTotal.toLocaleString() : "-"}</td>
-                            <td className="px-2 py-1.5 text-right text-blue-700">{d.expenseTotal ? d.expenseTotal.toLocaleString() : "-"}</td>
-                            <td className="px-2 py-1.5 text-right text-emerald-700">{d.savingTotal ? d.savingTotal.toLocaleString() : "-"}</td>
-                            <td className="px-2 py-1.5 text-slate-700 truncate max-w-[220px]">{mainMemo || "-"}</td>
+                            <td className="px-2 py-1.5 text-slate-800 whitespace-nowrap lg:px-3 lg:py-2">{formatKoreanDate(d.date)}</td>
+                            <td className="px-2 py-1.5 text-right text-sky-700 lg:px-3 lg:py-2">{d.incomeTotal ? d.incomeTotal.toLocaleString() : "-"}</td>
+                            <td className="px-2 py-1.5 text-right text-blue-700 lg:px-3 lg:py-2">{d.expenseTotal ? d.expenseTotal.toLocaleString() : "-"}</td>
+                            <td className="px-2 py-1.5 text-right text-emerald-700 lg:px-3 lg:py-2">{d.savingTotal ? d.savingTotal.toLocaleString() : "-"}</td>
+                            <td className="px-2 py-1.5 text-slate-700 truncate max-w-[220px] lg:px-3 lg:py-2 lg:max-w-[320px]">{mainMemo || "-"}</td>
                           </tr>
                         );
                       })}
@@ -860,13 +882,13 @@ function DashboardInner() {
 
               {/* 셰프 분석 카드 */}
               <div className="space-y-3">
-                <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="lg:rounded-3xl lg:border lg:border-slate-200 lg:bg-white/90 lg:p-5 lg:shadow-sm">
                   <div className="mb-2 flex items-center gap-2">
                     <span className="text-lg">👨‍🍳</span>
-                    <h2 className="text-xs font-semibold text-slate-900">이번 달 셰프 노트</h2>
+                    <h2 className="text-xs font-semibold text-slate-900 lg:text-base">이번 달 셰프 노트</h2>
                   </div>
 
-                  <ul className="space-y-1.5 text-[11px] leading-relaxed text-slate-700">
+                  <ul className="space-y-1.5 text-[11px] leading-relaxed text-slate-700 lg:text-xs">
                     {baseIncome ? (
                       <>
                         <li>
@@ -882,8 +904,8 @@ function DashboardInner() {
 
                     {topCat && (
                       <li>
-                        • 가장 큰 지출 구분은 <span className="font-semibold">{topCat.label}</span> ({" "}
-                        <span className="font-semibold text-blue-700">{topCat.amount.toLocaleString()}원</span> ) 입니다.
+                        • 가장 큰 지출 구분은 <span className="font-semibold">{topCat.label}</span> (
+                        <span className="font-semibold text-blue-700">{topCat.amount.toLocaleString()}원</span>) 입니다.
                       </li>
                     )}
 
@@ -905,12 +927,12 @@ function DashboardInner() {
                   </ul>
                 </div>
 
-                <div className="rounded-3xl bg-gradient-to-r from-[#FFF7EB] to-[#FFEFD9] p-3.5 text-[11px] leading-relaxed text-slate-800 shadow-sm shadow-blue-100/80 w-auto">
+                <div className="rounded-3xl bg-gradient-to-r from-[#FFF7EB] to-[#FFEFD9] p-3.5 text-[11px] leading-relaxed text-slate-800 shadow-sm shadow-blue-100/80 w-auto lg:p-5 lg:text-xs">
                   <p className="mb-2">
                     🧂 <strong>셰프 TIP.</strong> 이번 달 데이터를 바탕으로 <span className="font-semibold">“줄이고 싶은 구분(카테고리)”</span>를 1~2개만 고른 뒤,
                     다음 달 달력에서 그 구분의 지출을 상한선으로 관리해 보세요.
                   </p>
-                  <p className="text-[10px] text-slate-600">
+                  <p className="text-[10px] text-slate-600 lg:text-[11px]">
                     이 화면은 달력에 입력한 “하루 레시피” 기준 분석입니다.
                     <br />
                     나중에 실제 카드 사용 내역을 연동하면, 계획 vs 실제를 비교하는 리포트로 확장할 수 있습니다.
@@ -920,9 +942,10 @@ function DashboardInner() {
             </div>
           </div>
         </section>
-      </main>
-    </PageContainer>
-  );
+      </div>
+    </main>
+  </PageContainer>
+);
 }
 
 /* ========================

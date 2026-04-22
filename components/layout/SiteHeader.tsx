@@ -221,7 +221,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 w-full">
       {/* 1차 헤더 */}
       <div className="border-b border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-        <div className="mx-auto flex h-[64px] w-full max-w-[1280px] items-center justify-between px-3 sm:h-[72px] sm:px-6">
+        <div className="mx-auto flex h-[64px] w-full max-w-[1380px] items-center justify-between px-3 sm:h-[72px] sm:px-6">
           {/* 좌측 */}
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             <button
@@ -496,7 +496,7 @@ export function SiteHeader() {
       {/* 모바일 메뉴 */}
       {isNavOpen && (
         <div className="border-b border-slate-200 bg-white/95 px-3 py-3 shadow-sm md:hidden">
-          <div className="mx-auto max-w-[1280px]">
+          <div className="mx-auto max-w-[1320px]">
             <nav className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
               <div className="border-b border-slate-100 px-4 py-3">
                 <div className="text-[14px] font-extrabold text-slate-900">메뉴</div>

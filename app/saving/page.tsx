@@ -386,7 +386,7 @@ export default function SavingPage() {
           "[background-size:18px_18px]",
         ].join(" ")}
       >
-        <div className="mx-auto w-full max-w-[1240px] px-3 py-4 sm:px-4 sm:py-6">
+        <div className="mx-auto w-full max-w-[1360px] px-3 py-4 sm:px-0 sm:py-6">
           <div className="space-y-4 sm:space-y-6">
             {/* 헤더 */}
             <section className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">

@@ -13,7 +13,7 @@ function cn(...xs: Array<string | false | null | undefined>) {
 const UI = {
   pageBg: "bg-[#ffffff]",
   paperDots:
-    "bg-[radial-gradient(circle,rgba(251,146,60,0.12)_1px,transparent_1px)] bg-[size:16px_16px] mx-auto w-full max-w-[1280px] px-3 py-4 sm:px-4 sm:py-6",
+    "bg-[radial-gradient(circle,rgba(251,146,60,0.12)_1px,transparent_1px)] bg-[size:16px_16px] mx-auto w-full max-w-[1380px] px-3 py-4 sm:px-4 sm:py-6",
   ink: "text-[#3B2F1E]",
   inkSoft: "text-[#7f7f7f]",
   line: "border-[#e8f8ff]",

@@ -28,7 +28,7 @@ export default function NotificationsPage() {
   if (loading) {
     return (
       <main className="min-h-screen bg-[#f8fbff] px-4 py-6">
-        <div className="mx-auto w-full max-w-[1240px] text-sm text-zinc-500">
+        <div className="mx-auto w-full max-w-[1320px] text-sm text-zinc-500">
           알림을 불러오는 중입니다...
         </div>
       </main>
@@ -38,7 +38,7 @@ export default function NotificationsPage() {
   if (!userId) {
     return (
       <main className="min-h-screen bg-[#f8fbff] px-4 py-6">
-        <div className="mx-auto w-full max-w-[1240px] rounded-2xl bg-white p-6 shadow-sm">
+        <div className="mx-auto w-full max-w-[1320px] rounded-2xl bg-white p-6 shadow-sm">
           <h1 className="text-lg font-bold text-zinc-900">알림 내역</h1>
           <p className="mt-2 text-sm text-zinc-600">
             로그인 후 알림 내역을 확인할 수 있습니다.
@@ -56,7 +56,7 @@ export default function NotificationsPage() {
 
   return (
     <main className="min-h-screen bg-[#f8fbff] px-4 py-6">
-      <div className="mx-auto w-full max-w-[1240px]">
+      <div className="mx-auto w-full max-w-[1320px]">
         <div className="mb-5 flex items-center justify-between gap-3">
           <div>
             <h1 className="text-xl font-bold text-zinc-900">알림 내역</h1>

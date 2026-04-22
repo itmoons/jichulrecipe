@@ -504,7 +504,7 @@ export default function CalendarEditClient() {
         "[background-size:18px_18px]",
       ].join(" ")}
     >
-      <div className="w-full max-w-full lg:max-w-[1240px] mx-auto flex flex-col">
+      <div className="w-full max-w-full lg:max-w-[1320px] mx-auto flex flex-col">
         <header className="flex items-center justify-between px-4 sm:px-8 lg:px-0 py-4 bg-white/90">
           <div className="flex items-center gap-3">
             <button
