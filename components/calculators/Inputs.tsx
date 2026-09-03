@@ -31,7 +31,7 @@ export function MoneyInput({
           onChange={(e) => setValue(e.target.value)}
           className={cn(
             "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-[12px] outline-none",
-            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
+            "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
           )}
         />
       </div>
@@ -62,7 +62,7 @@ export function NumberInput({
         onChange={(e) => setValue(e.target.value)}
         className={cn(
           "h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
-          "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
+          "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
         )}
       />
     </div>
@@ -86,7 +86,7 @@ export function TextInput({
         onChange={(e) => setValue(e.target.value)}
         className={cn(
           "h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
-          "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
+          "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
         )}
       />
     </div>
@@ -112,7 +112,7 @@ export function SelectInput({
         onChange={(e) => onChange(e.target.value)}
         className={cn(
           "h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
-          "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
+          "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
         )}
       >
         {options.map((o) => (
@@ -144,7 +144,7 @@ export function PctInput({
           onChange={(e) => setValue(e.target.value)}
           className={cn(
             "h-11 w-full rounded-xl border bg-white px-3 pr-10 text-[12px] outline-none",
-            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
+            "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
           )}
         />
         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-[#9C7A55]">
@@ -159,7 +159,7 @@ export function InfoPill({ label, value }: { label: string; value: string }) {
   return (
     <div className="grid gap-1.5">
       <div className="text-[12px] font-semibold text-[#3B2F1E]">{label}</div>
-      <div className="rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] px-3 py-2 text-[12px] font-bold text-[#7f7f7f]">
+      <div className="rounded-xl border border-[#ffedd5] bg-[#ff8a3d] px-3 py-2 text-[12px] font-bold text-[#7f7f7f]">
         {value}
       </div>
     </div>

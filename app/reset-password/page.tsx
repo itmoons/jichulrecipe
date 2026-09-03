@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabaseClient";
 
-const BRAND_BLUE = "#5bbbf3";
+const BRAND_BLUE = "#ff8a3d";
 
 function validatePassword(value: string) {
   if (!value) {
@@ -163,7 +163,7 @@ export default function ResetPasswordPage() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#FFF8EC] via-[#FFFDFC] to-[#F7FAFF] px-4">
+      <main className="flex min-h-screen items-center justify-center landing-surface px-4">
         <p className="text-xs text-slate-500">
           비밀번호 재설정 링크를 확인하고 있습니다...
         </p>
@@ -173,8 +173,8 @@ export default function ResetPasswordPage() {
 
   if (!hasRecoverySession) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#FFF8EC] via-[#FFFDFC] to-[#F7FAFF] px-4">
-        <div className="w-full max-w-md rounded-3xl bg-white/95 p-6 text-center shadow-lg shadow-blue-100">
+      <main className="flex min-h-screen items-center justify-center landing-surface px-4">
+        <div className="w-full max-w-md rounded-3xl bg-white/95 p-6 text-center shadow-lg shadow-orange-100">
           <h1 className="mb-2 text-base font-semibold text-slate-900">
             유효하지 않은 비밀번호 재설정 링크입니다
           </h1>
@@ -186,7 +186,7 @@ export default function ResetPasswordPage() {
           <button
             type="button"
             onClick={() => router.replace("/sign-in")}
-            className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-white shadow-md shadow-blue-200 hover:bg-[#0c86ea]"
+            className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-slate-900 shadow-md shadow-orange-100 hover:bg-[#fb923c]"
             style={{ ["--brand-blue" as any]: BRAND_BLUE }}
           >
             로그인 페이지로 이동
@@ -197,15 +197,15 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center bg-gradient-to-b from-[#ecf4ff] via-[#fcfdff] to-[#F7FAFF] px-4">
+    <main className="relative flex min-h-screen items-center justify-center landing-surface px-4">
       <div className="pointer-events-none fixed left-[-80px] top-[40%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,184,108,0.25)] blur-3xl" />
-      <div className="pointer-events-none fixed right-[-60px] bottom-[8%] -z-10 h-52 w-52 rounded-full bg-[rgba(86,115,231,0.18)] blur-3xl" />
+      <div className="pointer-events-none fixed right-[-60px] bottom-[8%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,193,130,0.22)] blur-3xl" />
 
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: "easeOut" }}
-        className="mt-[12rem] w-full max-w-md rounded-3xl bg-white/95 p-6 shadow-lg shadow-blue-100"
+        className="mt-[12rem] w-full max-w-md rounded-3xl bg-white/95 p-6 shadow-lg shadow-orange-100"
       >
         <div className="mb-4 flex flex-col gap-1">
           <div className="inline-flex items-center gap-2">
@@ -223,7 +223,7 @@ export default function ResetPasswordPage() {
         </div>
 
         {successMsg && (
-          <div className="mb-3 rounded-xl border border-blue-200 bg-[#FFF7EB] px-3 py-2 text-[11px] text-blue-700">
+          <div className="mb-3 rounded-xl border border border-[#ff8a3d]/30 bg-[#ff8a3d]/10 px-3 py-2 text-[11px] text-slate-700">
             {successMsg}
           </div>
         )}
@@ -264,7 +264,7 @@ export default function ResetPasswordPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="mt-2 flex w-full items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-white shadow-md shadow-blue-200 transition hover:bg-[#0c86ea] disabled:cursor-not-allowed disabled:opacity-70"
+            className="mt-2 flex w-full items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-slate-900 shadow-md shadow-orange-100 transition hover:bg-[#fb923c] disabled:cursor-not-allowed disabled:opacity-70"
             style={{ ["--brand-blue" as any]: BRAND_BLUE }}
           >
             {isSubmitting ? "변경 중..." : "비밀번호 변경하기"}

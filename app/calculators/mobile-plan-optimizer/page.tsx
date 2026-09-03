@@ -15,7 +15,7 @@ const UI = {
     "bg-[radial-gradient(circle,rgba(251,146,60,0.14)_1px,transparent_1px)] bg-[size:16px_16px] mx-auto w-full max-w-[1320px] px-3 py-4 sm:px-4 sm:py-6",
   ink: "text-[#3B2F1E]",
   inkSoft: "text-[#7f7f7f]",
-  card: "bg-[#f2fbff] border-[#e8f8ff]",
+  card: "bg-[#fff7ed] border-[#ffedd5]",
 };
 
 function toNumberSafe(v: string) {
@@ -109,8 +109,8 @@ export default function MobilePlanOptimizerPage() {
       monthlySave > 0
         ? { label: "절감", badge: "bg-[#34D399] text-white", msg: "변경 시 월 통신비가 줄어듭니다." }
         : monthlySave < 0
-        ? { label: "증가", badge: "bg-[#5bbbf3] text-white", msg: "변경 시 월 통신비가 늘어납니다." }
-        : { label: "동일", badge: "bg-[#52a9ff] text-[#ffffff]", msg: "두 요금제의 월 부담이 동일합니다." };
+        ? { label: "증가", badge: "bg-[#ff8a3d] text-white", msg: "변경 시 월 통신비가 늘어납니다." }
+        : { label: "동일", badge: "bg-[#ff8a3d] text-[#ffffff]", msg: "두 요금제의 월 부담이 동일합니다." };
 
     return { c, n, monthlySave, yearlySave, saveRate, delta, effect, driver, verdict };
   }, [current, next]);
@@ -123,20 +123,20 @@ export default function MobilePlanOptimizerPage() {
           <div className="mb-5 flex items-center justify-between gap-3">
             <Link
               href="/calculators"
-              className="rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
+              className="rounded-full border border-[#ffedd5] bg-[#fff7ed] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
             >
               ← 계산기 모음
             </Link>
 
-            <span className="rounded-full bg-[#5bbbf3] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
+            <span className="rounded-full bg-[#ff8a3d] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
               통신비 점검
             </span>
           </div>
 
           {/* 헤더 */}
           <div className="mb-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm">
-              <span className="inline-block h-2 w-2 rounded-full bg-[#5bbbf3]" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#ffedd5] bg-[#fff7ed] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm">
+              <span className="inline-block h-2 w-2 rounded-full bg-[#ff8a3d]" />
               Recipe Calculator
             </div>
 
@@ -164,7 +164,7 @@ export default function MobilePlanOptimizerPage() {
                   chip="현재"
                 />
 
-                <div className="h-px bg-[#e8f8ff]" />
+                <div className="h-px bg-[#ffedd5]" />
 
                 <PlanBox
                   title="변경 후"
@@ -174,7 +174,7 @@ export default function MobilePlanOptimizerPage() {
                 />
               </div>
 
-              <div className="mt-5 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+              <div className="mt-5 rounded-2xl border border-[#ffedd5] bg-white p-4">
                 <div className={cn("text-[12px] font-semibold", UI.ink)}>현실 체크</div>
                 <ul className={cn("mt-2 list-disc pl-5 text-[12px] leading-relaxed", UI.inkSoft)}>
                   <li>결합할인/약정할인은 변경 시 깨질 수 있습니다. 할인 조건을 먼저 확인하세요.</li>
@@ -204,10 +204,10 @@ export default function MobilePlanOptimizerPage() {
                 <MetricCard title="변경 후 월 총액" value={`${formatKRW(calc.n.total)}원`} />
               </div>
 
-              <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+              <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
                 <div className="flex items-center justify-between gap-3">
                   <div className={cn("text-[12px] font-semibold", UI.ink)}>월 절감액</div>
-                  <span className="rounded-full bg-[#5bbbf3] px-3 py-1 text-xs font-semibold text-[#ffffff]">
+                  <span className="rounded-full bg-[#ff8a3d] px-3 py-1 text-xs font-semibold text-[#ffffff]">
                     절감률 {pct(calc.saveRate)}%
                   </span>
                 </div>
@@ -234,7 +234,7 @@ export default function MobilePlanOptimizerPage() {
               </div>
 
               {/* 요인 분해 */}
-              <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+              <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
                 <div className={cn("text-[12px] font-semibold", UI.ink)}>변경 요인(어디서 변했나)</div>
                 <div className={cn("mt-1 text-xs", UI.inkSoft)}>
                   ‘변경 후 - 현재’ 기준입니다. (할인 증가는 총액에 감소 효과)
@@ -248,13 +248,13 @@ export default function MobilePlanOptimizerPage() {
                   <DeltaRow label="기타(부가서비스)" delta={calc.effect.other} />
                 </div>
 
-                <div className="mt-3 rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] p-3">
+                <div className="mt-3 rounded-xl border border-[#ffedd5] bg-[#ff8a3d] p-3">
                   <div className="text-xs font-semibold text-[#7f7f7f]">가장 큰 변화 TOP 3</div>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {calc.driver.map((d) => (
                       <span
                         key={d.k}
-                        className="rounded-full border border-[#e8f8ff] bg-white px-3 py-1 text-xs font-semibold text-[#7f7f7f]"
+                        className="rounded-full border border-[#ffedd5] bg-white px-3 py-1 text-xs font-semibold text-[#7f7f7f]"
                       >
                         {d.k === "planFee"
                           ? "요금제"
@@ -276,13 +276,13 @@ export default function MobilePlanOptimizerPage() {
               <div className="mt-5 flex flex-col gap-2 sm:flex-row">
                 <Link
                   href="/calculators/fixed-cost-ratio"
-                  className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+                  className="rounded-2xl bg-[#ff8a3d] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
                 >
                   다음: 고정비 비율 점검 →
                 </Link>
                 <Link
                   href="/calculators"
-                  className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
+                  className="rounded-2xl border border-[#ffedd5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
                 >
                   계산기 모음으로
                 </Link>
@@ -315,13 +315,13 @@ function PlanBox({
   const patch = (k: keyof Plan, v: string) => onChange({ ...plan, [k]: v });
 
   return (
-    <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
+    <div className="rounded-2xl border border-[#ffedd5] bg-white p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-[12px] font-semibold text-[#3B2F1E]">{title}</div>
           <div className="mt-1 text-xs text-[#7f7f7f]">월 기준 총액을 비교합니다.</div>
         </div>
-        <span className="rounded-full bg-[#5bbbf3] px-3 py-1 text-xs font-semibold text-[#ffffff]">
+        <span className="rounded-full bg-[#ff8a3d] px-3 py-1 text-xs font-semibold text-[#ffffff]">
           {chip}
         </span>
       </div>
@@ -366,7 +366,7 @@ function MoneyInput({
           placeholder="0"
           className={cn(
             "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-[12px] outline-none",
-            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
+            "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
           )}
         />
       </div>
@@ -376,7 +376,7 @@ function MoneyInput({
 
 function MetricCard({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
+    <div className="rounded-2xl border border-[#ffedd5] bg-white p-4">
       <div className="text-xs font-semibold text-[#7f7f7f]">{title}</div>
       <div className="mt-1 text-xl font-bold text-[#3B2F1E]">{value}</div>
     </div>
@@ -393,7 +393,7 @@ function MiniCard({
   accent?: boolean;
 }) {
   return (
-    <div className={cn("rounded-2xl border p-4", accent ? "border-[#5bbbf3] bg-[#5bbbf3]" : "border-[#e8f8ff] bg-white")}>
+    <div className={cn("rounded-2xl border p-4", accent ? "border-[#ff8a3d] bg-[#ff8a3d]" : "border-[#ffedd5] bg-white")}>
       <div className={cn("text-xs font-semibold", accent ? "text-[#ffffff]" : "text-[#7f7f7f]")}>
         {title}
       </div>
@@ -414,7 +414,7 @@ function DeltaRow({ label, delta }: { label: string; delta: number }) {
       : "text-[#7f7f7f]";
 
   return (
-    <div className="flex items-center justify-between rounded-xl border border-[#e8f8ff] bg-[#f2fbff] px-3 py-2">
+    <div className="flex items-center justify-between rounded-xl border border-[#ffedd5] bg-[#fff7ed] px-3 py-2">
       <span className="text-[12px] font-semibold text-[#3B2F1E]">{label}</span>
       <span className={cn("text-[12px] font-bold", tone)}>
         {sign}

@@ -41,12 +41,12 @@ export default function RefinanceComparePage() {
 
     const verdict =
       P <= 0
-        ? { label: "입력 필요", badge: "bg-[#52a9ff] text-[#ffffff]" }
+        ? { label: "입력 필요", badge: "bg-[#ff8a3d] text-[#ffffff]" }
         : saving > 0
         ? { label: "대환 유리(총비용)", badge: "bg-[#34D399] text-white" }
         : saving < 0
-        ? { label: "유지 유리(총비용)", badge: "bg-[#5bbbf3] text-white" }
-        : { label: "비슷", badge: "bg-[#52a9ff] text-[#ffffff]" };
+        ? { label: "유지 유리(총비용)", badge: "bg-[#ff8a3d] text-white" }
+        : { label: "비슷", badge: "bg-[#ff8a3d] text-[#ffffff]" };
 
     return { P, n, fee, curPay, curInterest, newPay, newInterest, newAllIn, saving, verdict };
   }, [principal, remainMonths, currentRate, newRate, refiFee]);
@@ -95,7 +95,7 @@ export default function RefinanceComparePage() {
             <MetricCard title="대환 총비용(이자+수수료)" value={`${formatKRW(calc.newAllIn)}원`} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+          <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
             <div className={cn("text-[12px] font-semibold", UI.ink)}>손익</div>
             <div className="mt-3 grid gap-2">
               <Row
@@ -112,13 +112,13 @@ export default function RefinanceComparePage() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/calculators/revolving-cost"
-              className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+              className="rounded-2xl bg-[#ff8a3d] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
             >
               다음: 리볼빙 비용 →
             </Link>
             <Link
               href="/calculators"
-              className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
+              className="rounded-2xl border border-[#ffedd5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
             >
               계산기 모음으로
             </Link>

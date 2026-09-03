@@ -4,8 +4,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { PageContainer } from "@/components/layout/PageContainer";
+import { RecurringManagerPage } from "@/app/dashboard/recurring/page";
 
-const BRAND_BLUE = "#3d8bffeb";
+const BRAND_BLUE = "#ff8a3deb";
 
 type SavingPlan = {
   id: number;
@@ -116,6 +117,8 @@ export default function SavingPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [linkMsg, setLinkMsg] = useState<string | null>(null);
+  const [recurringVersion, setRecurringVersion] = useState(0);
 
   const [sortKey, setSortKey] = useState<SortKey>("created_at");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
@@ -377,13 +380,69 @@ export default function SavingPage() {
     }
   };
 
+  const handleCreateRecurringFromPlan = async (plan: SavingPlan) => {
+    if (!userId) return;
+
+    const amount = Number(plan.monthly_amount) || 0;
+    if (!plan.name.trim() || amount <= 0) {
+      setErrorMsg("이름과 월 불입액이 있어야 정기 저축으로 등록할 수 있습니다.");
+      return;
+    }
+
+    const now = new Date();
+    const baseMonth = plan.start_month || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    const transferDay = Math.min(31, Math.max(1, plan.auto_transfer_day ?? now.getDate()));
+    const lastDay = new Date(Number(baseMonth.slice(0, 4)), Number(baseMonth.slice(5, 7)), 0).getDate();
+    const startDate = plan.start_date || `${baseMonth}-${String(Math.min(transferDay, lastDay)).padStart(2, "0")}`;
+
+    setSaving(true);
+    setErrorMsg(null);
+    setLinkMsg(null);
+    try {
+      const { data: duplicate, error: duplicateError } = await supabase
+        .from("recurring_rules")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("title", plan.name.trim())
+        .eq("category", "saving")
+        .eq("frequency", "monthly")
+        .limit(1);
+
+      if (duplicateError) throw duplicateError;
+      if (duplicate?.length) {
+        setLinkMsg(`‘${plan.name}’은 이미 정기 저축 규칙으로 등록되어 있습니다.`);
+        return;
+      }
+
+      const { error } = await supabase.from("recurring_rules").insert({
+        user_id: userId,
+        title: plan.name.trim(),
+        category: "saving",
+        frequency: "monthly",
+        start_date: startDate,
+        end_date: plan.end_date || null,
+        day_of_month: transferDay,
+        day_of_week: null,
+        default_amount: amount,
+      });
+      if (error) throw error;
+
+      setRecurringVersion((version) => version + 1);
+      setLinkMsg(`‘${plan.name}’을 정기 저축으로 등록했습니다. 아래 정기 레시피에서 선택한 달에 적용하세요.`);
+      document.getElementById("recurring")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    } catch (err) {
+      console.error(err);
+      setErrorMsg("정기 저축 규칙을 만드는 중 오류가 발생했습니다.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <PageContainer>
       <main
         className={[
-          "min-h-screen bg-slate-50",
-          "bg-[radial-gradient(circle_at_1px_1px,#e5e7eb_1px,transparent_0)]",
-          "[background-size:18px_18px]",
+          "min-h-screen bg-transparent",
         ].join(" ")}
       >
         <div className="mx-auto w-full max-w-[1360px] px-3 py-4 sm:px-0 sm:py-6">
@@ -392,10 +451,10 @@ export default function SavingPage() {
             <section className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div className="min-w-0">
                 <h1 className="text-[16px] font-bold text-slate-900 sm:text-[20px]">
-                  💰 적금 · 목표 저축
+                  💰 저축 · 정기 레시피
                 </h1>
                 <p className="mt-1 text-[10px] text-slate-600 sm:text-[8px]">
-                  항목은 목록에서 보고, 추가/수정은 팝업에서 처리합니다.
+                  목표 저축과 반복 이체를 한 곳에서 관리하고 달력에 반영하세요.
                 </p>
               </div>
 
@@ -417,6 +476,11 @@ export default function SavingPage() {
               </div>
             </section>
 
+            <nav className="flex w-fit items-center gap-1 rounded-xl border border-orange-100 bg-white p-1 text-[11px] font-semibold text-slate-600 shadow-sm">
+              <a href="#saving-plans" className="rounded-lg bg-orange-50 px-3 py-2 text-orange-800">저축 목표</a>
+              <a href="#recurring" className="rounded-lg px-3 py-2 transition hover:bg-orange-50 hover:text-orange-800">정기 레시피</a>
+            </nav>
+
             {/* 에러 */}
             {errorMsg && (
               <section className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-[10px] text-red-700 sm:text-[8px]">
@@ -424,8 +488,14 @@ export default function SavingPage() {
               </section>
             )}
 
+            {linkMsg && (
+              <section className="rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-[11px] font-medium text-orange-800">
+                {linkMsg}
+              </section>
+            )}
+
             {/* 요약 */}
-            <section className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+            <section id="saving-plans" className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
               <SummaryCard
                 label="등록된 항목"
                 value={`${plans.length}개`}
@@ -574,17 +644,24 @@ export default function SavingPage() {
                           </td>
 
                           <td className="px-3 py-3 text-center">
-                            <button
-                              type="button"
-                              className="rounded-full border border-slate-200 px-3 py-1 text-[11px] text-slate-600 hover:border-red-200 hover:text-red-600 disabled:opacity-50"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDelete(p.id);
-                              }}
-                              disabled={saving}
-                            >
-                              삭제
-                            </button>
+                            <div className="flex justify-center gap-2">
+                              <button
+                                type="button"
+                                className="rounded-lg border border-orange-200 bg-orange-50 px-3 py-1 text-[11px] font-semibold text-orange-800 hover:bg-orange-100 disabled:opacity-50"
+                                onClick={(e) => { e.stopPropagation(); handleCreateRecurringFromPlan(p); }}
+                                disabled={saving}
+                              >
+                                정기 이체 등록
+                              </button>
+                              <button
+                                type="button"
+                                className="rounded-lg border border-slate-200 px-3 py-1 text-[11px] text-slate-600 hover:border-red-200 hover:text-red-600 disabled:opacity-50"
+                                onClick={(e) => { e.stopPropagation(); handleDelete(p.id); }}
+                                disabled={saving}
+                              >
+                                삭제
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       );
@@ -675,10 +752,18 @@ export default function SavingPage() {
                         </span>
                       </div>
 
-                      <div className="mt-3 flex justify-end">
+                      <div className="mt-3 flex justify-end gap-2">
                         <button
                           type="button"
-                          className="rounded-full border border-slate-200 px-3 py-1 text-[10px] text-slate-600 hover:border-red-200 hover:text-red-600 disabled:opacity-50"
+                          className="rounded-lg border border-orange-200 bg-orange-50 px-3 py-1 text-[10px] font-semibold text-orange-800 hover:bg-orange-100 disabled:opacity-50"
+                          onClick={(e) => { e.stopPropagation(); handleCreateRecurringFromPlan(p); }}
+                          disabled={saving}
+                        >
+                          정기 이체 등록
+                        </button>
+                        <button
+                          type="button"
+                          className="rounded-lg border border-slate-200 px-3 py-1 text-[10px] text-slate-600 hover:border-red-200 hover:text-red-600 disabled:opacity-50"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDelete(p.id);
@@ -693,6 +778,8 @@ export default function SavingPage() {
                 })}
               </div>
             </section>
+
+            <RecurringManagerPage key={recurringVersion} embedded />
 
             <SavingPlanModal
               open={isModalOpen}

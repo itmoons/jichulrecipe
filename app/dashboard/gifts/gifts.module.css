@@ -3,7 +3,7 @@
   margin: 0 auto;
   padding: 20px 16px 80px;
   color: #111;
-  background: #5bbbf300;
+  background: #ff8a3d00;
 }
 
 .header {
@@ -37,8 +37,8 @@
   align-items: center;
   gap: 8px;
   border: none;
-  background: rgb(61, 194, 255);
-  color: #fff;
+  background: #ff8a3d;
+  color: #111827;
   padding: 10px 12px;
   border-radius: 10px;
   cursor: pointer;
@@ -246,7 +246,7 @@
 .out {
   color: rgb(61, 122, 255);
   border-color: #e2effe;
-  background: #f7fbff;
+  background: #fffaf5;
 }
 
 .in {

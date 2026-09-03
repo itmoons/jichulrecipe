@@ -28,8 +28,8 @@ export default function NetPayInsurancePage() {
 
     const status =
       g <= 0
-        ? { label: "입력 필요", badge: "bg-[#52a9ff] text-[#ffffff]" }
-        : { label: "범위 추정", badge: "bg-[#5bbbf3] text-white" };
+        ? { label: "입력 필요", badge: "bg-[#ff8a3d] text-[#ffffff]" }
+        : { label: "범위 추정", badge: "bg-[#ff8a3d] text-white" };
 
     return { g, lowDeduct, highDeduct, netLow, netHigh, status };
   }, [grossMonthly]);
@@ -63,7 +63,7 @@ export default function NetPayInsurancePage() {
             <MoneyInput label="월급(세전)" value={grossMonthly} setValue={setGrossMonthly} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+          <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
             <div className="text-[12px] font-semibold text-[#3B2F1E]">안내</div>
             <p className="mt-2 text-[12px] text-[#6d6d6d]">
               개인별 과세/비과세, 급여항목, 보험료 상한/기준소득월액 등으로 실제 실수령은 달라집니다.
@@ -86,7 +86,7 @@ export default function NetPayInsurancePage() {
             />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+          <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
             <div className={cn("text-[12px] font-semibold", UI.ink)}>예산에 쓰는 법</div>
             <div className="mt-3 grid gap-2">
               <Row label="보수적 계획" value="실수령 하단(낮은 값) 기준으로 고정비를 맞추세요" tone="ok" />
@@ -97,13 +97,13 @@ export default function NetPayInsurancePage() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/calculators/insurance-ratio-check"
-              className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+              className="rounded-2xl bg-[#ff8a3d] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
             >
               다음: 보험료 점검 →
             </Link>
             <Link
               href="/calculators"
-              className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
+              className="rounded-2xl border border-[#ffedd5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
             >
               계산기 모음으로
             </Link>

@@ -9,9 +9,9 @@ import { ToasterHost } from "@/components/ui/toaster-host";
 import SiteFooter from "@/components/layout/SiteFooter";
 
 const pretendard = localFont({
-  src: "./fonts/SCDream6.otf",
+  src: "./fonts/PretendardVariable.woff2",
   variable: "--font-pretendard",
-  weight: "45 920",
+  weight: "100 900",
   display: "swap",
 });
 

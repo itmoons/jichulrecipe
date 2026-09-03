@@ -6,17 +6,32 @@
 */
 @source "../**/*.{js,ts,jsx,tsx,mdx}";
 
-/* 지출레시피 Theme (네가 추가했던 오렌지 변수/배경은 그대로 유지 가능) */
+/* 지출레시피 Theme — 로고의 오렌지를 중심으로 한 따뜻하고 신뢰감 있는 금융 UI */
+@theme {
+  --color-sky-50: #fffaf5;
+  --color-sky-100: #fff1e6;
+  --color-sky-200: #fed7aa;
+  --color-sky-400: #fb923c;
+  --color-sky-500: #f97316;
+  --color-sky-600: #ea580c;
+  --color-blue-50: #fffaf5;
+  --color-blue-100: #ffedd5;
+  --color-blue-200: #fed7aa;
+  --color-blue-400: #fb923c;
+  --color-blue-500: #f97316;
+  --color-blue-600: #ea580c;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fff8f2;
+  --foreground: #1f2937;
 
-  --recipe-blue: #3dd8ff;
-  --recipe-blue-strong: #5bbbf3;
-  --recipe-blue-soft: #f2fbff;
+  --recipe-orange: #ff8a3d;
+  --recipe-orange-strong: #ff8a3d;
+  --recipe-orange-soft: #fff7ed;
 
-  --recipe-border: #cfe4fd;
-  --recipe-card: #5bbbf3;
+  --recipe-border: #fed7aa;
+  --recipe-card: #ffffff;
 
   --recipe-muted: #6b7280;
 }
@@ -27,13 +42,37 @@ body {
 }
 
 body {
-  background: var(--background);
+  background: #fff8f2;
   color: var(--foreground);
 }
 
+::selection {
+  background: #fed7aa;
+  color: #ff8a3d;
+}
+
+:focus-visible {
+  outline: 3px solid #fdba74;
+  outline-offset: 3px;
+}
+
 .bg-recipe {
-  background:rgb(255, 255, 255);
-    /* radial-gradient(800px 320px at 10% 0%, rgba(255, 138, 61, 0.18), transparent 60%), */
-    /* radial-gradient(800px 320px at 90% 20%, rgba(255, 138, 61, 0.10), transparent 60%), */
-    /* linear-gradient(to bottom, #fff7f0, #5bbbf3); */
+  background:
+    radial-gradient(800px 320px at 10% 0%, rgba(255, 138, 61, 0.15), transparent 60%),
+    radial-gradient(800px 320px at 90% 20%, rgba(255, 193, 130, 0.16), transparent 60%),
+    linear-gradient(to bottom, #fffdfb, #fff8f2);
+}
+
+.app-surface {
+  background:
+    radial-gradient(780px 440px at 6% 0%, rgba(255, 138, 61, 0.14), transparent 68%),
+    radial-gradient(680px 400px at 96% 0%, rgba(255, 193, 130, 0.18), transparent 64%),
+    linear-gradient(135deg, #fffdfb, #fff8f2);
+}
+
+.landing-surface {
+  background:
+    radial-gradient(780px 440px at 0% 0%, rgba(255, 138, 61, 0.16), transparent 65%),
+    radial-gradient(680px 400px at 100% 0%, rgba(255, 138, 61, 0.12), transparent 64%),
+    #fff8f2;
 }

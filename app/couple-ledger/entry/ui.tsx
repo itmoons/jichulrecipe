@@ -68,8 +68,8 @@ function Pill({
     <span
       className={cx(
         "inline-flex items-center gap-1 rounded-[10px] px-3 py-1 text-[11px] font-medium",
-        tone === "accent" && "border border-[#aadffe] bg-[#edf7ff] text-[#0c86ea]",
-        tone === "soft" && "border border-[#E5E7EB] bg-white text-[#0c86ea]",
+        tone === "accent" && "border border-[#fed7aa] bg-[#fff7ed] text-[#ff8a3d]",
+        tone === "soft" && "border border-[#E5E7EB] bg-white text-[#ff8a3d]",
         tone === "muted" && "border border-slate-200 bg-slate-50 text-slate-600"
       )}
     >
@@ -96,8 +96,8 @@ function TabButton({
       className={cx(
         "inline-flex shrink-0 items-center gap-1 rounded-[12px] px-4 py-2.5 text-[10px] font-medium transition-all duration-200",
         active
-          ? "border border-[#aadffe] bg-[#edf7ff] text-[#0c86ea] shadow-sm"
-          : "border border-slate-200 bg-white text-slate-600 hover:border-[#aadffe] hover:bg-[#edf7ff] hover:text-[#0c86ea]"
+          ? "border border-[#fed7aa] bg-[#fff7ed] text-[#ff8a3d] shadow-sm"
+          : "border border-slate-200 bg-white text-slate-600 hover:border-[#fed7aa] hover:bg-[#fff7ed] hover:text-[#ff8a3d]"
       )}
     >
       <span className="text-[14px]">{icon}</span>
@@ -187,7 +187,7 @@ function InlineReceiptField({
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="inline-flex shrink-0 items-center rounded-[10px] border border-[#cfe9ff] bg-[#f4fbff] px-3 py-1.5 text-[12px] font-medium text-[#0c86ea] transition hover:bg-[#eaf6ff]"
+          className="inline-flex shrink-0 items-center rounded-[10px] border border-[#cfe9ff] bg-[#f4fbff] px-3 py-1.5 text-[12px] font-medium text-[#ff8a3d] transition hover:bg-[#eaf6ff]"
         >
           {preview || hasExisting ? "변경" : "첨부"}
         </button>
@@ -204,7 +204,7 @@ function InlineReceiptField({
             </div>
           ) : hasExisting ? (
             <div className="flex items-center gap-2">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-[8px] bg-[#edf7ff] text-[13px]">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-[8px] bg-[#fff7ed] text-[13px]">
                 🧾
               </span>
               <span className="truncate text-[12px] text-slate-600">기존 영수증 있음</span>
@@ -229,10 +229,10 @@ function InlineReceiptField({
 }
 
 const inputBaseClass =
-  "mt-1.5 w-full rounded-[16px] border border-[#E5E7EB] bg-white px-3.5 py-2.5 text-[14px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#FDBA74] focus:ring-4 focus:ring-[#edf7ff]";
+  "mt-1.5 w-full rounded-[16px] border border-[#E5E7EB] bg-white px-3.5 py-2.5 text-[14px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#FDBA74] focus:ring-4 focus:ring-[#fff7ed]";
 
 const primaryButtonClass =
-  "inline-flex items-center justify-center rounded-[12px] bg-[#69b6ff] px-4 py-2.5 text-[13px] font-medium text-white transition hover:bg-[#0c86ea] disabled:opacity-60";
+  "inline-flex items-center justify-center rounded-[12px] bg-[#ff8a3d] px-4 py-2.5 text-[13px] font-medium text-white transition hover:bg-[#ff8a3d] disabled:opacity-60";
 
 const neutralButtonClass =
   "inline-flex items-center justify-center rounded-[12px] border border-slate-200 bg-white px-4 py-2.5 text-[10px] font-medium text-slate-700 transition hover:bg-slate-50";
@@ -736,12 +736,12 @@ export default function CoupleLedgerEntryUI() {
   }, [sharedList, ctx?.partner_user_id]);
 
   if (checking) {
-    return <div className="mx-auto max-w-[1180px] min-h-screen bg-white p-6 text-[14px] text-slate-600">불러오는 중…</div>;
+    return <div className="mx-auto max-w-[1180px] landing-surface min-h-screen p-6 text-[14px] text-slate-600">불러오는 중…</div>;
   }
 
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-white p-4 md:p-6">
+      <div className="landing-surface min-h-screen p-4 md:p-6">
         <Surface className="mx-auto max-w-xl p-5 md:p-6">
           <div className="text-[18px] md:text-[20px] font-semibold tracking-[-0.02em] text-slate-900">
             우리의 지출 레시피
@@ -759,7 +759,7 @@ export default function CoupleLedgerEntryUI() {
 
   if (!ctx?.couple_link_id) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="landing-surface min-h-screen">
         <div className="mx-auto max-w-5xl px-4 py-6 md:px-6 md:py-8">
           <Surface className="p-5 md:p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -789,7 +789,7 @@ export default function CoupleLedgerEntryUI() {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-24 md:pb-10">
+    <div className="landing-surface min-h-screen pb-24 md:pb-10">
       <div className="mx-auto max-w-[1320px] px-4 py-5 md:px-6 md:py-8">
         <Surface className="overflow-hidden">
           <div className="border-b border-[#F3F4F6] bg-white px-4 py-5 md:px-6 md:py-6">
@@ -875,7 +875,7 @@ export default function CoupleLedgerEntryUI() {
                       className={cx(
                         "rounded-[10px] px-3 py-1.5 text-[12px] font-medium transition",
                         period === "thisMonth"
-                          ? "bg-[#edf7ff] text-[#0c6ac2]"
+                          ? "bg-[#fff7ed] text-[#0c6ac2]"
                           : "border border-slate-200 bg-white text-slate-600"
                       )}
                       onClick={() => setPeriod("thisMonth")}
@@ -887,7 +887,7 @@ export default function CoupleLedgerEntryUI() {
                       className={cx(
                         "rounded-[10px] px-3 py-1.5 text-[12px] font-medium transition",
                         period === "all"
-                          ? "bg-[#edf7ff] text-[#0c86ea]"
+                          ? "bg-[#fff7ed] text-[#ff8a3d]"
                           : "border border-slate-200 bg-white text-slate-600"
                       )}
                       onClick={() => setPeriod("all")}
@@ -899,7 +899,7 @@ export default function CoupleLedgerEntryUI() {
                       className={cx(
                         "rounded-[10px] px-3 py-1.5 text-[12px] font-medium transition",
                         period === "custom"
-                          ? "bg-[#edf7ff] text-[#0c86ea]"
+                          ? "bg-[#fff7ed] text-[#ff8a3d]"
                           : "border border-slate-200 bg-white text-slate-600"
                       )}
                       onClick={() => setPeriod("custom")}
@@ -939,9 +939,9 @@ export default function CoupleLedgerEntryUI() {
                       max={100}
                       value={mySharePct}
                       onChange={(e) => setMySharePct(Number(e.target.value))}
-                      className="w-full accent-[#69b6ff]"
+                      className="w-full accent-[#ff8a3d]"
                     />
-                    <div className="min-w-[68px] rounded-[16px] border border-[#aadffe] bg-[#edf7ff] px-3 py-2 text-center text-[14px] font-semibold text-[#0c86ea]">
+                    <div className="min-w-[68px] rounded-[16px] border border-[#fed7aa] bg-[#fff7ed] px-3 py-2 text-center text-[14px] font-semibold text-[#ff8a3d]">
                       {mySharePct}%
                     </div>
                   </div>
@@ -951,7 +951,7 @@ export default function CoupleLedgerEntryUI() {
                   </div>
                 </div>
 
-                <div className="rounded-[20px] md:rounded-[24px] border border-[#aadffe] bg-[#f9fdff] p-4">
+                <div className="rounded-[20px] md:rounded-[24px] border border-[#fed7aa] bg-[#f9fdff] p-4">
                   <div className="text-[12px] font-medium text-slate-500">정산 결과</div>
 
                   {settlement ? (
@@ -1019,7 +1019,7 @@ export default function CoupleLedgerEntryUI() {
                 <button
                   type="button"
                   onClick={openMobileAddForm}
-                  className="inline-flex md:hidden items-center justify-center rounded-[12px] bg-[#69b6ff] px-4 py-2.5 text-[10px] font-medium text-white"
+                  className="inline-flex md:hidden items-center justify-center rounded-[12px] bg-[#ff8a3d] px-4 py-2.5 text-[10px] font-medium text-white"
                 >
                   새 레시피
                 </button>
@@ -1043,7 +1043,7 @@ export default function CoupleLedgerEntryUI() {
             <div
               ref={addFormRef}
               className={cx(
-                "mt-5 rounded-[20px] md:rounded-[24px] border border-[#aadffe] bg-[#f9fdff] p-4 md:p-5",
+                "mt-5 rounded-[20px] md:rounded-[24px] border border-[#fed7aa] bg-[#f9fdff] p-4 md:p-5",
                 "block",
                 !showMobileAddForm && "hidden md:block"
               )}
@@ -1143,7 +1143,7 @@ export default function CoupleLedgerEntryUI() {
           )}
 
           {tab === "shared" && editingId && canEdit && (
-            <div className="mt-5 rounded-[20px] md:rounded-[24px] border border-[#aadffe] bg-[#f9fdff] p-4 md:p-5">
+            <div className="mt-5 rounded-[20px] md:rounded-[24px] border border-[#fed7aa] bg-[#f9fdff] p-4 md:p-5">
               <div className="text-[15px] font-semibold text-slate-900">지출 레시피 수정</div>
               <div className="mt-2 text-[10px] text-slate-600">선택한 항목을 다시 정리합니다.</div>
 
@@ -1242,7 +1242,7 @@ export default function CoupleLedgerEntryUI() {
                           {e.memo?.trim() ? e.memo : "지출"}
                         </span>
 
-                        <span className="rounded-[10px] bg-[#edf7ff] px-2.5 py-1 text-[11px] font-medium text-[#0c86ea]">
+                        <span className="rounded-[10px] bg-[#fff7ed] px-2.5 py-1 text-[11px] font-medium text-[#ff8a3d]">
                           {e.category || "기타"}
                         </span>
 
@@ -1258,7 +1258,7 @@ export default function CoupleLedgerEntryUI() {
                           className={cx(
                             "inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium",
                             e.receipt_url
-                              ? "border border-[#bfe4ff] bg-[#eef8ff] text-[#0c86ea]"
+                              ? "border border-[#bfe4ff] bg-[#eef8ff] text-[#ff8a3d]"
                               : "border border-slate-200 bg-slate-50 text-slate-500"
                           )}
                         >
@@ -1276,14 +1276,14 @@ export default function CoupleLedgerEntryUI() {
                     </div>
 
                     <div className="flex flex-col items-stretch gap-2 sm:items-end sm:text-right">
-                      <div className="text-[15px] font-semibold text-[#0c86ea]">{money(e.amount)}원</div>
+                      <div className="text-[15px] font-semibold text-[#ff8a3d]">{money(e.amount)}원</div>
 
                       {e.receipt_url && (
                         <a
                           href={e.receipt_url}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-[11px] text-slate-500 underline underline-offset-2 hover:text-[#0c86ea]"
+                          className="text-[11px] text-slate-500 underline underline-offset-2 hover:text-[#ff8a3d]"
                         >
                           영수증 보기
                         </a>
@@ -1294,7 +1294,7 @@ export default function CoupleLedgerEntryUI() {
                           <button
                             type="button"
                             onClick={() => startEdit(e as CoupleExpense)}
-                            className="rounded-[10px] border border-[#aadffe] bg-white px-3 py-1.5 text-[11px] font-medium text-[#0c86ea] hover:bg-[#edf7ff]"
+                            className="rounded-[10px] border border-[#fed7aa] bg-white px-3 py-1.5 text-[11px] font-medium text-[#ff8a3d] hover:bg-[#fff7ed]"
                             title="수정"
                           >
                             수정
@@ -1332,7 +1332,7 @@ export default function CoupleLedgerEntryUI() {
         <button
           type="button"
           onClick={openMobileAddForm}
-          className="fixed bottom-5 right-4 z-40 inline-flex md:hidden items-center gap-2 rounded-full bg-[#69b6ff] px-4 py-3 text-[13px] font-semibold text-white shadow-[0_14px_30px_rgba(12,134,234,0.28)]"
+          className="fixed bottom-5 right-4 z-40 inline-flex md:hidden items-center gap-2 rounded-full bg-[#ff8a3d] px-4 py-3 text-[13px] font-semibold text-white shadow-[0_14px_30px_rgba(12,134,234,0.28)]"
         >
           <span className="text-[16px]">＋</span>
           <span>새 레시피</span>
@@ -1344,7 +1344,7 @@ export default function CoupleLedgerEntryUI() {
           <div
             className={cx(
               "min-w-[220px] rounded-[10px] px-4 py-2.5 text-[12px] font-medium text-white shadow-[0_12px_30px_rgba(0,0,0,0.16)]",
-              toast.type === "success" && "bg-[#69b6ff]",
+              toast.type === "success" && "bg-[#ff8a3d]",
               toast.type === "error" && "bg-[#d84b4b]",
               toast.type === "info" && "bg-slate-900"
             )}

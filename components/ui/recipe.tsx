@@ -58,7 +58,7 @@ export function RecipeBadge({
 }) {
   const cls =
     variant === "blue"
-      ? "bg-blue-50 text-blue-700 border-blue-200"
+      ? "bg-orange-50 text-orange-600 border-orange-200"
       : variant === "danger"
       ? "bg-red-50 text-red-700 border-red-200"
       : variant === "success"
@@ -80,12 +80,12 @@ export function RecipeButton({
 
   const v =
     variant === "primary"
-      ? "bg-blue-500 text-white hover:bg-blue-600 shadow-sm"
+      ? "bg-[#ff8a3d] text-slate-900 hover:bg-[#fb923c] shadow-sm"
       : variant === "danger"
       ? "bg-red-500 text-white hover:bg-red-600"
       : variant === "outline"
-      ? "border border-blue-200 bg-white hover:bg-blue-50 text-zinc-900"
-      : "bg-transparent hover:bg-blue-50 text-zinc-900";
+      ? "border border-orange-200 bg-white hover:bg-orange-50 text-zinc-900"
+      : "bg-transparent hover:bg-orange-50 text-zinc-900";
 
   return <button className={cn(base, v, className)} {...props} />;
 }

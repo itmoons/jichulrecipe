@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { supabase } from "@/lib/supabaseClient";
 
-const BRAND_blue = "#5bbbf3";
+const BRAND_blue = "#ff8a3d";
 const BRAND_GREEN = "#22C55E";
 
 /** ✅ edit 페이지와 맞추는 타입 (category/subcategory 추가) */
@@ -129,6 +129,21 @@ function getTodayKeyKST() {
 
 function compareDateKey(a: string, b: string) {
   return a < b ? -1 : a > b ? 1 : 0;
+}
+
+function getRecurringRuleId(item: MoneyItem): number | null {
+  if (typeof item.rule_id === "number") return item.rule_id;
+  const id = String(item.id ?? "");
+  const match = /^(?:rec-|rr:)(\d+)/.exec(id);
+  return match ? Number(match[1]) : null;
+}
+
+function excludeExpiredRecurring(items: MoneyItem[], dateKey: string, endDates: Map<number, string>) {
+  return items.filter((item) => {
+    const ruleId = getRecurringRuleId(item);
+    const endDate = ruleId == null ? null : endDates.get(ruleId);
+    return !endDate || dateKey <= endDate;
+  });
 }
 
 /** 하루 데이터 정규화 */
@@ -496,6 +511,22 @@ function DashboardInner() {
           return;
         }
 
+        const { data: recurringRules, error: recurringRulesError } = await supabase
+          .from("recurring_rules")
+          .select("id,end_date")
+          .eq("user_id", user.id)
+          .not("end_date", "is", null);
+
+        if (recurringRulesError) {
+          console.warn("정기 규칙 종료일 조회 실패:", recurringRulesError.message);
+        }
+
+        const recurringEndDates = new Map<number, string>(
+          (recurringRules ?? [])
+            .filter((rule: any) => typeof rule?.id === "number" && typeof rule?.end_date === "string")
+            .map((rule: any) => [rule.id, rule.end_date])
+        );
+
         const mapRowItems = (arr: any[] | null): MoneyItem[] =>
           (arr ?? []).map((i) => ({
             id: i?.id ?? crypto.randomUUID(),
@@ -514,13 +545,17 @@ function DashboardInner() {
           // ✅ 안전장치: 혹시라도 섞이면 미래 날짜 제외
           if (dateKey > todayKey) return;
 
+          const incomeItems = excludeExpiredRecurring(mapRowItems(row.income_items), dateKey, recurringEndDates);
+          const expenseItems = excludeExpiredRecurring(mapRowItems(row.expense_items), dateKey, recurringEndDates);
+          const savingItems = excludeExpiredRecurring(mapRowItems(row.saving_items), dateKey, recurringEndDates);
+
           store[dateKey] = {
-            incomeItems: mapRowItems(row.income_items),
-            expenseItems: mapRowItems(row.expense_items),
-            savingItems: mapRowItems(row.saving_items),
-            incomeTotal: typeof row.income_total === "number" ? row.income_total : undefined,
-            expenseTotal: typeof row.expense_total === "number" ? row.expense_total : undefined,
-            savingTotal: typeof row.saving_total === "number" ? row.saving_total : undefined,
+            incomeItems,
+            expenseItems,
+            savingItems,
+            incomeTotal: incomeItems.reduce((sum, item) => sum + safeNum(item.amount), 0),
+            expenseTotal: expenseItems.reduce((sum, item) => sum + safeNum(item.amount), 0),
+            savingTotal: savingItems.reduce((sum, item) => sum + safeNum(item.amount), 0),
             createdAt: row.created_at,
             updatedAt: row.updated_at,
           } satisfies DailyRecipeNew;
@@ -557,16 +592,23 @@ function DashboardInner() {
 
   const expenseRatio = baseIncome && totalExpense > 0 ? (totalExpense / baseIncome) * 100 : 0;
   const savingRatio = baseIncome && totalSaving > 0 ? (totalSaving / baseIncome) * 100 : 0;
+  const [year, month] = monthParam.split("-").map(Number);
+  const monthDays = new Date(year, month, 0).getDate();
+  const recordingRate = Math.round(((stats?.days.length ?? 0) / monthDays) * 100);
 
   const handleMoveMonth = (delta: number) => {
     const next = shiftMonth(monthParam, delta);
     router.push(`/dashboard?month=${next}`);
   };
 
+  const handleGoToCurrentMonth = () => {
+    router.push(`/dashboard?month=${getYearMonth()}`);
+  };
+
   if (loading) {
     return (
       <PageContainer title="">
-        <div className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-[#FFF7EB] via-[#FFFDFC] to-[#F3F4FF]" />
+        <div className="pointer-events-none fixed inset-0 -z-10 landing-surface" />
         <div className="flex min-h-[60vh] items-center justify-center">
           <p className="text-xs text-slate-500">달력에서 기록한 하루 레시피를 불러오고 있어요...</p>
         </div>
@@ -577,50 +619,45 @@ function DashboardInner() {
   if (!stats) {
     return (
       <PageContainer title="">
-        <div className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-[#FFF7EB] via-[#FFFDFC] to-[#F3F4FF]" />
-        <main className="min-h-[70vh] flex items-center justify-center px-4">
-          <div className="w-full max-w-xl rounded-3xl bg-white/95 border border-blue-100 px-5 py-6 shadow-lg shadow-blue-100/70">
-            <div className="mb-3 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-base">📅</span>
-                <span className="text-xs font-medium text-slate-700">{ymToText(monthParam)} 레시피 없음</span>
+        <div className="pointer-events-none fixed inset-0 -z-10 landing-surface" />
+        <main className="min-h-[70vh] px-4 py-10 sm:py-16">
+          <div className="mx-auto w-full max-w-3xl overflow-hidden rounded-[32px] border border-orange-100 bg-white/95 shadow-[0_20px_55px_rgba(255,138,61,0.14)]">
+            <div className="flex flex-col gap-4 border-b border-orange-100 bg-gradient-to-r from-[#fffaf5] to-[#ffedd5] px-6 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+              <div>
+                <p className="text-xs font-bold tracking-[0.14em] text-orange-600">MONTHLY MONEY REPORT</p>
+                <h1 className="mt-2 text-xl font-bold tracking-tight text-slate-900">{ymToText(monthParam)} 소비 흐름을 시작해 볼까요?</h1>
               </div>
-              <div className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-[10px] text-blue-700 border border-blue-100">
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => handleMoveMonth(-1)}
-                  className="h-5 w-5 flex items-center justify-center rounded-full hover:bg-blue-100"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-orange-200 bg-white text-slate-600 hover:bg-orange-50"
                 >
                   ←
                 </button>
-                <span>{ymToText(monthParam)}</span>
+                <span className="rounded-full bg-white/80 px-3 py-2 text-xs font-semibold text-slate-700">{ymToText(monthParam)}</span>
                 <button
                   type="button"
                   onClick={() => handleMoveMonth(1)}
-                  className="h-5 w-5 flex items-center justify-center rounded-full hover:bg-blue-100"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-orange-200 bg-white text-slate-600 hover:bg-orange-50"
                 >
                   →
                 </button>
               </div>
             </div>
 
-            {loadError && <p className="mb-2 text-[11px] text-red-500">{loadError}</p>}
-
-            <h2 className="mb-2 text-[12px] font-semibold text-slate-900">{ymToText(monthParam)} 하루 지출 레시피부터 적어볼까요?</h2>
-            <p className="mb-4 text-[11px] text-slate-600 leading-relaxed">
-              <span className="font-semibold text-slate-900">레시피 달력</span>에서 날짜별로 수입·지출·저축을 입력하면,
-              <br />
-              이 화면에서 한 달 전체가 <span className="font-semibold text-blue-700">분석 리포트</span>로 정리됩니다.
-            </p>
-
-            <button
-              type="button"
-              onClick={() => router.push(`/dashboard/calendar?month=${monthParam}`)}
-              className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-xs font-semibold text-white shadow-md shadow-blue-200 hover:bg-[#5bbbf3] transition"
-              style={{ ["--brand-blue" as any]: BRAND_blue }}
-            >
-              🍳 {ymToText(monthParam)} 달력 레시피 쓰러 가기
-            </button>
+            <div className="px-6 py-7 sm:px-8 sm:py-8">
+              {loadError && <p className="mb-4 rounded-xl bg-red-50 px-3 py-2 text-xs text-red-600">{loadError}</p>}
+              <p className="max-w-xl text-sm leading-7 text-slate-600">수입·지출·저축을 날짜별로 기록하면, 이곳에서 월별 소비 비율과 지출이 컸던 날, 카테고리별 흐름을 바로 확인할 수 있습니다.</p>
+              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                {[['01', '하루 기록', '달력에서 수입·지출·저축을 입력하세요.'], ['02', '자동 집계', '기록한 금액을 월간 기준으로 모읍니다.'], ['03', '소비 점검', '지출 비중과 추이를 확인하세요.']].map(([number, title, text]) => <div key={number} className="rounded-2xl border border-orange-100 bg-[#fffaf5] p-4"><span className="text-xs font-bold text-orange-600">{number}</span><p className="mt-3 text-sm font-bold text-slate-900">{title}</p><p className="mt-1 text-xs leading-5 text-slate-500">{text}</p></div>)}
+              </div>
+              <div className="mt-6 flex flex-wrap gap-2">
+                <button type="button" onClick={() => router.push(`/dashboard/calendar?month=${monthParam}`)} className="inline-flex items-center justify-center rounded-xl bg-[#ff8a3d] px-4 py-3 text-sm font-bold text-slate-900 shadow-md shadow-orange-100 transition hover:bg-[#fb923c]">🍳 {ymToText(monthParam)} 기록하기</button>
+                <button type="button" onClick={handleGoToCurrentMonth} className="rounded-xl border border-orange-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-orange-50">이번 달로 이동</button>
+                <button type="button" onClick={() => router.push('/calculators')} className="rounded-xl border border-orange-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-orange-50">계산기 둘러보기</button>
+              </div>
+            </div>
           </div>
         </main>
       </PageContainer>
@@ -644,7 +681,7 @@ function DashboardInner() {
     {
       label: "기록일 수",
       value: `${stats.days.length}일`,
-      sub: `지출일 ${stats.daysWithExpense}일 · 저축일 ${stats.daysWithSaving}일`,
+      sub: `기록 완성도 ${recordingRate}% · 지출일 ${stats.daysWithExpense}일`,
     },
   ];
 
@@ -652,14 +689,14 @@ function DashboardInner() {
 
   return (
   <PageContainer title="">
-    <div className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-[#FFF7EB] via-[#FFFDFC] to-[#F3F4FF]" />
+    <div className="pointer-events-none fixed inset-0 -z-10 landing-surface" />
 
     <main className="min-h-screen pb-7 pt-3 lg:pb-10 lg:pt-5">
       <div className="mx-auto w-full max-w-[1320px]">
         {/* 상단 헤더 */}
         <section className="mb-4 flex flex-col gap-3 lg:mb-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <div className="inline-flex items-center gap-1 rounded-full bg-white/80 border border-blue-100 px-2 py-1 text-[10px] text-blue-700 shadow-sm">
+            <div className="inline-flex items-center gap-1 rounded-full bg-white/80 border border-orange-100 px-2 py-1 text-[10px] text-orange-700 shadow-sm">
               <span>🍲</span>
               <span>{ymToText(monthParam)} 지출 레시피</span>
             </div>
@@ -693,7 +730,7 @@ function DashboardInner() {
             <button
               type="button"
               onClick={() => router.push(`/dashboard/calendar?month=${monthParam}`)}
-              className="inline-flex items-center gap-1 rounded-full bg-slate-900 px-3 py-1.5 text-[11px] font-medium text-white shadow hover:bg-slate-800"
+              className="inline-flex items-center gap-1 rounded-full bg-[#ff8a3d] px-3 py-1.5 text-[11px] font-medium text-slate-900 shadow shadow-orange-100 hover:bg-[#fb923c]"
             >
               ✏️ 달력 레시피 수정
             </button>
@@ -705,7 +742,7 @@ function DashboardInner() {
           {summaryChips.map((chip) => (
             <div
               key={chip.label}
-              className="rounded-2xl border border-blue-100 bg-white/95 px-3.5 py-3 shadow-sm shadow-blue-100/60 flex flex-col justify-between w-auto lg:min-h-[108px] lg:px-5 lg:py-4"
+              className="rounded-2xl border border-orange-100 bg-white/95 px-3.5 py-3 shadow-sm shadow-orange-100/60 flex flex-col justify-between w-auto lg:min-h-[108px] lg:px-5 lg:py-4"
             >
               <span className="text-[11px] text-slate-500 lg:text-xs">{chip.label}</span>
               <span className="mt-1 text-base font-semibold text-slate-900 lg:text-[22px]">{chip.value}</span>
@@ -717,11 +754,11 @@ function DashboardInner() {
         {/* 메인 2컬럼 - 모바일은 그대로 세로, 웹만 2단 */}
         <section className="mb-4 flex flex-col gap-3 lg:grid lg:grid-cols-12 lg:gap-5">
           {/* 좌측: 파이 + 카테고리 */}
-          <div className="flex flex-col gap-3 rounded-2xl bg-white/95 border border-blue-100 p-3.5 shadow-sm shadow-blue-100/70 w-auto lg:col-span-4 lg:rounded-3xl lg:p-5 lg:sticky lg:top-6">
+          <div className="flex flex-col gap-3 rounded-2xl bg-white/95 border border-orange-100 p-3.5 shadow-sm shadow-orange-100/70 w-auto lg:col-span-4 lg:rounded-3xl lg:p-5 lg:sticky lg:top-6">
             {/* 건강도 + 요약 */}
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <div className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-[10px] text-blue-800 border border-blue-100 mb-1">
+                <div className="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2 py-1 text-[10px] text-orange-800 border border-orange-100 mb-1">
                   <span>{health.emoji}</span>
                   <span>{health.title}</span>
                 </div>
@@ -748,7 +785,7 @@ function DashboardInner() {
             <PieChartCard items={topExpenseItems} total={totalExpense} />
 
             {/* 카테고리 리스트 */}
-            <div className="mt-2 rounded-2xl bg-blue-50/40 border border-blue-100 px-3 py-2.5 lg:px-4 lg:py-3">
+            <div className="mt-2 rounded-2xl bg-orange-50/40 border border-orange-100 px-3 py-2.5 lg:px-4 lg:py-3">
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-[11px] text-slate-700 lg:text-xs">지출 구분 요약</span>
                 <span className="text-[10px] text-slate-500">{topExpenseItems.length}개 항목</span>
@@ -762,11 +799,11 @@ function DashboardInner() {
                 {topExpenseItems.map((item, idx) => {
                   const ratio = totalExpense > 0 ? (item.amount / totalExpense) * 100 : 0;
                   const chipColors = [
-                    "bg-blue-500",
-                    "bg-blue-400",
+                    "bg-orange-500",
+                    "bg-orange-400",
                     "bg-lime-400",
                     "bg-emerald-400",
-                    "bg-sky-400",
+                    "bg-orange-400",
                     "bg-fuchsia-400",
                     "bg-slate-400",
                   ];
@@ -775,7 +812,7 @@ function DashboardInner() {
                   return (
                     <div
                       key={`${item.label}-${idx}`}
-                      className="flex items-center justify-between gap-2 rounded-xl bg-white/80 px-2 py-1 hover:bg-blue-50 lg:px-3 lg:py-2"
+                      className="flex items-center justify-between gap-2 rounded-xl bg-white/80 px-2 py-1 hover:bg-orange-50 lg:px-3 lg:py-2"
                     >
                       <div className="flex items-center gap-2 min-w-0">
                         <span className={`h-4 w-4 flex items-center justify-center rounded-full text-[10px] text-white font-semibold ${chipColor}`}>
@@ -815,7 +852,7 @@ function DashboardInner() {
                 {stats.maxExpenseDay ? (
                   <>
                     가장 많이 쓴 날은 <span className="font-semibold">{formatKoreanDate(stats.maxExpenseDay.date)}</span>로,{" "}
-                    <span className="font-semibold text-blue-600">{stats.maxExpenseDay.amount.toLocaleString()}원</span>을 사용했습니다.
+                    <span className="font-semibold text-orange-600">{stats.maxExpenseDay.amount.toLocaleString()}원</span>을 사용했습니다.
                   </>
                 ) : (
                   <>아직 지출이 큰 날은 없습니다.</>
@@ -868,8 +905,8 @@ function DashboardInner() {
                             className={"border-t border-slate-200 " + (isOdd ? "bg-slate-50/70" : "bg-white")}
                           >
                             <td className="px-2 py-1.5 text-slate-800 whitespace-nowrap lg:px-3 lg:py-2">{formatKoreanDate(d.date)}</td>
-                            <td className="px-2 py-1.5 text-right text-sky-700 lg:px-3 lg:py-2">{d.incomeTotal ? d.incomeTotal.toLocaleString() : "-"}</td>
-                            <td className="px-2 py-1.5 text-right text-blue-700 lg:px-3 lg:py-2">{d.expenseTotal ? d.expenseTotal.toLocaleString() : "-"}</td>
+                            <td className="px-2 py-1.5 text-right text-orange-700 lg:px-3 lg:py-2">{d.incomeTotal ? d.incomeTotal.toLocaleString() : "-"}</td>
+                            <td className="px-2 py-1.5 text-right text-orange-700 lg:px-3 lg:py-2">{d.expenseTotal ? d.expenseTotal.toLocaleString() : "-"}</td>
                             <td className="px-2 py-1.5 text-right text-emerald-700 lg:px-3 lg:py-2">{d.savingTotal ? d.savingTotal.toLocaleString() : "-"}</td>
                             <td className="px-2 py-1.5 text-slate-700 truncate max-w-[220px] lg:px-3 lg:py-2 lg:max-w-[320px]">{mainMemo || "-"}</td>
                           </tr>
@@ -905,13 +942,13 @@ function DashboardInner() {
                     {topCat && (
                       <li>
                         • 가장 큰 지출 구분은 <span className="font-semibold">{topCat.label}</span> (
-                        <span className="font-semibold text-blue-700">{topCat.amount.toLocaleString()}원</span>) 입니다.
+                        <span className="font-semibold text-orange-700">{topCat.amount.toLocaleString()}원</span>) 입니다.
                       </li>
                     )}
 
                     <li>
                       • 지출이 있었던 날 기준 하루 평균{" "}
-                      <span className="font-semibold text-blue-700">{stats.avgExpensePerSpendingDay.toLocaleString()}원</span>을 사용했습니다.
+                      <span className="font-semibold text-orange-700">{stats.avgExpensePerSpendingDay.toLocaleString()}원</span>을 사용했습니다.
                     </li>
                     <li>
                       • 저축이 있었던 날 기준 하루 평균{" "}
@@ -921,13 +958,13 @@ function DashboardInner() {
                     {stats.maxExpenseDay && (
                       <li>
                         • 가장 지출이 컸던 날은 <span className="font-semibold">{formatKoreanDate(stats.maxExpenseDay.date)}</span>로,{" "}
-                        <span className="font-semibold text-blue-700">{stats.maxExpenseDay.amount.toLocaleString()}원</span>을 사용했습니다.
+                        <span className="font-semibold text-orange-700">{stats.maxExpenseDay.amount.toLocaleString()}원</span>을 사용했습니다.
                       </li>
                     )}
                   </ul>
                 </div>
 
-                <div className="rounded-3xl bg-gradient-to-r from-[#FFF7EB] to-[#FFEFD9] p-3.5 text-[11px] leading-relaxed text-slate-800 shadow-sm shadow-blue-100/80 w-auto lg:p-5 lg:text-xs">
+                <div className="rounded-3xl bg-gradient-to-r from-[#FFF7EB] to-[#FFEFD9] p-3.5 text-[11px] leading-relaxed text-slate-800 shadow-sm shadow-orange-100/80 w-auto lg:p-5 lg:text-xs">
                   <p className="mb-2">
                     🧂 <strong>셰프 TIP.</strong> 이번 달 데이터를 바탕으로 <span className="font-semibold">“줄이고 싶은 구분(카테고리)”</span>를 1~2개만 고른 뒤,
                     다음 달 달력에서 그 구분의 지출을 상한선으로 관리해 보세요.
@@ -1107,7 +1144,7 @@ function PieChartCard({ items, total }: PieChartProps) {
   const radius = 48;
   const circumference = 2 * Math.PI * radius;
 
-  const palette = ["#5bbbf3", "#facc15", "#4ade80", "#38bdf8", "#a855f7", "#f97373", "#94a3b8"];
+  const palette = ["#ff8a3d", "#facc15", "#4ade80", "#ff8a3d", "#fdba74", "#f97373", "#94a3b8"];
 
   let currentOffset = 0;
 
@@ -1157,7 +1194,7 @@ export default function DashboardPage() {
     <Suspense
       fallback={
         <PageContainer title="">
-          <div className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-[#FFF7EB] via-[#FFFDFC] to-[#F3F4FF]" />
+          <div className="pointer-events-none fixed inset-0 -z-10 landing-surface" />
           <div className="flex min-h-[60vh] items-center justify-center">
             <p className="text-xs text-slate-500">이 달의 지출 레시피 대시보드를 준비하고 있어요...</p>
           </div>

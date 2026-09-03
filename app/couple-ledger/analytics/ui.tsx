@@ -139,9 +139,9 @@ function Pill({
       className={cx(
         "inline-flex items-center gap-1 rounded-[10px] px-3 py-1 text-[11px] font-medium",
         tone === "accent" &&
-          "border border-[#aadffe] bg-[#edf7ff] text-[#0c86ea]",
+          "border border-[#fed7aa] bg-[#fff7ed] text-[#ff8a3d]",
         tone === "soft" &&
-          "border border-[#E5E7EB] bg-white text-[#0c86ea]",
+          "border border-[#E5E7EB] bg-white text-[#ff8a3d]",
         tone === "muted" &&
           "border border-slate-200 bg-slate-50 text-slate-600"
       )}
@@ -174,14 +174,14 @@ function DataCard({
 }
 
 const primaryButtonClass =
-  "inline-flex items-center justify-center rounded-[12px] bg-[#69b6ff] px-4 py-2.5 text-[13px] font-medium text-white transition hover:bg-[#0c86ea] disabled:opacity-60";
+  "inline-flex items-center justify-center rounded-[12px] bg-[#ff8a3d] px-4 py-2.5 text-[13px] font-medium text-white transition hover:bg-[#ff8a3d] disabled:opacity-60";
 
 const neutralButtonClass =
   "inline-flex items-center justify-center rounded-[12px] border border-slate-200 bg-white px-4 py-2.5 text-[13px] font-medium text-slate-700 transition hover:bg-slate-50";
 
-const PIE_COLORS = ["#69b6ff", "#94a3b8"];
+const PIE_COLORS = ["#ff8a3d", "#94a3b8"];
 const CATEGORY_COLORS = [
-  "#69b6ff",
+  "#ff8a3d",
   "#94a3b8",
   "#f59e0b",
   "#34d399",
@@ -438,7 +438,7 @@ export default function CoupleLedgerAnalyticsUI() {
 
   if (checking) {
     return (
-      <div className="mx-auto max-w-[1180px] min-h-screen bg-white p-6 text-[14px] text-slate-600">
+      <div className="mx-auto max-w-[1180px] landing-surface min-h-screen p-6 text-[14px] text-slate-600">
         불러오는 중…
       </div>
     );
@@ -446,7 +446,7 @@ export default function CoupleLedgerAnalyticsUI() {
 
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-white p-4 md:p-6">
+      <div className="landing-surface min-h-screen p-4 md:p-6">
         <Surface className="mx-auto max-w-xl p-5 md:p-6">
           <div className="text-[18px] md:text-[20px] font-semibold tracking-[-0.02em] text-slate-900">
             지출 분석
@@ -466,7 +466,7 @@ export default function CoupleLedgerAnalyticsUI() {
 
   if (!ctx?.couple_link_id) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="landing-surface min-h-screen">
         <div className="mx-auto max-w-5xl px-4 py-6 md:px-6 md:py-8">
           <Surface className="p-5 md:p-6">
             <div className="text-[20px] md:text-[22px] font-semibold tracking-[-0.02em] text-slate-900">
@@ -493,7 +493,7 @@ export default function CoupleLedgerAnalyticsUI() {
   const sharedLocked = ctx.shared_ledger_on !== true;
 
   return (
-    <div className="min-h-screen bg-white pb-10">
+    <div className="landing-surface min-h-screen pb-10">
       <div className="mx-auto max-w-[1320px] px-4 py-5 md:px-6 md:py-8">
         <Surface className="overflow-hidden">
           <div className="border-b border-[#F3F4F6] bg-white px-4 py-5 md:px-6 md:py-6">
@@ -714,7 +714,7 @@ export default function CoupleLedgerAnalyticsUI() {
                       <Line
                         type="monotone"
                         dataKey="amount"
-                        stroke="#69b6ff"
+                        stroke="#ff8a3d"
                         strokeWidth={3}
                         dot={{ r: 4 }}
                         activeDot={{ r: 6 }}
@@ -779,7 +779,7 @@ export default function CoupleLedgerAnalyticsUI() {
           <div
             className={cx(
               "min-w-[220px] rounded-[10px] px-4 py-2.5 text-[12px] font-medium text-white shadow-[0_12px_30px_rgba(0,0,0,0.16)]",
-              toast.type === "success" && "bg-[#69b6ff]",
+              toast.type === "success" && "bg-[#ff8a3d]",
               toast.type === "error" && "bg-[#d84b4b]",
               toast.type === "info" && "bg-slate-900"
             )}

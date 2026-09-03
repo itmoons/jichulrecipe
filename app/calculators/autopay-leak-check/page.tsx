@@ -15,7 +15,7 @@ const UI = {
     "bg-[radial-gradient(circle,rgba(251,146,60,0.14)_1px,transparent_1px)] bg-[size:16px_16px] mx-auto w-full max-w-[1320px] px-3 py-4 sm:px-4 sm:py-6",
   ink: "text-[#3B2F1E]",
   inkSoft: "text-[#7f7f7f]",
-  card: "bg-[#f2fbff] border-[#e8f8ff]",
+  card: "bg-[#fff7ed] border-[#ffedd5]",
 };
 
 type Intention = "유지" | "보류" | "해지 고려";
@@ -151,12 +151,12 @@ export default function AutoPayLeakCheckPage() {
         : leakRatio <= 40
         ? {
             label: "주의",
-            badge: "bg-[#52a9ff] text-[#ffffff]",
+            badge: "bg-[#ff8a3d] text-[#ffffff]",
             msg: "누수 비중이 꽤 있습니다. ‘금액 큰데 사용 적은’ 항목부터 정리해 보세요.",
           }
         : {
             label: "경계",
-            badge: "bg-[#5bbbf3] text-white",
+            badge: "bg-[#ff8a3d] text-white",
             msg: "누수가 크고 자동결제 관리가 필요합니다. 결제수단(카드/앱스토어)별 구독 목록부터 싹 점검하세요.",
           };
 
@@ -179,20 +179,20 @@ export default function AutoPayLeakCheckPage() {
           <div className="mb-5 flex items-center justify-between gap-3">
             <Link
               href="/calculators"
-              className="rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
+              className="rounded-full border border-[#ffedd5] bg-[#fff7ed] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
             >
               ← 계산기 모음
             </Link>
 
-            <span className="rounded-full bg-[#5bbbf3] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
+            <span className="rounded-full bg-[#ff8a3d] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
               자동결제 점검
             </span>
           </div>
 
           {/* 헤더 */}
           <div className="mb-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm">
-              <span className="inline-block h-2 w-2 rounded-full bg-[#5bbbf3]" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#ffedd5] bg-[#fff7ed] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm">
+              <span className="inline-block h-2 w-2 rounded-full bg-[#ff8a3d]" />
               Recipe Calculator
             </div>
 
@@ -218,7 +218,7 @@ export default function AutoPayLeakCheckPage() {
 
                 <button
                   onClick={addItem}
-                  className="rounded-2xl bg-[#5bbbf3] px-3 py-2 text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+                  className="rounded-2xl bg-[#ff8a3d] px-3 py-2 text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
                 >
                   + 추가
                 </button>
@@ -226,7 +226,7 @@ export default function AutoPayLeakCheckPage() {
 
               <div className="mt-4 grid gap-3">
                 {items.map((it) => (
-                  <div key={it.id} className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                  <div key={it.id} className="rounded-2xl border border-[#ffedd5] bg-white p-4">
                     <div className="grid gap-3 sm:grid-cols-12 sm:items-end">
                       <div className="sm:col-span-5">
                         <label className="text-[12px] font-semibold text-[#3B2F1E]">항목 이름</label>
@@ -236,7 +236,7 @@ export default function AutoPayLeakCheckPage() {
                           placeholder="예: 안 보는 OTT, 안 쓰는 앱 멤버십"
                           className={cn(
                             "mt-1 h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
-                            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
+                            "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
                           )}
                         />
                       </div>
@@ -254,7 +254,7 @@ export default function AutoPayLeakCheckPage() {
                             placeholder="0"
                             className={cn(
                               "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-[12px] outline-none",
-                              "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
+                              "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
                             )}
                           />
                         </div>
@@ -269,7 +269,7 @@ export default function AutoPayLeakCheckPage() {
                           placeholder="0"
                           className={cn(
                             "mt-1 h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
-                            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
+                            "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
                           )}
                         />
                         <div className="mt-1 text-[11px] text-[#7f7f7f]">0~30회</div>
@@ -282,7 +282,7 @@ export default function AutoPayLeakCheckPage() {
                           onChange={(e) => updateItem(it.id, { intention: e.target.value as Intention })}
                           className={cn(
                             "mt-1 h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
-                            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
+                            "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
                           )}
                         >
                           <option value="유지">유지</option>
@@ -298,7 +298,7 @@ export default function AutoPayLeakCheckPage() {
                       </span>
                       <button
                         onClick={() => removeItem(it.id)}
-                        className="rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] px-3 py-1.5 text-xs font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
+                        className="rounded-xl border border-[#ffedd5] bg-[#ff8a3d] px-3 py-1.5 text-xs font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
                       >
                         삭제
                       </button>
@@ -307,7 +307,7 @@ export default function AutoPayLeakCheckPage() {
                 ))}
               </div>
 
-              <div className="mt-5 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+              <div className="mt-5 rounded-2xl border border-[#ffedd5] bg-white p-4">
                 <div className={cn("text-[12px] font-semibold", UI.ink)}>해지 전 체크리스트</div>
                 <ul className={cn("mt-2 list-disc pl-5 text-[12px] leading-relaxed", UI.inkSoft)}>
                   <li>환불/부분환불 조건(다음 결제일 이전 해지 여부)</li>
@@ -338,10 +338,10 @@ export default function AutoPayLeakCheckPage() {
                 <MetricCard title="월 누수 추정액" value={`${formatKRW(calc.leakMonthlyTotal)}원`} accent />
               </div>
 
-              <div className="mt-3 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+              <div className="mt-3 rounded-2xl border border-[#ffedd5] bg-white p-4">
                 <div className="flex items-center justify-between">
                   <div className={cn("text-[12px] font-semibold", UI.ink)}>최근 3개월 누수 추정</div>
-                  <span className="rounded-full bg-[#5bbbf3] px-3 py-1 text-xs font-semibold text-[#ffffff]">
+                  <span className="rounded-full bg-[#ff8a3d] px-3 py-1 text-xs font-semibold text-[#ffffff]">
                     누수 비중 {calc.monthlyTotal > 0 ? ((calc.leakMonthlyTotal / calc.monthlyTotal) * 100).toFixed(1) : "0.0"}%
                   </span>
                 </div>
@@ -349,7 +349,7 @@ export default function AutoPayLeakCheckPage() {
                 <div className={cn("mt-2 text-[12px] leading-relaxed", UI.inkSoft)}>{calc.signal.msg}</div>
               </div>
 
-              <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+              <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
                 <div className="flex items-center justify-between gap-3">
                   <div className={cn("text-[12px] font-semibold", UI.ink)}>누수 후보 TOP</div>
                   <div className={cn("text-xs", UI.inkSoft)}>정리 우선순위</div>
@@ -362,12 +362,12 @@ export default function AutoPayLeakCheckPage() {
                     {calc.top.map((t, idx) => (
                       <li
                         key={t.id}
-                        className="rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] p-3"
+                        className="rounded-xl border border-[#ffedd5] bg-[#ff8a3d] p-3"
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
                             <div className="flex items-center gap-2">
-                              <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-[#5bbbf3] text-xs font-bold text-[#ffffff]">
+                              <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-[#ff8a3d] text-xs font-bold text-[#ffffff]">
                                 {idx + 1}
                               </span>
                               <div className={cn("truncate text-[12px] font-semibold", UI.ink)}>
@@ -377,9 +377,9 @@ export default function AutoPayLeakCheckPage() {
                                 className={cn(
                                   "rounded-full px-2 py-0.5 text-[11px] font-semibold",
                                   t.intention === "해지 고려"
-                                    ? "bg-[#5bbbf3] text-white"
+                                    ? "bg-[#ff8a3d] text-white"
                                     : t.intention === "보류"
-                                    ? "bg-[#52a9ff] text-[#ffffff]"
+                                    ? "bg-[#ff8a3d] text-[#ffffff]"
                                     : "bg-[#34D399] text-white"
                                 )}
                               >
@@ -411,13 +411,13 @@ export default function AutoPayLeakCheckPage() {
               <div className="mt-5 flex flex-col gap-2 sm:flex-row">
                 <Link
                   href="/calculators/subscription-total"
-                  className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+                  className="rounded-2xl bg-[#ff8a3d] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
                 >
                   다음: 구독 총액 합산 →
                 </Link>
                 <Link
                   href="/calculators"
-                  className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
+                  className="rounded-2xl border border-[#ffedd5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
                 >
                   계산기 모음으로
                 </Link>
@@ -449,7 +449,7 @@ function MetricCard({
     <div
       className={cn(
         "rounded-2xl border p-4",
-        accent ? "border-[#5bbbf3] bg-[#5bbbf3]" : "border-[#e8f8ff] bg-white"
+        accent ? "border-[#ff8a3d] bg-[#ff8a3d]" : "border-[#ffedd5] bg-white"
       )}
     >
       <div className={cn("text-xs font-semibold", accent ? "text-[#ffffff]" : "text-[#7f7f7f]")}>

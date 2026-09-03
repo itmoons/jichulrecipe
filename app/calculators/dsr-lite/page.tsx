@@ -23,12 +23,12 @@ export default function DsrLitePage() {
     // 단순 구간 (정책기준/규제판단 아님)
     const grade =
       income <= 0
-        ? { label: "입력 필요", badge: "bg-[#52a9ff] text-[#ffffff]" }
+        ? { label: "입력 필요", badge: "bg-[#ff8a3d] text-[#ffffff]" }
         : dsr < 20
         ? { label: "여유", badge: "bg-[#34D399] text-white" }
         : dsr < 40
-        ? { label: "보통", badge: "bg-[#52a9ff] text-[#ffffff]" }
-        : { label: "부담", badge: "bg-[#5bbbf3] text-white" };
+        ? { label: "보통", badge: "bg-[#ff8a3d] text-[#ffffff]" }
+        : { label: "부담", badge: "bg-[#ff8a3d] text-white" };
 
     return { income, debt, dsr, monthlyIncome, monthlyDebt, grade };
   }, [annualIncome, annualDebtService]);
@@ -62,7 +62,7 @@ export default function DsrLitePage() {
             <MoneyInput label="연간 원리금 상환액(합계)" value={annualDebtService} setValue={setAnnualDebtService} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+          <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
             <div className="text-[12px] font-semibold text-[#3B2F1E]">입력 팁</div>
             <ul className="mt-2 list-disc pl-5 text-[12px] text-[#6d6d6d]">
               <li>월 상환액을 알고 있으면 “월 상환액 × 12”로 연간 원리금을 만들 수 있습니다.</li>
@@ -85,7 +85,7 @@ export default function DsrLitePage() {
             />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+          <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
             <div className={cn("text-[12px] font-semibold", UI.ink)}>해석 프레임</div>
             <div className="mt-3 grid gap-2">
               <Row
@@ -102,13 +102,13 @@ export default function DsrLitePage() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/calculators/loan-payment"
-              className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+              className="rounded-2xl bg-[#ff8a3d] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
             >
               다음: 대출 월 상환액 →
             </Link>
             <Link
               href="/calculators"
-              className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
+              className="rounded-2xl border border-[#ffedd5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
             >
               계산기 모음으로
             </Link>

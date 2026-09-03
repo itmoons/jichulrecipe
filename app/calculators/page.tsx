@@ -18,19 +18,32 @@ type Category = {
   items: CalcItem[];
 };
 
-/** ✅ 레시피북 톤(연노랑 + 주황) */
+/** 신뢰감 있는 금융 도구 톤: 중립 배경 + 선명한 브랜드 오렌지 */
 const UI = {
-  paperBg: "bg-[#ffffff]", // 연노랑 종이
-  paperDots:
-    "bg-[radial-gradient(circle,rgba(251,146,60,0.14)_1px,transparent_1px)] bg-[size:16px_16px]", // 은은한 점무늬
-  ink: "text-[#3B2F1E]", // 잉크색(진한 브라운)
-  inkSoft: "text-[#7f7f7f]",
-  blue: "#5bbbf3",
-  blueDark: "#5bbbf3",
-  card: "bg-[#f2fbff] border-[#e8f8ff]",
+  // 계산기 본문도 사이트의 따뜻한 기본 배경을 그대로 사용한다.
+  paperBg: "bg-transparent",
+  paperDots: "",
+  ink: "text-slate-900",
+  inkSoft: "text-slate-600",
+  blue: "#ff8a3d",
+  blueDark: "#ff8a3d",
+  card: "bg-white border-slate-200",
 };
 
 const categories: Category[] = [
+  {
+    key: "quick",
+    title: "연봉·주거·자산 빠른 계산",
+    subtitle: "검색량이 높은 생활 금융 계산을 한 화면에 모았습니다. 필요한 숫자만 입력하면 바로 확인할 수 있어요.",
+    items: [
+      {
+        title: "연봉·전월세·복리 빠른 계산",
+        slug: "everyday-money",
+        desc: "연봉 인상률, 퇴직금, 월급 연봉 환산, 전월세, 마진율, 복리와 투자 수익률을 계산합니다.",
+        tags: ["연봉", "전월세", "복리", "투자"],
+      },
+    ],
+  },
   {
     key: "fixed",
     title: "월 고정비·구독·생활비",
@@ -241,6 +254,20 @@ const categories: Category[] = [
   },
 ];
 
+const quickLinks = [
+  { label: "연봉 실수령액", href: "/calculators/net-pay-insurance", detail: "4대보험 반영" },
+  { label: "연봉 인상률", href: "/calculators/everyday-money?tool=raise", detail: "인상 후 연봉" },
+  { label: "퇴직금", href: "/calculators/everyday-money?tool=severance", detail: "예상 금액" },
+  { label: "월급 → 연봉", href: "/calculators/everyday-money?tool=salary", detail: "상여 포함 환산" },
+  { label: "대출 이자", href: "/calculators/loan-payment", detail: "월 상환액" },
+  { label: "전월세", href: "/calculators/everyday-money?tool=housing", detail: "전환율 환산" },
+  { label: "할인율", href: "/calculators/annual-vs-monthly", detail: "연·월 결제 비교" },
+  { label: "마진율", href: "/calculators/everyday-money?tool=margin", detail: "원가·판매가" },
+  { label: "적금", href: "/calculators/emergency-fund-timeline", detail: "목표 달성 기간" },
+  { label: "복리", href: "/calculators/everyday-money?tool=compound", detail: "매월 적립" },
+  { label: "투자 수익률", href: "/calculators/everyday-money?tool=return", detail: "예상 평가액" },
+];
+
 function cn(...xs: Array<string | false | null | undefined>) {
   return xs.filter(Boolean).join(" ");
 }
@@ -286,15 +313,33 @@ export default function CalculatorsHubPage() {
       <div className={cn("min-h-screen", UI.paperDots)}>
         <div className="mx-auto px-0 py-8 sm:py-10">
 
+          <section className="mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="relative overflow-hidden border-b border-orange-100 bg-gradient-to-br from-[#fffaf5] via-[#fff3e8] to-[#ffedd5] px-6 py-8 sm:px-9 sm:py-10">
+              <div className="absolute -right-16 -top-20 h-64 w-64 rounded-full border-[28px] border-[#ff8a3d]/15" />
+              <div className="absolute bottom-0 right-24 h-28 w-px bg-[#ff8a3d]/20" />
+              <p className="relative text-xs font-semibold tracking-[0.14em] text-orange-600">JICUL RECIPE · MONEY TOOLS</p>
+              <h1 className="relative mt-3 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">돈 계산을 가장 쉽게.</h1>
+              <p className="relative mt-3 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">자주 찾는 계산을 빠르게 확인하고, 필요한 경우 더 자세한 가계부 관리로 이어갈 수 있습니다.</p>
+            </div>
+            <div className="grid grid-cols-2 gap-px bg-slate-100 sm:grid-cols-3 lg:grid-cols-6">
+              {quickLinks.map((item) => (
+                <Link key={item.label} href={item.href} className="group bg-white px-4 py-4 transition hover:bg-slate-50 sm:px-5">
+                  <div className="text-sm font-semibold text-slate-800 group-hover:text-orange-700">{item.label} <span className="text-orange-600">→</span></div>
+                  <div className="mt-1 text-xs text-slate-500">{item.detail}</div>
+                </Link>
+              ))}
+            </div>
+          </section>
+
           {/* 검색 + 필터(모바일 최적) */}
           <div className="mb-8 sm:mb-10">
             <div className="grid gap-3 sm:gap-4">
-              <div className={cn("rounded-2xl border p-4 sm:p-5 shadow-sm", UI.card)}>
+              <div className={cn("rounded-2xl border p-5 sm:p-6", UI.card)}>
                 <div className="flex flex-col gap-2">
                   <label className={cn("text-[12px] font-semibold", UI.ink)}>검색</label>
 
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9C7A55]">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-600">
                       ⌕
                     </span>
                     <input
@@ -303,7 +348,7 @@ export default function CalculatorsHubPage() {
                       placeholder="예: 구독, 고정비, DSR, 실수령…"
                       className={cn(
                         "h-11 w-full rounded-xl border bg-white pl-9 pr-3 text-[12px] outline-none",
-                        "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
+                        "border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-100"
                       )}
                     />
                   </div>
@@ -318,10 +363,10 @@ export default function CalculatorsHubPage() {
                     <button
                       onClick={() => setActiveCat("all")}
                       className={cn(
-                        "shrink-0 rounded-[10px] border px-4 py-2 text-[12px] font-medium transition",
+                        "shrink-0 rounded-lg border px-4 py-2 text-[12px] font-medium transition",
                         activeCat === "all"
-                          ? "border-[#5bbbf3] bg-[#5bbbf3] text-white shadow-sm"
-                          : "border-[#e8f8ff] bg-white text-[#7f7f7f] hover:border-[#5bbbf3]"
+                          ? "border-[#ff8a3d] bg-[#ff8a3d] text-slate-900 shadow-sm"
+                          : "border-slate-200 bg-white text-slate-600 hover:border-orange-300 hover:text-orange-700"
                       )}
                     >
                       전체
@@ -332,10 +377,10 @@ export default function CalculatorsHubPage() {
                         key={c.key}
                         onClick={() => setActiveCat(c.key)}
                         className={cn(
-                          "shrink-0 rounded-[10px] border px-4 py-2 text-[12px] font-medium transition",
+                          "shrink-0 rounded-lg border px-4 py-2 text-[12px] font-medium transition",
                           activeCat === c.key
-                            ? "border-[#5bbbf3] bg-[#5bbbf3] text-white shadow-sm"
-                            : "border-[#e8f8ff] bg-white text-[#7f7f7f] hover:border-[#5bbbf3]"
+                            ? "border-[#ff8a3d] bg-[#ff8a3d] text-slate-900 shadow-sm"
+                            : "border-slate-200 bg-white text-slate-600 hover:border-orange-300 hover:text-orange-700"
                         )}
                       >
                         {c.title}
@@ -349,7 +394,7 @@ export default function CalculatorsHubPage() {
 
           {/* 카테고리별 섹션 */}
           <div className="space-y-8 sm:space-y-10">
-            {categories.map((cat) => {
+            {categories.map((cat, index) => {
               const items = grouped.get(cat.key) ?? [];
               if (activeCat !== "all" && activeCat !== cat.key) return null;
               if (items.length === 0) return null;
@@ -358,8 +403,7 @@ export default function CalculatorsHubPage() {
                 <section
                   key={cat.key}
                   className={cn(
-                    "rounded-3xl border p-4 sm:p-6 shadow-[0_10px_30px_rgba(251,146,60,0.10)]",
-                    UI.card
+                    "border-b border-slate-200 pb-8 last:border-b-0",
                   )}
                 >
                   {/* 섹션 헤더 */}
@@ -367,8 +411,8 @@ export default function CalculatorsHubPage() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-[#5bbbf3] text-[#ffffff]">
-                            🍊
+                          <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-[#ff8a3d] text-xs font-bold text-slate-900">
+                            {String(index + 1).padStart(2, "0")}
                           </span>
                           <h2 className={cn("text-lg sm:text-xl font-semibold", UI.ink)}>
                             {cat.title}
@@ -378,7 +422,7 @@ export default function CalculatorsHubPage() {
                       </div>
 
                       <div className="shrink-0">
-                        <div className="rounded-[10px] bg-[#5bbbf3] px-3 py-1 text-[12px] font-semibold text-[#ffffff]">
+                        <div className="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
                           {items.length}개
                         </div>
                       </div>
@@ -392,8 +436,8 @@ export default function CalculatorsHubPage() {
                         key={it.slug}
                         href={`/calculators/${it.slug}`}
                         className={cn(
-                          "group rounded-2xl border bg-white p-4 transition",
-                          "border-[#e8f8ff] hover:border-[#5bbbf3] hover:shadow-[0_12px_30px_rgba(249,115,22,0.12)]"
+                          "group rounded-xl border bg-white p-5 transition",
+                          "border-slate-200 hover:-translate-y-0.5 hover:border-orange-300 hover:shadow-md"
                         )}
                       >
                         <div className="flex items-start justify-between gap-3">
@@ -408,8 +452,7 @@ export default function CalculatorsHubPage() {
 
                           <div
                             className={cn(
-                              "shrink-0 rounded-[10px] border px-3 py-1 text-xs font-semibold",
-                              "border-[#5bbbf3] bg-[#5bbbf3] text-[#ffffff]"
+                              "shrink-0 text-sm font-semibold text-slate-400 transition group-hover:text-orange-600"
                             )}
                           >
                             열기 →
@@ -421,8 +464,8 @@ export default function CalculatorsHubPage() {
                             <span
                               key={t}
                               className={cn(
-                                "rounded-[10px] px-2 py-1 text-xs font-medium",
-                                "bg-[#f2fbff] text-[#7f7f7f] border border-[#e8f8ff]"
+                                "rounded-md px-2 py-1 text-xs font-medium",
+                                "bg-slate-50 text-slate-500 border border-slate-100"
                               )}
                             >
                               #{t}
@@ -450,7 +493,7 @@ export default function CalculatorsHubPage() {
               <div className="min-w-0">
                 <div className={cn("text-lg font-semibold", UI.ink)}>다음 단계</div>
                 <p className={cn("mt-1 text-[12px] leading-relaxed", UI.inkSoft)}>
-                  계산 결과를 바탕으로 <span className="font-semibold text-[#3da8ff]">“고정비 점검 → 구독 정리 → 예산 배분”</span>{" "}
+                  계산 결과를 바탕으로 <span className="font-semibold text-orange-600">“고정비 점검 → 구독 정리 → 예산 배분”</span>{" "}
                   순서로 정리하면 효과가 빠릅니다.
                 </p>
               </div>
@@ -460,7 +503,7 @@ export default function CalculatorsHubPage() {
                   href="/"
                   className={cn(
                     "rounded-2xl border bg-white px-4 py-2 text-[12px] font-semibold transition",
-                    "border-[#f2fbff] text-[#7f7f7f] hover:border-[#5bbbf3]"
+                    "border-[#fff7ed] text-[#7f7f7f] hover:border-[#ff8a3d]"
                   )}
                 >
                   지출레시피 홈으로
@@ -469,7 +512,7 @@ export default function CalculatorsHubPage() {
                   href="/calculators/subscription-total"
                   className={cn(
                     "rounded-2xl px-4 py-2 text-[12px] font-semibold text-white transition shadow-sm",
-                    "bg-[#5bbbf3] hover:bg-[#0c47ea]"
+                    "bg-[#ff8a3d] text-slate-900 hover:bg-[#fb923c]"
                   )}
                 >
                   구독 총액 계산부터

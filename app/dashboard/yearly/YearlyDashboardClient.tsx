@@ -41,7 +41,7 @@ type MonthlyStore = {
 
 const LS_KEY_MONTHLY = "jichulrecipe_setup_monthly_v1";
 
-const BRAND_blue = "#5bbbf3";
+const BRAND_blue = "#ff8a3d";
 const BRAND_GREEN = "#4CAF50";
 
 const DETAIL_LABELS: Record<
@@ -391,9 +391,9 @@ export default function YearlyDashboardClient() {
   if (checkingAuth) {
     return (
       <PageContainer title="연간 지출 레시피 대시보드">
-        <div className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-[#FFF8EC] via-[#FFFDFC] to-[#F7FAFF]" />
+        <div className="pointer-events-none fixed inset-0 -z-10 landing-surface" />
         <div className="pointer-events-none fixed left-[-80px] top-[40%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,184,108,0.25)] blur-3xl" />
-        <div className="pointer-events-none fixed right-[-60px] bottom-[8%] -z-10 h-52 w-52 rounded-full bg-[rgba(86,115,231,0.18)] blur-3xl" />
+        <div className="pointer-events-none fixed right-[-60px] bottom-[8%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,193,130,0.22)] blur-3xl" />
 
         <div className="flex min-h-[60vh] items-center justify-center">
           <p className="text-xs text-slate-500">
@@ -409,9 +409,9 @@ export default function YearlyDashboardClient() {
     return (
       <PageContainer title="연간 지출 레시피 대시보드">
         {/* 배경 */}
-        <div className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-[#FFF8EC] via-[#FFFDFC] to-[#F7FAFF]" />
+        <div className="pointer-events-none fixed inset-0 -z-10 landing-surface" />
         <div className="pointer-events-none fixed left-[-80px] top-[40%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,184,108,0.25)] blur-3xl" />
-        <div className="pointer-events-none fixed right-[-60px] bottom-[8%] -z-10 h-52 w-52 rounded-full bg-[rgba(86,115,231,0.18)] blur-3xl" />
+        <div className="pointer-events-none fixed right-[-60px] bottom-[8%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,193,130,0.22)] blur-3xl" />
 
         <div className="mx-auto max-w-xl rounded-2xl bg-white/95 p-6 text-center shadow-sm shadow-blue-50">
           {/* 연도 네비 */}
@@ -444,7 +444,7 @@ export default function YearlyDashboardClient() {
           <button
             type="button"
             onClick={handleGoSetup}
-            className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-white shadow-md shadow-blue-200 hover:bg-[#0c86ea] transition"
+            className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-slate-900 shadow-md shadow-orange-100 hover:bg-[#fb923c] transition"
             style={{ ["--brand-blue" as any]: BRAND_blue }}
           >
             🍽 기본 레시피 입력하러 가기
@@ -469,9 +469,9 @@ export default function YearlyDashboardClient() {
   return (
     <PageContainer title="연간 지출 레시피 대시보드">
       {/* 배경 */}
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-[#FFF8EC] via-[#FFFDFC] to-[#F7FAFF]" />
+      <div className="pointer-events-none fixed inset-0 -z-10 landing-surface" />
       <div className="pointer-events-none fixed left-[-80px] top-[40%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,184,108,0.25)] blur-3xl" />
-      <div className="pointer-events-none fixed right-[-60px] bottom-[8%] -z-10 h-52 w-52 rounded-full bg-[rgba(86,115,231,0.18)] blur-3xl" />
+      <div className="pointer-events-none fixed right-[-60px] bottom-[8%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,193,130,0.22)] blur-3xl" />
 
       {/* 헤더 */}
       <motion.section

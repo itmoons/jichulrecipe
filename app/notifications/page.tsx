@@ -27,7 +27,7 @@ export default function NotificationsPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#f8fbff] px-4 py-6">
+      <main className="landing-surface min-h-screen px-4 py-6">
         <div className="mx-auto w-full max-w-[1320px] text-sm text-zinc-500">
           알림을 불러오는 중입니다...
         </div>
@@ -37,7 +37,7 @@ export default function NotificationsPage() {
 
   if (!userId) {
     return (
-      <main className="min-h-screen bg-[#f8fbff] px-4 py-6">
+      <main className="landing-surface min-h-screen px-4 py-6">
         <div className="mx-auto w-full max-w-[1320px] rounded-2xl bg-white p-6 shadow-sm">
           <h1 className="text-lg font-bold text-zinc-900">알림 내역</h1>
           <p className="mt-2 text-sm text-zinc-600">
@@ -45,7 +45,7 @@ export default function NotificationsPage() {
           </p>
           <Link
             href="/sign-in"
-            className="mt-4 inline-flex rounded-lg bg-sky-500 px-4 py-2 text-sm font-semibold text-white"
+            className="mt-4 inline-flex rounded-lg bg-[#ff8a3d] px-4 py-2 text-sm font-semibold text-white"
           >
             로그인하러 가기
           </Link>
@@ -55,7 +55,7 @@ export default function NotificationsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f8fbff] px-4 py-6">
+    <main className="landing-surface min-h-screen px-4 py-6">
       <div className="mx-auto w-full max-w-[1320px]">
         <div className="mb-5 flex items-center justify-between gap-3">
           <div>

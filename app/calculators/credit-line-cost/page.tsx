@@ -23,8 +23,8 @@ export default function CreditLineCostPage() {
 
     const status =
       B <= 0
-        ? { label: "입력 필요", badge: "bg-[#52a9ff] text-[#ffffff]" }
-        : { label: "점검", badge: "bg-[#5bbbf3] text-white" };
+        ? { label: "입력 필요", badge: "bg-[#ff8a3d] text-[#ffffff]" }
+        : { label: "점검", badge: "bg-[#ff8a3d] text-white" };
 
     return { B, r, n, monthlyInterest, totalInterest, status };
   }, [avgBalance, annualRate, months]);
@@ -58,7 +58,7 @@ export default function CreditLineCostPage() {
             <NumberInput label="사용기간(개월)" value={months} setValue={setMonths} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+          <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
             <div className="text-[12px] font-semibold text-[#3B2F1E]">입력 팁</div>
             <ul className="mt-2 list-disc pl-5 text-[12px] text-[#6d6d6d]">
               <li>한 달 내내 300만원을 썼다면 평균잔액은 300만원입니다.</li>
@@ -78,7 +78,7 @@ export default function CreditLineCostPage() {
             <MetricCard title="기간(개월)" value={`${calc.n}개월`} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+          <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
             <div className={cn("text-[12px] font-semibold", UI.ink)}>해석 프레임</div>
             <div className="mt-3 grid gap-2">
               <Row label="평균잔액이 줄면" value="이자 비용은 선형으로 줄어듭니다" tone="ok" />
@@ -92,13 +92,13 @@ export default function CreditLineCostPage() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/calculators"
-              className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
+              className="rounded-2xl border border-[#ffedd5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
             >
               계산기 모음으로
             </Link>
             <Link
               href="/"
-              className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+              className="rounded-2xl bg-[#ff8a3d] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
             >
               지출레시피 홈으로
             </Link>

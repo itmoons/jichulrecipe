@@ -7,9 +7,9 @@ import { ArrowLeft, Check, Plus, X } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 
-const BRAND_blue = "rgb(31 172 255)";
-const BRAND_BLUE1 = "#aadffe";
-const BRAND_BLUE2 = "#e8f8ff";
+const BRAND_blue = "#ff8a3d";
+const BRAND_BLUE1 = "#fed7aa";
+const BRAND_BLUE2 = "#ffedd5";
 
 
 /** 항목 단위 (메모 + 금액 + 카테고리) */
@@ -499,7 +499,7 @@ export default function CalendarEditClient() {
   return (
     <main
       className={[
-        "min-h-screen text-neutral-900 flex flex-col items-stretch bg-white",
+        "landing-surface min-h-screen text-neutral-900 flex flex-col items-stretch",
         "bg-[radial-gradient(circle_at_1px_1px,#e5e7eb_1px,transparent_0)]",
         "[background-size:18px_18px]",
       ].join(" ")}
@@ -529,7 +529,7 @@ export default function CalendarEditClient() {
             type="submit"
             form="daily-recipe-form"
             className="inline-flex min-w-[120px] items-center justify-center gap-1.5 rounded-[10px] px-3 sm:px-4 py-1.5 text-xs sm:text-[12px] font-medium shadow-sm"
-            style={{ backgroundColor: BRAND_BLUE2, color: "#5bbbf3" }}
+            style={{ backgroundColor: BRAND_blue, color: "#111827" }}
           >
             <Check size={16} />
             레시피 저장

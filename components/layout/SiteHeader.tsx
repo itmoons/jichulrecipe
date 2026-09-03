@@ -7,8 +7,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import NotificationsPanel from "@/components/NotificationsPanel";
 
-const BRAND_BLUE = "#4cbcff";
-const BRAND_SKY = "#BCE6FF";
+const BRAND_ORANGE = "#f97316";
 
 const PUBLIC_ROUTES = ["/", "/calculators"];
 
@@ -172,7 +171,6 @@ export function SiteHeader() {
   const isDashboard = pathname === "/dashboard";
   const isYearly = pathname?.startsWith("/dashboard/yearly");
   const isCouple = pathname?.startsWith("/couple-ledger");
-  const isMainPage = pathname === "/";
 
   const guardedHref = (target: string) => {
     if (isPublicRoute(target)) return target;
@@ -191,13 +189,8 @@ export function SiteHeader() {
       active: pathname === "/dashboard" || pathname?.startsWith("/dashboard/yearly"),
     },
     {
-      href: "/dashboard/recurring",
-      label: "정기 등록",
-      active: pathname?.startsWith("/dashboard/recurring"),
-    },
-    {
       href: "/saving",
-      label: "적금 저장",
+      label: "저축 · 정기관리",
       active: pathname?.startsWith("/saving"),
     },
     {
@@ -218,9 +211,9 @@ export function SiteHeader() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full">
+    <header className="sticky top-0 z-40 w-full px-3 pt-3 sm:px-6 sm:pt-4">
       {/* 1차 헤더 */}
-      <div className="border-b border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+      <div className="rounded-[22px] border border-white/80 bg-white/75 shadow-[0_12px_40px_rgba(255,138,61,0.10)] backdrop-blur-xl supports-[backdrop-filter]:bg-white/65">
         <div className="mx-auto flex h-[64px] w-full max-w-[1380px] items-center justify-between px-3 sm:h-[72px] sm:px-6">
           {/* 좌측 */}
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
@@ -257,7 +250,7 @@ export function SiteHeader() {
 
               <div className="min-w-0 leading-tight">
                 <div className="truncate text-[14px] font-black tracking-[-0.04em] text-slate-800 sm:text-[18px]">
-                  지출<span className="text-sky-400">recipe</span>
+                  지출<span className="text-orange-500">recipe</span>
                 </div>
                 <div className="hidden text-[12px] text-slate-400 sm:block">
                   프리미엄 무료 가계부 사이트
@@ -271,10 +264,10 @@ export function SiteHeader() {
             <Link
               href={guardedHref("/dashboard/calendar")}
               className={[
-                "rounded-md px-3 py-2 transition",
+                "rounded-xl px-3 py-2 transition",
                 isCalendar
-                  ? "bg-slate-100 text-slate-900"
-                  : "hover:bg-slate-50 hover:text-slate-900",
+                  ? "bg-orange-100 text-orange-800"
+                  : "hover:bg-[#ff8a3d]/10 hover:text-slate-900",
               ].join(" ")}
               onClick={closeNotif}
             >
@@ -284,10 +277,10 @@ export function SiteHeader() {
             <Link
               href={guardedHref("/dashboard")}
               className={[
-                "rounded-md px-3 py-2 transition",
+                "rounded-xl px-3 py-2 transition",
                 isDashboard || isYearly
-                  ? "bg-slate-100 text-slate-900"
-                  : "hover:bg-slate-50 hover:text-slate-900",
+                  ? "bg-orange-100 text-orange-800"
+                  : "hover:bg-[#ff8a3d]/10 hover:text-slate-900",
               ].join(" ")}
               onClick={closeNotif}
             >
@@ -295,38 +288,25 @@ export function SiteHeader() {
             </Link>
 
             <Link
-              href={guardedHref("/dashboard/recurring")}
-              className={[
-                "rounded-md px-3 py-2 transition",
-                pathname?.startsWith("/dashboard/recurring")
-                  ? "bg-slate-100 text-slate-900"
-                  : "hover:bg-slate-50 hover:text-slate-900",
-              ].join(" ")}
-              onClick={closeNotif}
-            >
-              정기레시피
-            </Link>
-
-            <Link
               href={guardedHref("/saving")}
               className={[
-                "rounded-md px-3 py-2 transition",
+                "rounded-xl px-3 py-2 transition",
                 pathname?.startsWith("/saving")
-                  ? "bg-slate-100 text-slate-900"
-                  : "hover:bg-slate-50 hover:text-slate-900",
+                  ? "bg-orange-100 text-orange-800"
+                  : "hover:bg-[#ff8a3d]/10 hover:text-slate-900",
               ].join(" ")}
               onClick={closeNotif}
             >
-              적금
+              저축 · 정기관리
             </Link>
 
             <Link
               href={guardedHref("/dashboard/gifts")}
               className={[
-                "rounded-md px-3 py-2 transition",
+                "rounded-xl px-3 py-2 transition",
                 pathname?.startsWith("/dashboard/gifts")
-                  ? "bg-slate-100 text-slate-900"
-                  : "hover:bg-slate-50 hover:text-slate-900",
+                  ? "bg-orange-100 text-orange-800"
+                  : "hover:bg-[#ff8a3d]/10 hover:text-slate-900",
               ].join(" ")}
               onClick={closeNotif}
             >
@@ -336,10 +316,10 @@ export function SiteHeader() {
             <Link
               href={guardedHref("/calculators")}
               className={[
-                "rounded-md px-3 py-2 transition",
+                "rounded-xl px-3 py-2 transition",
                 pathname?.startsWith("/calculators")
-                  ? "bg-slate-100 text-slate-900"
-                  : "hover:bg-slate-50 hover:text-slate-900",
+                  ? "bg-orange-100 text-orange-800"
+                  : "hover:bg-[#ff8a3d]/10 hover:text-slate-900",
               ].join(" ")}
               onClick={closeNotif}
             >
@@ -349,10 +329,10 @@ export function SiteHeader() {
             <Link
               href={guardedHref("/couple-ledger")}
               className={[
-                "rounded-md px-3 py-2 transition",
+                "rounded-xl px-3 py-2 transition",
                 isCouple
-                  ? "bg-slate-100 text-slate-900"
-                  : "hover:bg-slate-50 hover:text-slate-900",
+                  ? "bg-orange-100 text-orange-800"
+                  : "hover:bg-[#ff8a3d]/10 hover:text-slate-900",
               ].join(" ")}
               onClick={closeNotif}
             >
@@ -375,7 +355,7 @@ export function SiteHeader() {
                 {unreadCount > 0 && (
                   <span
                     className="ml-1 inline-flex min-w-[18px] items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold text-white"
-                    style={{ backgroundColor: BRAND_BLUE }}
+                    style={{ backgroundColor: BRAND_ORANGE }}
                   >
                     {unreadCount > 99 ? "99+" : unreadCount}
                   </span>
@@ -398,7 +378,7 @@ export function SiteHeader() {
                   {unreadCount > 0 && (
                     <span
                       className="absolute -right-1 -top-1 inline-flex min-w-[18px] items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold text-white"
-                      style={{ backgroundColor: BRAND_BLUE }}
+                      style={{ backgroundColor: BRAND_ORANGE }}
                     >
                       {unreadCount > 99 ? "99+" : unreadCount}
                     </span>
@@ -453,7 +433,7 @@ export function SiteHeader() {
               ) : (
                 <Link
                   href="/sign-in"
-                  className="inline-flex h-10 items-center justify-center rounded-[10px] bg-slate-900 px-3 text-[10px] font-semibold text-white shadow-sm transition hover:bg-black"
+                  className="inline-flex h-10 items-center justify-center rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 px-4 text-[10px] font-semibold text-white shadow-[0_8px_18px_rgba(234,88,12,0.25)] transition hover:from-orange-600 hover:to-orange-700"
                 >
                   로그인
                 </Link>
@@ -461,37 +441,6 @@ export function SiteHeader() {
           </div>
         </div>
       </div>
-
-      {/* 2차 프로모션 탭 - 메인 페이지에서만 노출 */}
-      {isMainPage && (
-        <div className="border-b border-slate-200 bg-[#fafafa]">
-          <div className="mx-auto hidden w-full max-w-[980px] items-center justify-center px-4 md:flex">
-            {[
-              { label: "지출관리 필수 계산기", active: false, dark: true },
-              { label: "적금 관리", active: false, dark: true },
-              { label: "사회초년생 가계부", active: true, dark: false },
-              { label: "경조사비 관리", active: false, dark: true },
-            ].map((item) => (
-              <div
-                key={item.label}
-                className={[
-                  "flex h-12 flex-1 items-center justify-center border-x border-slate-200 text-center text-[14px] font-bold",
-                  item.active
-                    ? "text-slate-900"
-                    : item.dark
-                    ? "bg-[#242424] text-white"
-                    : "bg-white text-slate-700",
-                ].join(" ")}
-                style={{
-                  backgroundColor: item.active ? BRAND_SKY : undefined,
-                }}
-              >
-                {item.label}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* 모바일 메뉴 */}
       {isNavOpen && (
@@ -540,7 +489,7 @@ export function SiteHeader() {
                     {unreadCount > 0 && (
                       <span
                         className="inline-flex min-w-[20px] items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold text-white"
-                        style={{ backgroundColor: BRAND_BLUE }}
+                        style={{ backgroundColor: BRAND_ORANGE }}
                       >
                         {unreadCount > 99 ? "99+" : unreadCount}
                       </span>
@@ -549,7 +498,7 @@ export function SiteHeader() {
                 </div>
               )}
 
-              <div className="border-t border-slate-100 bg-sky-50/60 px-4 py-3">
+              <div className="border-t border-orange-100 bg-orange-50/70 px-4 py-3">
                 <div className="text-[10px] font-bold text-slate-800">첫 기록 혜택</div>
                 <div className="mt-1 text-[10px] leading-6 text-slate-600">
                   오늘의 지출을 기록하고 소비 달력을 확인해보세요.

@@ -9,17 +9,16 @@ function cn(...xs: Array<string | false | null | undefined>) {
   return xs.filter(Boolean).join(" ");
 }
 
-/** 레시피북 톤(연노랑 + 주황) */
+/** 금융 서비스 공통 프레임 */
 const UI = {
-  pageBg: "bg-[#ffffff]",
-  paperDots:
-    "bg-[radial-gradient(circle,rgba(251,146,60,0.12)_1px,transparent_1px)] bg-[size:16px_16px] mx-auto w-full max-w-[1380px] px-3 py-4 sm:px-4 sm:py-6",
-  ink: "text-[#3B2F1E]",
-  inkSoft: "text-[#7f7f7f]",
-  line: "border-[#e8f8ff]",
-  card: "bg-[#f2fbff] border-[#e8f8ff]",
+  pageBg: "app-surface",
+  paperDots: "min-h-screen",
+  ink: "text-slate-900",
+  inkSoft: "text-slate-500",
+  line: "border-slate-200",
+  card: "bg-white border-slate-200",
   accent: "text-[#ffffff]",
-  accentBg: "bg-[#5bbbf3]",
+  accentBg: "bg-[#ff8a3d]",
 };
 
 type CalcLink = { title: string; slug: string; group: "A" | "B" | "C" | "D" };
@@ -127,39 +126,34 @@ export default function CalculatorsLayout({ children }: { children: React.ReactN
     <div className={cn("min-h-screen break-keep", UI.pageBg)}>
       <div className={cn("min-h-screen", UI.paperDots)}>
         {/* Top bar */}
-        <header className={cn("sticky top-0 z-30 border-b bg-white/80 backdrop-blur", UI.line)}>
-          <div className="mx-auto flex  gap-3 px-4 py-3">
+        <header className={cn("rounded-2xl border bg-white/65 backdrop-blur-xl", UI.line)}>
+          <div className="mx-auto flex h-14 max-w-[1280px] items-center px-5 sm:px-8">
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="inline-flex h-2 w-2 rounded-full bg-[#5bbbf3]" />
                 <Link
                   href="/calculators"
                   className={cn(
-                    "text-[12px] font-semibold hover:underline whitespace-nowrap",
+                    "text-sm font-semibold hover:text-orange-700 whitespace-nowrap",
                     UI.ink
                   )}
                 >
-                  지출레시피 계산기
+                  금융 계산 도구
                 </Link>
                 {active && (
                   <>
-                    <span className="text-xs text-[#C8B79A]">/</span>
-                    <span className={cn("text-[12px] font-semibold truncate", UI.ink)}>
+                    <span className="text-sm text-slate-300">/</span>
+                    <span className={cn("text-sm font-medium truncate", UI.ink)}>
                       {active.title}
                     </span>
                   </>
                 )}
               </div>
-              <div className={cn("mt-0.5 text-xs text-[#7f7f7f] truncate", UI.inkSoft)}>
-                {groupMeta.title} · {groupMeta.subtitle}
-              </div>
             </div>
-
           </div>
         </header>
 
         {/* Main grid */}
-        <div className="mx-auto grid max-w-7xl gap-4 px-1  lg:gap-6">
+        <div className="mx-auto grid max-w-[1280px] gap-4 px-5 py-8 sm:px-8 lg:gap-6">
           {/* Content */}
           <main className={cn("min-w-0", "pb-24 lg:pb-6")}>{children}</main>
 
@@ -167,8 +161,8 @@ export default function CalculatorsLayout({ children }: { children: React.ReactN
 
 
         {/* Footer */}
-        <footer className="border-t border-[#e8f8ff] bg-white">
-          <div className="mx-auto px-4 py-6">
+        <footer className="rounded-2xl border border-white/70 bg-white/65 backdrop-blur-xl">
+          <div className="mx-auto max-w-[1280px] px-5 py-8 sm:px-8">
             <div className={cn("text-[12px] font-semibold", UI.ink)}>지출레시피</div>
             <p className={cn("mt-1 text-xs leading-relaxed", UI.inkSoft)}>
               계산기는 의사결정을 돕는 도구입니다. 실제 결제·계약·수수료는 각 서비스/금융기관 기준을 확인하세요.
@@ -178,13 +172,13 @@ export default function CalculatorsLayout({ children }: { children: React.ReactN
                 href={jiculHome}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1.5 text-xs font-semibold text-[#7f7f7f] hover:border-[#5bbbf3] whitespace-nowrap"
+                className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 hover:border-orange-300 whitespace-nowrap"
               >
                 https://www.jiculrecipe.com/ 방문 →
               </a>
               <Link
                 href="/calculators"
-                className="rounded-full border border-[#e8f8ff] bg-white px-3 py-1.5 text-xs font-semibold text-[#7f7f7f] hover:border-[#5bbbf3] whitespace-nowrap"
+                className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 hover:border-orange-300 whitespace-nowrap"
               >
                 계산기 목록으로
               </Link>

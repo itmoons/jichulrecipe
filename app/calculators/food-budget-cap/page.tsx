@@ -15,7 +15,7 @@ const UI = {
     "bg-[radial-gradient(circle,rgba(251,146,60,0.14)_1px,transparent_1px)] bg-[size:16px_16px] mx-auto w-full max-w-[1320px] px-3 py-4 sm:px-4 sm:py-6",
   ink: "text-[#3B2F1E]",
   inkSoft: "text-[#7f7f7f]",
-  card: "bg-[#f2fbff] border-[#e8f8ff]",
+  card: "bg-[#fff7ed] border-[#ffedd5]",
 };
 
 function toNumberSafe(v: string) {
@@ -97,7 +97,7 @@ export default function FoodBudgetCapPage() {
       currentSpend === 0
         ? {
             label: "가이드 산출",
-            badge: "bg-[#52a9ff] text-[#ffffff]",
+            badge: "bg-[#ff8a3d] text-[#ffffff]",
             msg: "현재 지출을 입력하면, 가이드 대비 과소/과다를 더 명확히 볼 수 있습니다.",
           }
         : gap <= 0
@@ -109,12 +109,12 @@ export default function FoodBudgetCapPage() {
         : gapRate <= 15
         ? {
             label: "조정 권장",
-            badge: "bg-[#52a9ff] text-[#ffffff]",
+            badge: "bg-[#ff8a3d] text-[#ffffff]",
             msg: "가이드 상한선을 조금 넘습니다. 외식 횟수나 1회 평균 단가를 먼저 조정하는 게 효과적입니다.",
           }
         : {
             label: "점검 필요",
-            badge: "bg-[#5bbbf3] text-white",
+            badge: "bg-[#ff8a3d] text-white",
             msg: "가이드 상한선을 크게 넘습니다. ‘외식 구조(횟수×단가)’와 ‘장보기 새는 구간(간식/즉석)’을 동시에 점검하세요.",
           };
 
@@ -158,20 +158,20 @@ export default function FoodBudgetCapPage() {
           <div className="mb-5 flex items-center justify-between gap-3">
             <Link
               href="/calculators"
-              className="rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
+              className="rounded-full border border-[#ffedd5] bg-[#fff7ed] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
             >
               ← 계산기 모음
             </Link>
 
-            <span className="rounded-full bg-[#5bbbf3] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
+            <span className="rounded-full bg-[#ff8a3d] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
               식비 설계
             </span>
           </div>
 
           {/* 헤더 */}
           <div className="mb-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm">
-              <span className="inline-block h-2 w-2 rounded-full bg-[#5bbbf3]" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#ffedd5] bg-[#fff7ed] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm">
+              <span className="inline-block h-2 w-2 rounded-full bg-[#ff8a3d]" />
               Recipe Calculator
             </div>
 
@@ -203,7 +203,7 @@ export default function FoodBudgetCapPage() {
                 <NumberInput label="외식/배달 주당 횟수(가구 기준)" value={eatOutPerWeek} setValue={setEatOutPerWeek} hint="예: 4" />
                 <MoneyInput label="외식/배달 1회 평균 비용(가구 기준)" value={avgEatOutCost} setValue={setAvgEatOutCost} hint="예: 18,000" />
 
-                <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                <div className="rounded-2xl border border-[#ffedd5] bg-white p-4">
                   <div className={cn("text-[12px] font-semibold", UI.ink)}>선택 입력(정확도↑)</div>
                   <div className={cn("mt-1 text-[12px]", UI.inkSoft)}>
                     이미 정해둔 장보기 예산이나 현재 월 식비가 있으면 입력하세요.
@@ -215,7 +215,7 @@ export default function FoodBudgetCapPage() {
                 </div>
               </div>
 
-              <div className="mt-5 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+              <div className="mt-5 rounded-2xl border border-[#ffedd5] bg-white p-4">
                 <div className={cn("text-[12px] font-semibold", UI.ink)}>계산 방식(간단히)</div>
                 <ul className={cn("mt-2 list-disc pl-5 text-[12px] leading-relaxed", UI.inkSoft)}>
                   <li>집밥 가이드는 “1인 1일 기준비 × 30일 × 가구원”에 외식 비중을 반영해 조정합니다.</li>
@@ -244,10 +244,10 @@ export default function FoodBudgetCapPage() {
                 <MetricCard title="외식/배달 월 추정" value={`${formatKRW(calc.estimatedEatOut)}원`} />
               </div>
 
-              <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+              <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
                 <div className="flex items-center justify-between gap-3">
                   <div className={cn("text-[12px] font-semibold", UI.ink)}>월 식비 상한선(가이드)</div>
-                  <span className="rounded-full bg-[#5bbbf3] px-3 py-1 text-xs font-semibold text-[#ffffff]">
+                  <span className="rounded-full bg-[#ff8a3d] px-3 py-1 text-xs font-semibold text-[#ffffff]">
                     목표: {goal}
                   </span>
                 </div>
@@ -261,7 +261,7 @@ export default function FoodBudgetCapPage() {
                 </div>
 
                 {toNumberSafe(currentFoodSpend) > 0 && (
-                  <div className="mt-3 rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] p-3">
+                  <div className="mt-3 rounded-xl border border-[#ffedd5] bg-[#ff8a3d] p-3">
                     <div className="text-xs font-semibold text-[#7f7f7f]">현재 지출 대비</div>
                     <div className="mt-1 text-[12px] font-semibold text-[#3B2F1E]">
                       차이:{" "}
@@ -277,7 +277,7 @@ export default function FoodBudgetCapPage() {
               </div>
 
               {/* 조정 레버 */}
-              <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+              <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
                 <div className={cn("text-[12px] font-semibold", UI.ink)}>조정 레버(효과 큰 순)</div>
                 <div className={cn("mt-1 text-xs", UI.inkSoft)}>
                   입력값 기준으로 “월 절감 가능성”이 큰 조정안을 위에 둡니다.
@@ -287,7 +287,7 @@ export default function FoodBudgetCapPage() {
                   {calc.levers.map((x) => (
                     <div
                       key={x.key}
-                      className="rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] p-3"
+                      className="rounded-xl border border-[#ffedd5] bg-[#ff8a3d] p-3"
                     >
                       <div className="flex items-center justify-between gap-3">
                         <div className="text-[12px] font-semibold text-[#3B2F1E]">{x.key}</div>
@@ -305,13 +305,13 @@ export default function FoodBudgetCapPage() {
               <div className="mt-5 flex flex-col gap-2 sm:flex-row">
                 <Link
                   href="/calculators/coffee-delivery-accum"
-                  className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+                  className="rounded-2xl bg-[#ff8a3d] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
                 >
                   다음: 커피/배달 누적 계산 →
                 </Link>
                 <Link
                   href="/calculators"
-                  className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
+                  className="rounded-2xl border border-[#ffedd5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
                 >
                   계산기 모음으로
                 </Link>
@@ -354,7 +354,7 @@ function NumberInput({
         placeholder="0"
         className={cn(
           "h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
-          "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
+          "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
         )}
       />
     </div>
@@ -389,7 +389,7 @@ function MoneyInput({
           placeholder="0"
           className={cn(
             "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-[12px] outline-none",
-            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
+            "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
           )}
         />
       </div>
@@ -421,7 +421,7 @@ function SelectInput({
         onChange={(e) => onChange(e.target.value)}
         className={cn(
           "h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
-          "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
+          "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
         )}
       >
         {options.map((o) => (
@@ -436,7 +436,7 @@ function SelectInput({
 
 function MetricCard({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
+    <div className="rounded-2xl border border-[#ffedd5] bg-white p-4">
       <div className="text-xs font-semibold text-[#7f7f7f]">{title}</div>
       <div className="mt-1 text-xl font-bold text-[#3B2F1E]">{value}</div>
     </div>

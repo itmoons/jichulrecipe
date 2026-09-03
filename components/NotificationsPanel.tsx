@@ -393,7 +393,7 @@ export default function NotificationsPanel({
   className={[
     "relative rounded-2xl border p-4 transition",
     isUnread
-      ? "border-blue-200 bg-gradient-to-br from-blue-50 to-blue-50 shadow-sm"
+      ? "border-orange-200 bg-gradient-to-br from-blue-50 to-blue-50 shadow-sm"
       : "border-zinc-200 bg-white",
   ].join(" ")}
   onClick={stopBubble}
@@ -518,7 +518,7 @@ export default function NotificationsPanel({
           <div
             className={`min-w-[220px] rounded-2xl px-4 py-3 text-[12px] font-semibold text-white shadow-xl ${
               toast.type === "success"
-                ? "bg-blue-500"
+                ? "bg-[#ff8a3d]"
                 : toast.type === "error"
                 ? "bg-red-500"
                 : "bg-slate-900"

@@ -126,9 +126,9 @@ function Pill({
       className={cx(
         "inline-flex items-center gap-1 rounded-[10px] px-3 py-1 text-[11px] font-medium",
         tone === "accent" &&
-          "border border-[#aadffe] bg-[#edf7ff] text-[#0c86ea]",
+          "border border-[#fed7aa] bg-[#fff7ed] text-[#ff8a3d]",
         tone === "soft" &&
-          "border border-[#E5E7EB] bg-white text-[#0c86ea]",
+          "border border-[#E5E7EB] bg-white text-[#ff8a3d]",
         tone === "muted" &&
           "border border-slate-200 bg-slate-50 text-slate-600"
       )}
@@ -139,10 +139,10 @@ function Pill({
 }
 
 const primaryButtonClass =
-  "inline-flex items-center justify-center rounded-[12px] bg-[#69b6ff] px-4 py-2.5 text-[13px] font-medium text-white transition hover:bg-[#0c86ea] disabled:opacity-60";
+  "inline-flex items-center justify-center rounded-[12px] bg-[#ff8a3d] px-4 py-2.5 text-[13px] font-medium text-white transition hover:bg-[#ff8a3d] disabled:opacity-60";
 
 const secondaryButtonClass =
-  "inline-flex items-center justify-center rounded-[12px] border border-[#aadffe] bg-white px-4 py-2.5 text-[13px] font-medium text-[#0c86ea] transition hover:bg-[#edf7ff]";
+  "inline-flex items-center justify-center rounded-[12px] border border-[#fed7aa] bg-white px-4 py-2.5 text-[13px] font-medium text-[#ff8a3d] transition hover:bg-[#fff7ed]";
 
 const neutralButtonClass =
   "inline-flex items-center justify-center rounded-[12px] border border-slate-200 bg-white px-4 py-2.5 text-[13px] font-medium text-slate-700 transition hover:bg-slate-50";
@@ -322,7 +322,7 @@ export default function CoupleLedgerCalendarUI() {
 
   if (checking) {
     return (
-      <div className="mx-auto max-w-[1180px] min-h-screen bg-white p-6 text-[14px] text-slate-600">
+      <div className="mx-auto max-w-[1180px] landing-surface min-h-screen p-6 text-[14px] text-slate-600">
         불러오는 중…
       </div>
     );
@@ -330,7 +330,7 @@ export default function CoupleLedgerCalendarUI() {
 
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-white p-4 md:p-6">
+      <div className="landing-surface min-h-screen p-4 md:p-6">
         <Surface className="mx-auto max-w-xl p-5 md:p-6">
           <div className="text-[18px] md:text-[20px] font-semibold tracking-[-0.02em] text-slate-900">
             지출 달력
@@ -350,7 +350,7 @@ export default function CoupleLedgerCalendarUI() {
 
   if (!ctx?.couple_link_id) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="landing-surface min-h-screen">
         <div className="mx-auto max-w-5xl px-4 py-6 md:px-6 md:py-8">
           <Surface className="p-5 md:p-6">
             <div className="text-[20px] md:text-[22px] font-semibold tracking-[-0.02em] text-slate-900">
@@ -377,7 +377,7 @@ export default function CoupleLedgerCalendarUI() {
   const sharedLocked = ctx.shared_ledger_on !== true;
 
   return (
-    <div className="min-h-screen bg-white pb-10">
+    <div className="landing-surface min-h-screen pb-10">
       <div className="mx-auto max-w-[1320px] px-4 py-5 md:px-6 md:py-8">
         <Surface className="overflow-hidden">
           <div className="border-b border-[#F3F4F6] bg-white px-4 py-5 md:px-6 md:py-6">
@@ -537,11 +537,11 @@ export default function CoupleLedgerCalendarUI() {
                           className={cx(
                             "min-h-[122px] rounded-[18px] border p-3 text-left transition",
                             isCurrentMonth
-                              ? "border-[#E5E7EB] bg-white hover:border-[#aadffe] hover:bg-[#fbfdff]"
+                              ? "border-[#E5E7EB] bg-white hover:border-[#fed7aa] hover:bg-[#fbfdff]"
                               : "border-slate-100 bg-slate-50 text-slate-400",
                             selectedDateKey === dateKey &&
-                              "border-[#69b6ff] ring-2 ring-[#d9efff]",
-                            isToday && "shadow-[inset_0_0_0_1px_#69b6ff]"
+                              "border-[#ff8a3d] ring-2 ring-[#d9efff]",
+                            isToday && "shadow-[inset_0_0_0_1px_#ff8a3d]"
                           )}
                         >
                           <div className="flex items-start justify-between gap-2">
@@ -559,7 +559,7 @@ export default function CoupleLedgerCalendarUI() {
                                 <span
                                   className={cx(
                                     "h-2.5 w-2.5 rounded-full",
-                                    mePaid > 0 ? "bg-[#69b6ff]" : "bg-slate-200"
+                                    mePaid > 0 ? "bg-[#ff8a3d]" : "bg-slate-200"
                                   )}
                                 />
                                 <span
@@ -575,7 +575,7 @@ export default function CoupleLedgerCalendarUI() {
                           <div className="mt-3">
                             {items.length > 0 ? (
                               <>
-                                <div className="text-[13px] font-semibold text-[#0c86ea]">
+                                <div className="text-[13px] font-semibold text-[#ff8a3d]">
                                   {money(total)}원
                                 </div>
                                 <div className="mt-1 text-[11px] text-slate-500">
@@ -586,7 +586,7 @@ export default function CoupleLedgerCalendarUI() {
                                   {topCategories.map((cat) => (
                                     <span
                                       key={cat}
-                                      className="rounded-[9px] bg-[#edf7ff] px-2 py-1 text-[10px] font-medium text-[#0c86ea]"
+                                      className="rounded-[9px] bg-[#fff7ed] px-2 py-1 text-[10px] font-medium text-[#ff8a3d]"
                                     >
                                       {cat}
                                     </span>
@@ -682,7 +682,7 @@ export default function CoupleLedgerCalendarUI() {
                             <span className="text-[14px] font-semibold text-slate-900">
                               {item.memo?.trim() ? item.memo : "지출"}
                             </span>
-                            <span className="rounded-[10px] bg-[#edf7ff] px-2.5 py-1 text-[11px] font-medium text-[#0c86ea]">
+                            <span className="rounded-[10px] bg-[#fff7ed] px-2.5 py-1 text-[11px] font-medium text-[#ff8a3d]">
                               {item.category || "기타"}
                             </span>
                             <span className="text-[11px] text-slate-500">
@@ -694,7 +694,7 @@ export default function CoupleLedgerCalendarUI() {
                               className={cx(
                                 "inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium",
                                 item.receipt_url
-                                  ? "border border-[#bfe4ff] bg-[#eef8ff] text-[#0c86ea]"
+                                  ? "border border-[#bfe4ff] bg-[#eef8ff] text-[#ff8a3d]"
                                   : "border border-slate-200 bg-slate-50 text-slate-500"
                               )}
                             >
@@ -707,7 +707,7 @@ export default function CoupleLedgerCalendarUI() {
                               <button
                                 type="button"
                                 onClick={() => setReceiptPreviewUrl(item.receipt_url || null)}
-                                className="inline-flex items-center rounded-[10px] border border-[#aadffe] bg-white px-3 py-1.5 text-[12px] font-medium text-[#0c86ea] transition hover:bg-[#edf7ff]"
+                                className="inline-flex items-center rounded-[10px] border border-[#fed7aa] bg-white px-3 py-1.5 text-[12px] font-medium text-[#ff8a3d] transition hover:bg-[#fff7ed]"
                               >
                                 영수증 보기
                               </button>
@@ -715,7 +715,7 @@ export default function CoupleLedgerCalendarUI() {
                           )}
                         </div>
 
-                        <div className="text-[15px] font-semibold text-[#0c86ea]">
+                        <div className="text-[15px] font-semibold text-[#ff8a3d]">
                           {money(item.amount)}원
                         </div>
                       </div>
@@ -782,7 +782,7 @@ export default function CoupleLedgerCalendarUI() {
           <div
             className={cx(
               "min-w-[220px] rounded-[10px] px-4 py-2.5 text-[12px] font-medium text-white shadow-[0_12px_30px_rgba(0,0,0,0.16)]",
-              toast.type === "success" && "bg-[#69b6ff]",
+              toast.type === "success" && "bg-[#ff8a3d]",
               toast.type === "error" && "bg-[#d84b4b]",
               toast.type === "info" && "bg-slate-900"
             )}

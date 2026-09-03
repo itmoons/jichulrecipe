@@ -51,7 +51,7 @@ function Surface({
   return (
     <section
       className={cx(
-        "rounded-[24px] border border-[#ECECEC] bg-white shadow-[0_8px_24px_rgba(15,23,42,0.04)]",
+        "rounded-[18px] border border-[#f1e4da] bg-white shadow-[0_4px_16px_rgba(85,47,18,0.05)]",
         className
       )}
     >
@@ -71,7 +71,7 @@ function ProfileCircle({
 }) {
   return (
     <div className="flex flex-col items-center">
-      <div className="relative h-[92px] w-[92px] overflow-hidden rounded-full bg-[#E9E9E9] sm:h-[110px] sm:w-[110px]">
+      <div className="relative h-[68px] w-[68px] overflow-hidden rounded-full border border-orange-100 bg-[#fff7ed] sm:h-[78px] sm:w-[78px]">
         {imageSrc ? (
           <Image
             src={imageSrc}
@@ -100,9 +100,9 @@ function SummaryChip({
   value: string;
 }) {
   return (
-    <div className="rounded-[16px] border border-[#EAEAEA] bg-[#FAFAFA] px-4 py-3">
-      <div className="text-[11px] text-slate-500">{label}</div>
-      <div className="mt-1 text-[14px] font-semibold text-slate-900">{value}</div>
+    <div className="rounded-[14px] border border-[#f3e5da] bg-[#fffdfb] px-4 py-3">
+      <div className="text-[11px] font-medium text-slate-500">{label}</div>
+      <div className="mt-1 text-[15px] font-bold tracking-[-0.02em] text-slate-900">{value}</div>
     </div>
   );
 }
@@ -121,12 +121,12 @@ function QuickCard({
   return (
     <Link
       href={href}
-      className="group block rounded-[24px] border border-[#EAEAEA] bg-[#F3F3F3] p-6 transition hover:-translate-y-[2px] hover:border-[#cfe7ff] hover:bg-[#f7fbff] hover:shadow-[0_12px_28px_rgba(12,134,234,0.08)]"
+      className="group block rounded-[18px] border border-[#f1e4da] bg-white p-5 transition hover:-translate-y-[2px] hover:border-orange-200 hover:bg-[#fffdfb] hover:shadow-[0_10px_22px_rgba(211,92,16,0.09)]"
     >
       <div className="flex h-full min-h-[190px] flex-col justify-between sm:min-h-[140px]">
         <div className="flex items-start justify-between gap-3">
           <div className="text-[28px]">{icon}</div>
-          <div className="rounded-full border border-white/80 bg-white/80 px-3 py-1 text-[11px] font-medium text-slate-600">
+          <div className="rounded-full border border-orange-100 bg-[#fff7ed] px-3 py-1 text-[11px] font-semibold text-orange-700">
             바로가기
           </div>
         </div>
@@ -159,8 +159,8 @@ function BarRow({
         <div className="text-[13px] text-slate-700">{label}</div>
         <div className="text-[13px] font-semibold text-slate-900">{money(amount)}원</div>
       </div>
-      <div className="mt-2 h-2.5 rounded-full bg-white/80">
-        <div className="h-2.5 rounded-full bg-[#69b6ff]" style={{ width: `${width}%` }} />
+      <div className="mt-2 h-2 rounded-full bg-orange-100/70">
+        <div className="h-2 rounded-full bg-[#ff8a3d]" style={{ width: `${width}%` }} />
       </div>
     </div>
   );
@@ -280,7 +280,7 @@ export default function CoupleLedgerPage() {
 
   if (checking) {
     return (
-      <div className="mx-auto max-w-[1320px] min-h-screen bg-[#ffffff] p-6 text-[14px] text-slate-600">
+      <div className="app-surface mx-auto max-w-[1320px] min-h-screen p-6 text-[14px] text-slate-600">
         불러오는 중…
       </div>
     );
@@ -288,7 +288,7 @@ export default function CoupleLedgerPage() {
 
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-[#ffffff] px-4 py-10 sm:px-6">
+      <div className="app-surface min-h-screen px-4 py-10 sm:px-6">
         <div className="mx-auto max-w-[1320px]">
           <Surface className="p-6 sm:p-8">
             <div className="text-[24px] font-semibold tracking-[-0.03em] text-slate-900">
@@ -300,7 +300,7 @@ export default function CoupleLedgerPage() {
             <div className="mt-6">
               <Link
                 href="/sign-in"
-                className="inline-flex items-center justify-center rounded-[14px] bg-[#69b6ff] px-5 py-3 text-[14px] font-medium text-white transition hover:bg-[#0c86ea]"
+                className="inline-flex items-center justify-center rounded-[14px] bg-[#ff8a3d] px-5 py-3 text-[14px] font-medium text-white transition hover:bg-[#ff8a3d]"
               >
                 로그인하기
               </Link>
@@ -313,7 +313,7 @@ export default function CoupleLedgerPage() {
 
   if (!ctx?.couple_link_id) {
     return (
-      <div className="min-h-screen bg-[#ffffff] px-4 py-10 sm:px-6">
+      <div className="app-surface min-h-screen px-4 py-10 sm:px-6">
         <div className="mx-auto max-w-[1320px]">
           <Surface className="p-6 sm:p-8">
             <div className="text-[24px] font-semibold tracking-[-0.03em] text-slate-900">
@@ -325,7 +325,7 @@ export default function CoupleLedgerPage() {
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 href="/couple-link"
-                className="inline-flex items-center justify-center rounded-[14px] bg-[#69b6ff] px-5 py-3 text-[14px] font-medium text-white transition hover:bg-[#0c86ea]"
+                className="inline-flex items-center justify-center rounded-[14px] bg-[#ff8a3d] px-5 py-3 text-[14px] font-medium text-white transition hover:bg-[#ff8a3d]"
               >
                 커플 연결하러 가기
               </Link>
@@ -343,10 +343,19 @@ export default function CoupleLedgerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#ffffff] px-4 py-8 sm:px-6 sm:py-6">
+    <div className="app-surface min-h-screen px-4 py-8 sm:px-6 sm:py-8">
       <div className="mx-auto max-w-[1320px]">
-        <Surface className="px-5 py-8 sm:px-8 sm:py-4">
-          <div className="flex flex-col items-center justify-center gap-6 sm:flex-row sm:gap-10">
+        <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-[11px] font-bold tracking-[0.12em] text-orange-600">COUPLE LEDGER</p>
+            <h1 className="mt-1 text-[24px] font-bold tracking-[-0.04em] text-slate-900">우리의 공동 장부</h1>
+            <p className="mt-1 text-[13px] text-slate-600">이번 달 함께 쓴 돈을 기록하고, 필요한 순간에 분석하세요.</p>
+          </div>
+          <Link href="/couple-ledger/entry" className="inline-flex w-fit items-center justify-center rounded-[10px] bg-[#ff8a3d] px-4 py-2.5 text-[13px] font-bold text-white shadow-[0_3px_8px_rgba(211,92,16,0.18)] transition hover:bg-[#ff963f]">지출 기록하기</Link>
+        </div>
+
+        <Surface className="px-5 py-6 sm:px-8">
+          <div className="flex flex-col items-center justify-center gap-5 sm:flex-row sm:gap-8">
             <ProfileCircle
   label="내 프로필"
   subLabel="내 프로필"
@@ -354,8 +363,8 @@ export default function CoupleLedgerPage() {
 />
 
             <div className="flex flex-col items-center justify-center">
-              <div className="text-[28px] sm:text-[34px]">💙</div>
-              <div className="mt-2 text-[12px] text-slate-500">커플 연결 완료</div>
+              <div className="text-[24px] text-orange-500">♥</div>
+              <div className="mt-1 text-[11px] font-medium text-slate-500">공동 장부 연결됨</div>
             </div>
 
             <ProfileCircle
@@ -372,37 +381,37 @@ export default function CoupleLedgerPage() {
           </div>
         </Surface>
 
-        <Surface className="mt-6 overflow-hidden bg-[#ECECEC]">
+        <Surface className="mt-5 overflow-hidden">
           <div className="grid min-h-[160px] gap-0 lg:grid-cols-[1.2fr_0.8fr]">
-            <div className="flex flex-col justify-center px-6 py-8 sm:px-10 sm:py-10">
-              <div className="text-[24px] font-semibold tracking-[-0.03em] text-slate-900 sm:text-[20px]">
-                지출 분석 그래프 및 요약 페이지
+            <div className="flex flex-col justify-center px-6 py-7 sm:px-8 sm:py-8">
+              <div className="text-[20px] font-bold tracking-[-0.03em] text-slate-900 sm:text-[22px]">
+                이번 달 소비 흐름
               </div>
               <div className="mt-3 max-w-[620px] text-[10px] leading-7 text-slate-600">
                 이번 달 함께 사용한 금액의 흐름을 빠르게 확인하고, 카테고리별 소비 패턴과 결제 비중을 정리해볼 수 있습니다.
               </div>
 
-              <div className="mt-7 flex flex-wrap gap-3">
+              <div className="mt-6 flex flex-wrap gap-2">
                 <Link
                   href="/couple-ledger/analytics"
-                  className="inline-flex items-center justify-center rounded-[14px] bg-[#69b6ff] px-5 py-3 text-[14px] font-medium text-white transition hover:bg-[#0c86ea]"
+                  className="inline-flex items-center justify-center rounded-[10px] bg-[#ff8a3d] px-4 py-2.5 text-[13px] font-bold text-white transition hover:bg-[#ff963f]"
                 >
                   분석 보러가기
                 </Link>
                 <Link
                   href="/couple-ledger/calendar"
-                  className="inline-flex items-center justify-center rounded-[14px] border border-slate-200 bg-white px-5 py-3 text-[14px] font-medium text-slate-700 transition hover:bg-slate-50"
+                  className="inline-flex items-center justify-center rounded-[10px] border border-orange-200 bg-white px-4 py-2.5 text-[13px] font-bold text-orange-800 transition hover:bg-[#fff7ed]"
                 >
                   달력 보러가기
                 </Link>
               </div>
             </div>
 
-            <div className="border-t border-white/50 px-6 py-8 lg:border-l lg:border-t-0 sm:px-8">
+            <div className="border-t border-[#f3e5da] bg-[#fffaf6] px-6 py-7 lg:border-l lg:border-t-0 sm:px-8">
               <div className="text-[14px] font-semibold text-slate-900">이번 달 카테고리 요약</div>
               <div className="mt-4 space-y-4">
                 {summary.topCategories.length === 0 ? (
-                  <div className="rounded-[18px] border border-white/70 bg-white/70 p-5 text-[13px] text-slate-600">
+                  <div className="rounded-[14px] border border-orange-100 bg-white p-5 text-[13px] text-slate-600">
                     아직 이번 달 공동 지출 기록이 없습니다.
                   </div>
                 ) : (
@@ -413,13 +422,13 @@ export default function CoupleLedgerPage() {
               </div>
 
               <div className="mt-6 grid grid-cols-2 gap-3">
-                <div className="rounded-[18px] border border-white/80 bg-white/80 px-4 py-4">
+                <div className="rounded-[14px] border border-orange-100 bg-white px-4 py-4">
                   <div className="text-[11px] text-slate-500">내 결제</div>
                   <div className="mt-1 text-[15px] font-semibold text-slate-900">
                     {money(summary.myPaid)}원
                   </div>
                 </div>
-                <div className="rounded-[18px] border border-white/80 bg-white/80 px-4 py-4">
+                <div className="rounded-[14px] border border-orange-100 bg-white px-4 py-4">
                   <div className="text-[11px] text-slate-500">상대 결제</div>
                   <div className="mt-1 text-[15px] font-semibold text-slate-900">
                     {money(summary.partnerPaid)}원

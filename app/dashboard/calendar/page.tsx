@@ -6,13 +6,15 @@ import { ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
-const BRAND_blue = "#5bbbf3"; // 지출레시피 메인 컬러
+const BRAND_blue = "#ff8a3d"; // 지출레시피 메인 컬러
 
 /** edit 페이지와 유사한 MoneyItem 타입 (DB JSON과 호환) */
 type MoneyItem = {
   id?: string;
   label: string;
   amount: number;
+  source?: "recurring" | "manual";
+  rule_id?: number;
 };
 
 /** Supabase에서 가져와서 달력이 쓰는 구조 */
@@ -208,8 +210,15 @@ function stripRecurringItems(items: any[]) {
   if (!Array.isArray(items)) return [];
   return items.filter((it) => {
     const id = typeof it?.id === "string" ? it.id : "";
-    // ✅ 우리가 만든 정기항목 id prefix
-    return !id.startsWith("rr:");
+    const label = typeof it?.label === "string" ? it.label.trim() : "";
+    // 현재(rr:)·기존(rec-) 형식 모두 정리해 종료일이 지난 항목이 남지 않게 한다.
+    return !(
+      it?.source === "recurring" ||
+      typeof it?.rule_id === "number" ||
+      id.startsWith("rr:") ||
+      id.startsWith("rec-") ||
+      label.startsWith("[R] ")
+    );
   });
 }
 
@@ -311,7 +320,13 @@ async function applyRecurringTblue(params: {
       const recurringId = makeRecurringItemId(rule.id, date, rule.category);
       const idx = target.findIndex((it) => it?.id === recurringId);
 
-      const nextItem: MoneyItem = { id: recurringId, label, amount: amt };
+      const nextItem: MoneyItem = {
+        id: recurringId,
+        label,
+        amount: amt,
+        source: "recurring",
+        rule_id: rule.id,
+      };
 
       if (idx >= 0) target[idx] = nextItem;
       else target.push(nextItem);
@@ -809,27 +824,27 @@ export default function SpendingCalendarPage() {
 
   return (
     <main
-      className="min-h-screen flex flex-col items-stretch overflow-x-hidden text-neutral-900 bg-[#ffffff]"
+      className="landing-surface min-h-screen flex flex-col items-stretch overflow-x-hidden text-neutral-900"
     >
       {/* 가운데 고정 폭 컨테이너 */}
       <div className="w-full lg:w-[1320px] mx-auto flex flex-col min-w-0 px-4 sm:px-6 lg:px-0 pb-16">
         {/* 상단 바 - 레시피 타이틀 */}
-        <header className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:justify-between pt-6 sm:pt-8 pb-2 ">
+        <header className="mt-4 flex flex-col gap-4 rounded-3xl border border-white/90 bg-white/70 px-4 py-4 shadow-[0_12px_32px_rgba(255,138,61,0.08)] backdrop-blur sm:mt-6 sm:flex-row sm:items-center sm:justify-between sm:px-5">
           <div className="flex items-start sm:items-center gap-3">
             <span
               className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[12px] font-semibold shadow-sm shrink-0"
               style={{
-                backgroundColor: "#e5f2ff",
+                backgroundColor: "#ffedd5",
                 color: "#9A3412",
               }}
             >
               🍳
             </span>
             <div className="space-y-1">
-              <h1 className="text-lg sm:text-xl font-semibold tracking-tight">
+              <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
                 이번 달 지출 레시피
               </h1>
-              <p className="text-xs text-neutral-500">
+              <p className="text-xs leading-5 text-neutral-500">
                 하루치 소비를 한 끼 레시피처럼 기록하고, 한 달의 식단표처럼
                 모아서 봅니다.
               </p>
@@ -848,7 +863,7 @@ export default function SpendingCalendarPage() {
                 />
               </button>
 
-              <div className="px-4 py-1.5 rounded-[10px] bg-blue-50 text-[12px] font-medium text-neutral-800 border border-blue-100 shadow-[0_2px_0_rgba(248,250,252,1)] whitespace-nowrap">
+              <div className="px-4 py-1.5 rounded-[10px] bg-orange-50 text-[12px] font-medium text-neutral-800 border border-orange-100 shadow-[0_2px_0_rgba(248,250,252,1)] whitespace-nowrap">
                 {monthLabel} 레시피북
               </div>
 
@@ -866,7 +881,7 @@ export default function SpendingCalendarPage() {
             {/* 정기 납부 관리로 이동 */}
             <button
               onClick={() => router.push("/dashboard/recurring")}
-              className="hidden sm:inline-flex w-full sm:w-auto rounded-full border border-blue-200 bg-white px-3 py-1.5 text-[11px] font-medium text-neutral-700 hover:bg-blue-50"
+              className="hidden sm:inline-flex w-full sm:w-auto rounded-full border border-orange-200 bg-white px-3 py-1.5 text-[11px] font-medium text-neutral-700 hover:bg-orange-50"
             >
               정기 납부 관리
             </button>
@@ -874,11 +889,11 @@ export default function SpendingCalendarPage() {
         </header>
 
         {/* 전체 레이아웃 */}
-        <section className="mt-2 flex-1 flex flex-col lg:flex-row gap-4 ">
+        <section className="mt-4 flex flex-1 flex-col gap-5 lg:flex-row">
           {/* 좌측: 달력 + 요약 */}
-          <div className="w-full lg:flex-[0.7] flex flex-col gap-4 min-w-0">
+          <div className="flex w-full min-w-0 flex-col gap-5 lg:flex-[0.7]">
             {/* 요약 바: 모바일 2열 + 순잔액 2칸 */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs sm:text-[12px] min-w-0">
+            <div className="grid min-w-0 grid-cols-2 gap-3 text-xs sm:grid-cols-3 sm:text-[12px]">
               <div className="col-span-2 sm:col-span-1 min-w-0">
                 <SummaryChip
                   label="이번 달 완성된 레시피(순 잔액)"
@@ -906,17 +921,17 @@ export default function SpendingCalendarPage() {
             </div>
 
             {/* 달력 */}
-            <div className="flex-1 rounded-[24px] border border-blue-100 bg-white shadow-[0_18px_45px_rgba(15,23,42,0.08)] px-2 sm:px-4 py-3 sm:py-4 flex flex-col min-w-0">
+            <div className="flex min-w-0 flex-1 flex-col rounded-[28px] border border-orange-100 bg-white p-3 shadow-[0_18px_45px_rgba(36,48,60,0.08)] sm:p-5">
               <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2 mb-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-semibold tracking-[0.22em] uppercase text-blue-500">
+                  <span className="text-[11px] font-semibold tracking-[0.22em] uppercase text-orange-500">
                     monthly recipe board
                   </span>
-                  <span className="h-[1px] w-12 bg-blue-200 hidden sm:block" />
+                  <span className="h-[1px] w-12 bg-orange-200 hidden sm:block" />
                 </div>
                 <div className="flex flex-wrap gap-2 text-[11px] text-neutral-400">
                   <span className="inline-flex items-center gap-1">
-                    <span className="h-2 w-2 rounded-full bg-sky-400" />
+                    <span className="h-2 w-2 rounded-full bg-orange-400" />
                     수입 재료
                   </span>
                   <span className="inline-flex items-center gap-1">
@@ -938,7 +953,7 @@ export default function SpendingCalendarPage() {
                 {["일", "월", "화", "수", "목", "금", "토"].map((d) => (
                   <div
                     key={d}
-                    className="text-center pb-2 border-b border-dashed border-blue-100"
+                    className="text-center pb-2 border-b border-dashed border-orange-100"
                   >
                     {d}
                   </div>
@@ -946,13 +961,13 @@ export default function SpendingCalendarPage() {
               </div>
 
               {/* 날짜 셀 */}
-              <div className="flex-1 grid grid-cols-7 auto-rows-[52px] sm:auto-rows-[110px] gap-[4px] sm:gap-[6px] mt-1 min-w-0">
+              <div className="mt-1 grid min-w-0 flex-1 grid-cols-7 auto-rows-[54px] gap-1 sm:auto-rows-[128px] sm:gap-2">
                 {cells.map((cell, idx) => {
                   if (!cell) {
                     return (
                       <div
                         key={idx}
-                        className="rounded-2xl bg-blue-50/40 border border-dashed border-blue-100/70"
+                        className="rounded-2xl bg-orange-50/40 border border-dashed border-orange-100/70"
                       />
                     );
                   }
@@ -983,23 +998,23 @@ export default function SpendingCalendarPage() {
                       key={idx}
                       onClick={() => handleDayClick(cell)}
                       className={[
-                        "relative flex flex-col rounded-2xl border px-1.5 sm:px-2 py-1.5 text-left transition-all",
-                        "h-[52px] sm:h-[110px] overflow-hidden",
-                        "bg-white/90 hover:bg-blue-50/60 active:bg-blue-50/80 hover:-translate-y-[1px] hover:shadow-sm active:scale-[0.99]",
+                        "relative flex flex-col rounded-2xl border px-1.5 py-1.5 text-left transition-all sm:px-2.5 sm:py-2",
+                        "h-[54px] overflow-hidden sm:h-[128px]",
+                        "bg-white hover:bg-orange-50/70 active:bg-orange-50/90 hover:-translate-y-[1px] hover:shadow-md active:scale-[0.99]",
                         "",
                         isTodayKey
-                          ? "border-[rgba(61,145,255,0.9)] shadow-[0_0_0_1px_rgba(248,250,252,1)]"
-                          : "border-blue-100",
+                          ? "border-[rgba(255,138,61,0.92)] shadow-[0_0_0_1px_rgba(248,250,252,1)]"
+                          : "border-orange-100",
                       ].join(" ")}
                     >
-                      <div className="flex items-center justify-between mb-0.5">
-                        <span className="text-[11px] font-semibold text-neutral-700">
+                      <div className="mb-1 flex items-center justify-between">
+                        <span className={isTodayKey ? "inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#ff8a3d] px-1.5 text-[10px] font-bold text-slate-900" : "text-[11px] font-semibold text-neutral-700"}>
                           {cell.getDate()}
                         </span>
                         {(income > 0 || expense > 0 || saving > 0) && (
                           <span className="flex gap-0.5">
                             {income > 0 && (
-                              <span className="h-1.5 w-1.5 rounded-full bg-sky-400" />
+                              <span className="h-1.5 w-1.5 rounded-full bg-orange-400" />
                             )}
                             {expense > 0 && (
                               <span
@@ -1014,25 +1029,25 @@ export default function SpendingCalendarPage() {
                         )}
                       </div>
 
-                      <div className="space-y-0.5 text-[10px] sm:text-[11px] leading-tight overflow-hidden">
+                      <div className="space-y-1 overflow-hidden text-[10px] leading-tight sm:text-[11px]">
                         {income > 0 && (
-                          <div className="flex justify-end sm:justify-between items-baseline">
-                            <span className="text-[8px] leading-[8px] hidden sm:inline text-neutral-400">
-                              재료(+)
+                          <div className="flex items-center justify-end sm:justify-between">
+                            <span className="hidden rounded bg-orange-50 px-1.5 py-0.5 text-[9px] font-medium text-orange-700 sm:inline">
+                              수입
                             </span>
-                            <span className="text-[7px] sm:text-[8px] leading-[8px] font-medium text-sky-600 whitespace-nowrap">
+                            <span className="text-[8px] font-semibold text-orange-600 whitespace-nowrap">
                               {income.toLocaleString("ko-KR")}
                             </span>
                           </div>
                         )}
 
                         {expense > 0 && (
-                          <div className="flex justify-end sm:justify-between items-baseline">
-                            <span className="text-[8px] leading-[8px] hidden sm:inline text-neutral-400">
-                              사용(-)
+                          <div className="flex items-center justify-end sm:justify-between">
+                            <span className="hidden rounded bg-orange-100 px-1.5 py-0.5 text-[9px] font-medium text-orange-800 sm:inline">
+                              지출
                             </span>
                             <span
-                              className="text-[7px] sm:text-[8px] leading-[8px] font-medium whitespace-nowrap"
+                              className="text-[8px] font-semibold whitespace-nowrap"
                               style={{ color: "#B45309" }}
                             >
                               -{expense.toLocaleString("ko-KR")}
@@ -1041,11 +1056,11 @@ export default function SpendingCalendarPage() {
                         )}
 
                         {saving > 0 && (
-                          <div className="flex justify-end sm:justify-between items-baseline">
-                            <span className="text-[8px] leading-[8px] hidden sm:inline text-neutral-400">
+                          <div className="flex items-center justify-end sm:justify-between">
+                            <span className="hidden rounded bg-emerald-50 px-1.5 py-0.5 text-[9px] font-medium text-emerald-700 sm:inline">
                               적금
                             </span>
-                            <span className="text-[7px] sm:text-[8px] leading-[8px] font-medium text-emerald-600 whitespace-nowrap">
+                            <span className="text-[8px] font-semibold text-emerald-600 whitespace-nowrap">
                               {saving.toLocaleString("ko-KR")}
                             </span>
                           </div>
@@ -1054,7 +1069,7 @@ export default function SpendingCalendarPage() {
 
                       {/* 모바일에서는 메모 숨기고 sm 이상에서만 */}
                       {mainMemo && (
-                        <div className="hidden sm:block mt-1 pt-1 border-t border-dashed border-blue-100 text-[10px] text-neutral-500 truncate">
+                        <div className="mt-1 hidden truncate border-t border-dashed border-orange-100 pt-1 text-[10px] text-neutral-500 sm:block">
                           {mainMemo}
                         </div>
                       )}
@@ -1075,14 +1090,14 @@ export default function SpendingCalendarPage() {
           </div>
 
           {/* 우측: 오늘의 메모 */}
-          <aside className="w-full lg:flex-[0.3] flex mt-1 lg:mt-0 min-w-0">
-            <div className="w-full rounded-[24px] border border-blue-100 bg-[#ebf5ff] shadow-[0_14px_14px_#0620d938] flex flex-col min-w-0">
-              <div className="px-4 py-3 border-b border-blue-100 flex items-center justify-between gap-3">
+          <aside className="flex w-full min-w-0 lg:flex-[0.3]">
+            <div className="flex min-w-0 w-full flex-col rounded-[28px] border border-orange-100 bg-[#fff7ed] shadow-[0_14px_28px_#ff8a3d18]">
+              <div className="flex items-center justify-between gap-3 border-b border-orange-100 px-5 py-4">
                 <div className="flex flex-col gap-0.5 min-w-0">
-                  <span className="text-xs font-semibold text-blue-900">
+                  <span className="text-xs font-semibold text-orange-900">
                     오늘의 메모
                   </span>
-                  <span className="text-[11px] text-blue-700/80 whitespace-nowrap overflow-hidden text-ellipsis">
+                  <span className="text-[11px] text-orange-700/80 whitespace-nowrap overflow-hidden text-ellipsis">
                     {todayKey.replace(/-/g, ".")} 장보기·약속·결제 알림을 적어두세요.
                   </span>
                 </div>
@@ -1099,7 +1114,7 @@ export default function SpendingCalendarPage() {
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 text-[12px] max-h-[260px] lg:max-h-none min-w-0">
+              <div className="max-h-[300px] min-w-0 flex-1 space-y-3 overflow-y-auto px-5 py-4 text-[12px] lg:max-h-none">
                 {memoLoading && (
                   <div className="text-xs text-neutral-400">
                     메모 불러오는 중...
@@ -1138,7 +1153,7 @@ export default function SpendingCalendarPage() {
 
       {/* 플로팅 + 버튼 */}
       <button
-        className="fixed bottom-6 right-6 inline-flex h-14 w-14 items-center justify-center rounded-full shadow-lg shadow-blue-400/50 border border-blue-200"
+        className="fixed bottom-6 right-6 inline-flex h-14 w-14 items-center justify-center rounded-full shadow-lg shadow-orange-400/50 border border-orange-200"
         style={{ backgroundColor: BRAND_blue, color: "#111827" }}
         onClick={() => router.push("/dashboard/calendar/edit?date=" + todayKey)}
         aria-label="오늘 레시피 입력"
@@ -1149,23 +1164,23 @@ export default function SpendingCalendarPage() {
       {/* === 메모 모달 === */}
       {memoModalOpen && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/30 px-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white shadow-2xl border border-blue-100">
+          <div className="w-full max-w-sm rounded-2xl bg-white shadow-2xl border border-orange-100">
             <form onSubmit={handleMemoSave}>
-              <div className="flex items-center justify-between px-4 py-3 border-b border-blue-100">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-orange-100">
                 <div className="flex flex-col gap-0.5">
-                  <span className="text-xs font-semibold text-blue-900">
+                  <span className="text-xs font-semibold text-orange-900">
                     {memoModalMode === "create"
                       ? "오늘의 메모 추가"
                       : "오늘의 메모 수정"}
                   </span>
-                  <span className="text-[11px] text-blue-700/80">
+                  <span className="text-[11px] text-orange-700/80">
                     {todayKey.replace(/-/g, ".")} 기준 메모입니다.
                   </span>
                 </div>
                 <button
                   type="button"
                   onClick={closeMemoModal}
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-full hover:bg-blue-50"
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-full hover:bg-orange-50"
                 >
                   <X size={16} className="text-neutral-500" />
                 </button>
@@ -1178,7 +1193,7 @@ export default function SpendingCalendarPage() {
                   </label>
                   <input
                     type="text"
-                    className="w-full rounded-xl border border-blue-200 bg-blue-50/60 px-3 py-2 text-[12px] text-neutral-900 outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-300 placeholder:text-neutral-400"
+                    className="w-full rounded-xl border border-orange-200 bg-orange-50/60 px-3 py-2 text-[12px] text-neutral-900 outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-300 placeholder:text-neutral-400"
                     placeholder="예: 친구 모임 / 카드 결제일 / 장보기 메모"
                     value={memoTitleInput}
                     onChange={(e) => setMemoTitleInput(e.target.value)}
@@ -1191,7 +1206,7 @@ export default function SpendingCalendarPage() {
                     내용
                   </label>
                   <textarea
-                    className="w-full rounded-xl border border-blue-200 bg-blue-50/60 px-3 py-2 text-[12px] text-neutral-900 outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-300 resize-none h-24 placeholder:text-neutral-400"
+                    className="w-full rounded-xl border border-orange-200 bg-orange-50/60 px-3 py-2 text-[12px] text-neutral-900 outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-300 resize-none h-24 placeholder:text-neutral-400"
                     placeholder="예: 저녁 모임 7시 / 회비 3만 · 택시비 1만 예상"
                     value={memoDetailInput}
                     onChange={(e) => setMemoDetailInput(e.target.value)}
@@ -1205,7 +1220,7 @@ export default function SpendingCalendarPage() {
                 )}
               </div>
 
-              <div className="flex items-center justify-between gap-2 px-4 py-3 border-t border-blue-100 bg-blue-50/60 rounded-b-2xl">
+              <div className="flex items-center justify-between gap-2 px-4 py-3 border-t border-orange-100 bg-orange-50/60 rounded-b-2xl">
                 {memoModalMode === "edit" && editingMemo && (
                   <button
                     type="button"
@@ -1221,14 +1236,14 @@ export default function SpendingCalendarPage() {
                   type="button"
                   onClick={closeMemoModal}
                   disabled={memoSubmitting}
-                  className="mr-1 rounded-full border border-blue-200 bg-white px-3 py-1.5 text-[11px] font-medium text-neutral-600 hover:bg-blue-50 disabled:opacity-50"
+                  className="mr-1 rounded-full border border-orange-200 bg-white px-3 py-1.5 text-[11px] font-medium text-neutral-600 hover:bg-orange-50 disabled:opacity-50"
                 >
                   취소
                 </button>
                 <button
                   type="submit"
                   disabled={memoSubmitting}
-                  className="rounded-full bg-[color:var(--brand-blue)] px-4 py-1.5 text-[11px] font-semibold text-white shadow-sm hover:bg-[#0c86ea] disabled:opacity-60"
+                  className="rounded-full bg-[color:var(--brand-blue)] px-4 py-1.5 text-[11px] font-semibold text-white shadow-sm hover:bg-[#ff8a3d] disabled:opacity-60"
                   style={{ ["--brand-blue" as any]: BRAND_blue }}
                 >
                   {memoSubmitting
@@ -1261,15 +1276,15 @@ type SummaryChipProps = {
 function SummaryChip({ label, value, tone, emphasis, note }: SummaryChipProps) {
   const toneStyle =
     tone === "income"
-      ? "border-sky-200 bg-sky-50 text-sky-900"
+      ? "border-orange-200 bg-orange-50 text-orange-900"
       : tone === "expense"
-      ? "border-blue-100 bg-blue-50 text-[#12457c]"
-      : "border-blue-100 bg-blue-50 text-neutral-900";
+      ? "border-orange-100 bg-orange-50 text-orange-700"
+      : "border-orange-100 bg-orange-50 text-neutral-900";
 
   return (
     <div
       className={[
-        "min-w-0 flex flex-col justify-between rounded-2xl border px-3 py-2.5 shadow-sm",
+        "min-w-0 flex min-h-[92px] flex-col justify-between rounded-2xl border px-4 py-3 shadow-sm",
         toneStyle,
         emphasis
           ? "shadow-[0_0_0_1px_rgba(251,146,60,0.6)]"
@@ -1284,7 +1299,7 @@ function SummaryChip({ label, value, tone, emphasis, note }: SummaryChipProps) {
           summary
         </span>
       </div>
-      <span className="mt-1 text-base font-semibold truncate">{value}</span>
+      <span className="mt-1 text-lg font-bold tracking-tight truncate">{value}</span>
       {note && (
         <span className="mt-1 text-[10px] text-neutral-500 truncate">
           {note}
@@ -1311,27 +1326,27 @@ function MemoCard({
 }: MemoCardProps) {
   const base =
     tone === "strong"
-      ? "bg-white/90 border-blue-200"
-      : "bg-blue-50/80 border-blue-100";
+      ? "bg-white/90 border-orange-200"
+      : "bg-orange-50/80 border-orange-100";
 
   return (
     <button
       type="button"
       onClick={onClick}
       className={[
-        "w-full text-left rounded-2xl px-3 py-2.5 flex flex-col gap-1.5 border shadow-sm transition hover:bg-blue-50 cursor-pointer",
+        "w-full text-left rounded-2xl px-3 py-2.5 flex flex-col gap-1.5 border shadow-sm transition hover:bg-orange-50 cursor-pointer",
         base,
       ].join(" ")}
     >
       <div className="flex items-center justify-between gap-2 min-w-0">
-        <span className="text-xs font-semibold text-blue-900 truncate min-w-0">
+        <span className="text-xs font-semibold text-orange-900 truncate min-w-0">
           {title}
         </span>
-        <span className="text-[10px] text-blue-700/80 whitespace-nowrap shrink-0">
+        <span className="text-[10px] text-orange-700/80 whitespace-nowrap shrink-0">
           {dateLabel}
         </span>
       </div>
-      <div className="text-[11px] text-blue-800 leading-snug line-clamp-3">
+      <div className="text-[11px] text-orange-800 leading-snug line-clamp-3">
         {detail}
       </div>
     </button>

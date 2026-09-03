@@ -15,7 +15,7 @@ const UI = {
     "bg-[radial-gradient(circle,rgba(251,146,60,0.14)_1px,transparent_1px)] bg-[size:16px_16px] mx-auto w-full max-w-[1320px] px-3 py-4 sm:px-4 sm:py-6",
   ink: "text-[#3B2F1E]",
   inkSoft: "text-[#7f7f7f]",
-  card: "bg-[#f2fbff] border-[#e8f8ff]",
+  card: "bg-[#fff7ed] border-[#ffedd5]",
 };
 
 function toNumberSafe(v: string) {
@@ -106,10 +106,10 @@ export default function TransportComparePage() {
     const absDiff = Math.abs(diffMonthly);
     const signal =
       absDiff <= 20000
-        ? { label: "근접", badge: "bg-[#52a9ff] text-[#ffffff]" }
+        ? { label: "근접", badge: "bg-[#ff8a3d] text-[#ffffff]" }
         : absDiff <= 80000
         ? { label: "차이 있음", badge: "bg-[#34D399] text-white" }
-        : { label: "차이 큼", badge: "bg-[#5bbbf3] text-white" };
+        : { label: "차이 큼", badge: "bg-[#ff8a3d] text-white" };
 
     // 자차 비용 비중
     const fixedCar = parking + insTax + maint + toll;
@@ -146,20 +146,20 @@ export default function TransportComparePage() {
           <div className="mb-5 flex items-center justify-between gap-3">
             <Link
               href="/calculators"
-              className="rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
+              className="rounded-full border border-[#ffedd5] bg-[#fff7ed] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
             >
               ← 계산기 모음
             </Link>
 
-            <span className="rounded-full bg-[#5bbbf3] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
+            <span className="rounded-full bg-[#ff8a3d] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
               교통비 비교
             </span>
           </div>
 
           {/* 헤더 */}
           <div className="mb-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm">
-              <span className="inline-block h-2 w-2 rounded-full bg-[#5bbbf3]" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#ffedd5] bg-[#fff7ed] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm">
+              <span className="inline-block h-2 w-2 rounded-full bg-[#ff8a3d]" />
               Recipe Calculator
             </div>
 
@@ -184,7 +184,7 @@ export default function TransportComparePage() {
                   hint="예: 600"
                 />
 
-                <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                <div className="rounded-2xl border border-[#ffedd5] bg-white p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <div className="text-[12px] font-semibold text-[#3B2F1E]">대중교통</div>
@@ -192,7 +192,7 @@ export default function TransportComparePage() {
                         정기권/교통카드 월 정액이 있으면 그 값이 가장 정확합니다.
                       </div>
                     </div>
-                    <span className="rounded-full bg-[#5bbbf3] px-3 py-1 text-xs font-semibold text-[#ffffff]">
+                    <span className="rounded-full bg-[#ff8a3d] px-3 py-1 text-xs font-semibold text-[#ffffff]">
                       Public
                     </span>
                   </div>
@@ -223,7 +223,7 @@ export default function TransportComparePage() {
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                <div className="rounded-2xl border border-[#ffedd5] bg-white p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <div className="text-[12px] font-semibold text-[#3B2F1E]">자차</div>
@@ -231,7 +231,7 @@ export default function TransportComparePage() {
                         연료비 + (주차/보험/세금/정비/통행료 등) 월 환산을 합산합니다.
                       </div>
                     </div>
-                    <span className="rounded-full bg-[#5bbbf3] px-3 py-1 text-xs font-semibold text-[#ffffff]">
+                    <span className="rounded-full bg-[#ff8a3d] px-3 py-1 text-xs font-semibold text-[#ffffff]">
                       Car
                     </span>
                   </div>
@@ -275,7 +275,7 @@ export default function TransportComparePage() {
                 </div>
               </div>
 
-              <div className="mt-5 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+              <div className="mt-5 rounded-2xl border border-[#ffedd5] bg-white p-4">
                 <div className={cn("text-[12px] font-semibold", UI.ink)}>해석 팁</div>
                 <ul className={cn("mt-2 list-disc pl-5 text-[12px] leading-relaxed", UI.inkSoft)}>
                   <li>자차는 “연료비”보다 <b>고정비(보험/세금/주차/정비)</b>가 큰 경우가 많습니다.</li>
@@ -306,10 +306,10 @@ export default function TransportComparePage() {
                 <MetricCard title="자차 1km당" value={`${formatKRW(calc.carPerKm)}원/km`} />
               </div>
 
-              <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+              <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
                 <div className="flex items-center justify-between gap-3">
                   <div className={cn("text-[12px] font-semibold", UI.ink)}>월 차이(자차 - 대중교통)</div>
-                  <span className="rounded-full bg-[#5bbbf3] px-3 py-1 text-xs font-semibold text-[#ffffff]">
+                  <span className="rounded-full bg-[#ff8a3d] px-3 py-1 text-xs font-semibold text-[#ffffff]">
                     {calc.cheaper.winner} 유리
                   </span>
                 </div>
@@ -327,7 +327,7 @@ export default function TransportComparePage() {
               </div>
 
               {/* 자차 비용 분해 */}
-              <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+              <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
                 <div className={cn("text-[12px] font-semibold", UI.ink)}>자차 비용 분해</div>
 
                 <div className="mt-3 grid gap-2">
@@ -338,14 +338,14 @@ export default function TransportComparePage() {
                   <Row label="통행료/기타" value={`${formatKRW(calc.toll)}원`} />
                 </div>
 
-                <div className="mt-3 rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] p-3">
+                <div className="mt-3 rounded-xl border border-[#ffedd5] bg-[#ff8a3d] p-3">
                   <div className="flex items-center justify-between text-xs font-semibold text-[#7f7f7f]">
                     <span>고정비 비중</span>
                     <span>{pct(calc.fixedShare)}%</span>
                   </div>
-                  <div className="mt-2 h-3 overflow-hidden rounded-full border border-[#e8f8ff] bg-white">
+                  <div className="mt-2 h-3 overflow-hidden rounded-full border border-[#ffedd5] bg-white">
                     <div
-                      className="h-full bg-[#5bbbf3]"
+                      className="h-full bg-[#ff8a3d]"
                       style={{ width: `${clamp(calc.fixedShare, 0, 100)}%` }}
                     />
                   </div>
@@ -360,13 +360,13 @@ export default function TransportComparePage() {
               <div className="mt-5 flex flex-col gap-2 sm:flex-row">
                 <Link
                   href="/calculators/category-deviation-alert"
-                  className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+                  className="rounded-2xl bg-[#ff8a3d] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
                 >
                   다음: 카테고리 편차 경보 →
                 </Link>
                 <Link
                   href="/calculators"
-                  className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
+                  className="rounded-2xl border border-[#ffedd5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
                 >
                   계산기 모음으로
                 </Link>
@@ -409,7 +409,7 @@ function NumberInput({
         placeholder="0"
         className={cn(
           "h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
-          "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
+          "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
         )}
       />
     </div>
@@ -444,7 +444,7 @@ function MoneyInput({
           placeholder="0"
           className={cn(
             "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-[12px] outline-none",
-            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
+            "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
           )}
         />
       </div>
@@ -471,7 +471,7 @@ function SelectInput({
         onChange={(e) => onChange(e.target.value)}
         className={cn(
           "h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
-          "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
+          "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
         )}
       >
         {options.map((o) => (
@@ -486,7 +486,7 @@ function SelectInput({
 
 function MetricCard({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
+    <div className="rounded-2xl border border-[#ffedd5] bg-white p-4">
       <div className="text-xs font-semibold text-[#7f7f7f]">{title}</div>
       <div className="mt-1 text-xl font-bold text-[#3B2F1E]">{value}</div>
     </div>
@@ -495,7 +495,7 @@ function MetricCard({ title, value }: { title: string; value: string }) {
 
 function MiniCard({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[#e8f8ff] bg-[#f2fbff] p-4">
+    <div className="rounded-2xl border border-[#ffedd5] bg-[#fff7ed] p-4">
       <div className="text-xs font-semibold text-[#7f7f7f]">{title}</div>
       <div className="mt-1 text-lg font-bold text-[#3B2F1E]">{value}</div>
     </div>
@@ -512,7 +512,7 @@ function Row({
   tone?: "blue";
 }) {
   return (
-    <div className="flex items-center justify-between rounded-xl border border-[#e8f8ff] bg-[#f2fbff] px-3 py-2">
+    <div className="flex items-center justify-between rounded-xl border border-[#ffedd5] bg-[#fff7ed] px-3 py-2">
       <span className="text-[12px] font-semibold text-[#3B2F1E]">{label}</span>
       <span className={cn("text-[12px] font-bold", tone === "blue" ? "text-[#ffffff]" : "text-[#7f7f7f]")}>
         {value}

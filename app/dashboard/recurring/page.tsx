@@ -66,6 +66,13 @@ function monthRange(year: number, month1to12: number) {
   return { start: toYmd(start), end: toYmd(end) };
 }
 
+function isValidMonth(value: string) {
+  const match = /^(\d{4})-(\d{2})$/.exec(value);
+  if (!match) return false;
+  const month = Number(match[2]);
+  return month >= 1 && month <= 12;
+}
+
 function lastDayOfMonth(year: number, month1to12: number) {
   return new Date(year, month1to12, 0).getDate();
 }
@@ -382,7 +389,7 @@ type TabKey = "rules" | "overrides";
 type SortKey = "created_at" | "title" | "category" | "frequency" | "amount";
 type SortDir = "asc" | "desc";
 
-export default function RecurringManagerPage() {
+export function RecurringManagerPage({ embedded = false }: { embedded?: boolean }) {
   const [tab, setTab] = useState<TabKey>("rules");
 
   const [userId, setUserId] = useState("");
@@ -472,6 +479,16 @@ export default function RecurringManagerPage() {
     return sorted;
   }, [rules, filterCategory, sortKey, sortDir]);
 
+  const activeDisplayedRules = useMemo(
+    () => displayedRules.filter((rule) => !rule.end_date || rule.end_date >= todayYmd()),
+    [displayedRules]
+  );
+
+  const expiredDisplayedRules = useMemo(
+    () => displayedRules.filter((rule) => !!rule.end_date && rule.end_date < todayYmd()),
+    [displayedRules]
+  );
+
   async function refreshRules(uid: string) {
     const { data, error } = await supabase
       .from("recurring_rules")
@@ -483,8 +500,8 @@ export default function RecurringManagerPage() {
   }
 
   async function applySelectedMonth(uid: string) {
+    if (!isValidMonth(ym)) throw new Error("적용할 월을 선택하세요.");
     const [y, m] = ym.split("-").map(Number);
-    if (!y || !m) throw new Error("월 형식이 올바르지 않습니다. (YYYY-MM)");
     const { start, end } = monthRange(y, m);
     const res = await applyRecurringTblue({ userId: uid, rangeStart: start, rangeEnd: end });
     return { start, end, applied: res.applied };
@@ -564,9 +581,18 @@ export default function RecurringManagerPage() {
   async function handleSaveRule() {
     if (!userId) return setLog("로그인이 필요합니다.");
     if (!form.title.trim()) return setLog("항목명은 필수입니다.");
+    if (!form.start_date) return setLog("시작일을 선택하세요.");
+    if (form.end_date && form.end_date < form.start_date) return setLog("종료일은 시작일보다 빠를 수 없습니다.");
+
+    if (form.frequency === "monthly" && (!Number.isInteger(Number(form.day_of_month)) || Number(form.day_of_month) < 1 || Number(form.day_of_month) > 31)) {
+      return setLog("매월 납부일은 1일부터 31일 사이로 입력하세요.");
+    }
+    if (form.frequency === "weekly" && (!Number.isInteger(Number(form.day_of_week)) || Number(form.day_of_week) < 0 || Number(form.day_of_week) > 6)) {
+      return setLog("매주 요일을 다시 선택하세요.");
+    }
 
     const def = Number(form.default_amount);
-    if (!Number.isFinite(def) || def < 0) return setLog("기본 금액을 올바르게 입력하세요.");
+    if (!Number.isFinite(def) || def <= 0) return setLog("기본 금액은 0원보다 크게 입력하세요.");
 
     setLoading(true);
     setLog("");
@@ -638,6 +664,7 @@ export default function RecurringManagerPage() {
       if (error) throw error;
 
       await refreshRules(userId);
+      if (selectedRuleId === ruleId) setSelectedRuleId(null);
 
       // 규칙 삭제는 daily_recipes에 남아있을 수 있는 해당 월 정기항목을 동기화로 정리하는 게 안전
       const ok2 = confirm("삭제 후 선택 월 달력을 동기화(정기항목 정리)할까요?");
@@ -711,6 +738,7 @@ export default function RecurringManagerPage() {
 
     const amt = amountStr.trim() === "" ? null : Number(amountStr);
     if (amt != null && (!Number.isFinite(amt) || amt < 0)) return setLog("금액은 0 이상 숫자여야 합니다.");
+    if (!isSkipped && amt === 0) return setLog("0원으로 적용하려면 ‘스킵’을 선택하세요.");
 
     setLoading(true);
     setLog("");
@@ -799,61 +827,45 @@ export default function RecurringManagerPage() {
     const exists = selectedRuleId && rulesForOverrideTab.some((r) => r.id === selectedRuleId);
     if (!exists) setSelectedRuleId(rulesForOverrideTab[0].id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tab, ovCategory, rulesForOverrideTab.length]);
+  }, [tab, ovCategory, rulesForOverrideTab, selectedRuleId]);
 
   /* =========================
      Render
      ========================= */
   return (
-    <div className={styles.page}>
+    <div id={embedded ? "recurring" : undefined} className={`${styles.page} ${embedded ? styles.embedded : ""}`}>
       <div className={styles.container}>
         {/* Header */}
         <div className={styles.header}>
           <div>
-            <div className={styles.title}>정기 납부 관리</div>
+            <div className={styles.title}>{embedded ? "정기 레시피" : "정기 납부 관리"}</div>
             <div className={styles.subtitle}>
-              1) <b>정기 규칙</b>은 “기본값(템플릿)”을 관리합니다. <br />
-              2) <b>이번 달 예외</b>는 “특정 달만 금액 변경/스킵”입니다.
+              {embedded
+                ? "적금 자동이체부터 반복 지출까지 한 번 등록하고 달력에 반영하세요."
+                : "반복되는 수입·지출·저축을 한 번 등록하고 달력에 반영하세요."}
             </div>
           </div>
-          <span className={styles.badge}>지출레시피 • Recurring</span>
+          <span className={styles.badge}>자동 반영 관리</span>
         </div>
 
         {/* Tabs */}
         <div className={styles.topbar}>
-  <div className={styles.tabRow}>
-    <button
-      className={styles.btnPrimary}
-      data-active={tab === "rules"}
-      onClick={() => setTab("rules")}
-      disabled={loading}
-    >
-      정기 규칙
-    </button>
+          <div className={styles.tabRow}>
+            <div className={styles.tabButtons}>
+              <button className={styles.btnPrimary} data-active={tab === "rules"} onClick={() => setTab("rules")} disabled={loading}>정기 규칙</button>
+              <button className={styles.btnSecondary} data-active={tab === "overrides"} onClick={() => setTab("overrides")} disabled={loading}>이번 달 예외</button>
+            </div>
+          </div>
 
-    <button
-      className={styles.btnPrimary}
-      data-active={tab === "overrides"}
-      onClick={() => setTab("overrides")}
-      disabled={loading}
-    >
-      이번 달 예외
-    </button>
-  </div>
-
-  <div className={styles.monthRow}>
-    <input
-      className={styles.input}
-      value={ym}
-      onChange={(e) => setYm(e.target.value)}
-      placeholder="YYYY-MM"
-      inputMode="numeric"
-    />
-    <button className={styles.btnPrimary} onClick={handleSyncThisMonth} disabled={loading}>
-      {loading ? "처리 중..." : "선택 월에 적용"}
-    </button>
-  </div>
-</div>
+          <div className={styles.monthRow}>
+            <label className={styles.monthPicker}>
+              <input className={styles.input} type="month" value={ym} onChange={(e) => setYm(e.target.value)} aria-label="달력에 반영할 월 선택" />
+            </label>
+            <button className={styles.btnPrimary} onClick={handleSyncThisMonth} disabled={loading}>
+              {loading ? "동기화 중..." : "선택 월에 적용"}
+            </button>
+          </div>
+        </div>
 
 
         {/* TAB: Rules */}
@@ -863,9 +875,7 @@ export default function RecurringManagerPage() {
               <div className={styles.cardTitleRow}>
                 <div>
                   <div className={styles.cardTitle}>{editingId ? "정기 규칙 수정" : "정기 규칙 추가"}</div>
-                  <div className={styles.cardDesc}>
-                    여기서는 <b>정기 규칙</b>만 관리합니다.
-                  </div>
+                  <div className={styles.cardDesc}>규칙을 저장한 뒤 선택한 달에 적용하세요.</div>
                 </div>
               </div>
 
@@ -969,18 +979,19 @@ export default function RecurringManagerPage() {
                 )}
               </div>
 
-              <div className={styles.btnPrimaryGroup} style={{ display: "flex",gap: 8,marginTop: 12,flexWrap: "wrap",justifyContent: "center",alignItems: "center",  }}>
+              <div className={styles.btnPrimaryGroup}>
+                <div className={styles.actionButtons}>
                 <button className={styles.btnPrimary} disabled={loading} onClick={handleSaveRule}>
                   {editingId ? "규칙 수정 저장" : "규칙 저장"}
                 </button>
                 <button
-                  className={styles.btnPrimary}
-                  style={{ background: "#0b1220" }}
+                  className={styles.btnSecondary}
                   disabled={loading}
                   onClick={resetForm}
                 >
                   초기화
                 </button>
+                </div>
               </div>
             </section>
 
@@ -1043,7 +1054,12 @@ export default function RecurringManagerPage() {
                     </tr>
                   </thead>
                   <tbody className={styles.tbody}>
-                    {displayedRules.map((r) => (
+                    {activeDisplayedRules.length > 0 && (
+                      <tr className={styles.ruleGroupRow}>
+                        <td colSpan={6}>사용 중인 규칙 <span>{activeDisplayedRules.length}</span></td>
+                      </tr>
+                    )}
+                    {activeDisplayedRules.map((r) => (
                       <tr key={r.id}>
                         <td className={styles.cellDate}>{r.title}</td>
                         <td>{r.category}</td>
@@ -1066,13 +1082,38 @@ export default function RecurringManagerPage() {
                             수정
                           </button>
                           <button
-                            className={styles.btnPrimary}
-                            style={{ padding: "8px 10px", background: "#d92d20" }}
+                            className={styles.btnDanger}
+                            style={{ padding: "8px 10px" }}
                             disabled={loading}
                             onClick={() => handleDeleteRule(r.id)}
                           >
                             삭제
                           </button>
+                        </td>
+                      </tr>
+                    ))}
+
+                    {expiredDisplayedRules.length > 0 && (
+                      <tr className={styles.ruleGroupRow} data-expired="true">
+                        <td colSpan={6}>마감 완료된 규칙 <span>{expiredDisplayedRules.length}</span></td>
+                      </tr>
+                    )}
+                    {expiredDisplayedRules.map((r) => (
+                      <tr key={r.id} className={styles.expiredRuleRow}>
+                        <td className={styles.cellDate}>
+                          {r.title}<span className={styles.expiredPill}>마감</span>
+                        </td>
+                        <td>{r.category}</td>
+                        <td>
+                          {r.frequency}
+                          {r.frequency === "monthly" && r.day_of_month != null ? ` (${r.day_of_month}일)` : ""}
+                          {r.frequency === "weekly" && r.day_of_week != null ? ` (dow:${r.day_of_week})` : ""}
+                        </td>
+                        <td>{Number(r.default_amount).toLocaleString()}</td>
+                        <td>{r.start_date} ~ {r.end_date}</td>
+                        <td style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                          <button className={styles.btnSecondary} style={{ padding: "8px 10px" }} disabled={loading} onClick={() => startEdit(r)}>수정</button>
+                          <button className={styles.btnDanger} style={{ padding: "8px 10px" }} disabled={loading} onClick={() => handleDeleteRule(r.id)}>삭제</button>
                         </td>
                       </tr>
                     ))}
@@ -1201,6 +1242,8 @@ export default function RecurringManagerPage() {
   );
 }
 
+export default RecurringManagerPage;
+
 /* =========================
    Override row editor component
    ========================= */
@@ -1264,8 +1307,8 @@ function OverrideRowEditor(props: {
           예외 저장
         </button>
         <button
-          className={styles.btnPrimary}
-          style={{ padding: "8px 10px", background: "#0b1220" }}
+          className={styles.btnDanger}
+          style={{ padding: "8px 10px" }}
           disabled={disabled}
           onClick={onReset}
         >

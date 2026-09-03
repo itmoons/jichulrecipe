@@ -15,7 +15,7 @@ const UI = {
     "bg-[radial-gradient(circle,rgba(251,146,60,0.14)_1px,transparent_1px)] bg-[size:16px_16px] mx-auto w-full max-w-[1320px] px-3 py-4 sm:px-4 sm:py-6",
   ink: "text-[#3B2F1E]",
   inkSoft: "text-[#7f7f7f]",
-  card: "bg-[#f2fbff] border-[#e8f8ff]",
+  card: "bg-[#fff7ed] border-[#ffedd5]",
 };
 
 function toNumberSafe(v: string) {
@@ -98,19 +98,19 @@ export default function VariableSpendSafePage() {
       rawAvailable < 0
         ? {
             label: "위험",
-            badge: "bg-[#5bbbf3] text-white",
+            badge: "bg-[#ff8a3d] text-white",
             msg: "현재 잔액으로는 월말 목표/확정지출을 감당하기 어렵습니다. 목표 잔액 또는 확정지출 입력을 우선 점검하세요.",
           }
         : safeAvailable < 0
         ? {
             label: "경고",
-            badge: "bg-[#52a9ff] text-[#ffffff]",
+            badge: "bg-[#ff8a3d] text-[#ffffff]",
             msg: "안전 버퍼를 적용하면 가변비 여력이 거의 없습니다. 버퍼를 낮추거나 지출 계획을 더 보수적으로 잡으세요.",
           }
         : daily <= 0
         ? {
             label: "타이트",
-            badge: "bg-[#52a9ff] text-[#ffffff]",
+            badge: "bg-[#ff8a3d] text-[#ffffff]",
             msg: "일 예산이 0원에 가깝습니다. 남은 기간에 가변비를 거의 쓰기 어려운 상태입니다.",
           }
         : {
@@ -169,20 +169,20 @@ export default function VariableSpendSafePage() {
           <div className="mb-5 flex items-center justify-between gap-3">
             <Link
               href="/calculators"
-              className="rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
+              className="rounded-full border border-[#ffedd5] bg-[#fff7ed] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
             >
               ← 계산기 모음
             </Link>
 
-            <span className="rounded-full bg-[#5bbbf3] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
+            <span className="rounded-full bg-[#ff8a3d] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
               가변비 안전예산
             </span>
           </div>
 
           {/* 헤더 */}
           <div className="mb-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#e8f8ff] bg-[#f2fbff] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm">
-              <span className="inline-block h-2 w-2 rounded-full bg-[#5bbbf3]" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#ffedd5] bg-[#fff7ed] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm">
+              <span className="inline-block h-2 w-2 rounded-full bg-[#ff8a3d]" />
               Recipe Calculator
             </div>
 
@@ -230,7 +230,7 @@ export default function VariableSpendSafePage() {
                   hint="예: 카드결제일, 정기회비, 공과금"
                 />
 
-                <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
+                <div className="rounded-2xl border border-[#ffedd5] bg-white p-4">
                   <div className="text-[12px] font-semibold text-[#3B2F1E]">기간 설정</div>
 
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -282,7 +282,7 @@ export default function VariableSpendSafePage() {
                 />
               </div>
 
-              <div className="mt-5 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+              <div className="mt-5 rounded-2xl border border-[#ffedd5] bg-white p-4">
                 <div className={cn("text-[12px] font-semibold", UI.ink)}>해석 팁</div>
                 <ul className={cn("mt-2 list-disc pl-5 text-[12px] leading-relaxed", UI.inkSoft)}>
                   <li>확정지출은 “미리 아는 카드결제/회비/공과금”만 넣고, 변동은 버퍼로 흡수하세요.</li>
@@ -298,7 +298,7 @@ export default function VariableSpendSafePage() {
               <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>{calc.status.msg}</p>
 
               {/* 헤드라인 */}
-              <div className="mt-4 rounded-3xl border border-[#e8f8ff] bg-white p-5">
+              <div className="mt-4 rounded-3xl border border-[#ffedd5] bg-white p-5">
                 <div className="text-[12px] font-semibold text-[#7f7f7f]">이번 주 쓸 수 있는 돈</div>
                 <div className="mt-2 text-4xl font-extrabold text-[#ffffff]">
                   {formatKRW(calc.headline)}원
@@ -314,7 +314,7 @@ export default function VariableSpendSafePage() {
               </div>
 
               {/* 분해 */}
-              <div className="mt-4 rounded-2xl border border-[#e8f8ff] bg-white p-4">
+              <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
                 <div className={cn("text-[12px] font-semibold", UI.ink)}>계산식(분해)</div>
                 <div className="mt-3 grid gap-2">
                   <Row label="현재 잔액" value={`${formatKRW(calc.bal)}원`} />
@@ -337,13 +337,13 @@ export default function VariableSpendSafePage() {
               <div className="mt-5 flex flex-col gap-2 sm:flex-row">
                 <Link
                   href="/calculators/no-spend-goal"
-                  className="rounded-2xl bg-[#5bbbf3] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+                  className="rounded-2xl bg-[#ff8a3d] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
                 >
                   다음: 무지출 데이 목표 →
                 </Link>
                 <Link
                   href="/calculators"
-                  className="rounded-2xl border border-[#e8f8ff] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#5bbbf3]"
+                  className="rounded-2xl border border-[#ffedd5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
                 >
                   계산기 모음으로
                 </Link>
@@ -390,7 +390,7 @@ function MoneyInput({
           placeholder="0"
           className={cn(
             "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-[12px] outline-none",
-            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
+            "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
           )}
         />
       </div>
@@ -422,7 +422,7 @@ function NumberInput({
         placeholder="0"
         className={cn(
           "h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
-          "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
+          "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
         )}
       />
     </div>
@@ -454,7 +454,7 @@ function PctInput({
           placeholder="0"
           className={cn(
             "h-11 w-full rounded-xl border bg-white px-3 pr-10 text-[12px] outline-none",
-            "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
+            "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
           )}
         />
         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-[#9C7A55]">
@@ -484,7 +484,7 @@ function SelectInput({
         onChange={(e) => onChange(e.target.value)}
         className={cn(
           "h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
-          "border-[#e8f8ff] focus:border-[#5bbbf3] focus:ring-2 focus:ring-[#5bbbf3]/20"
+          "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
         )}
       >
         {options.map((o) => (
@@ -499,7 +499,7 @@ function SelectInput({
 
 function MetricCard({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[#e8f8ff] bg-white p-4">
+    <div className="rounded-2xl border border-[#ffedd5] bg-white p-4">
       <div className="text-xs font-semibold text-[#7f7f7f]">{title}</div>
       <div className="mt-1 text-xl font-bold text-[#3B2F1E]">{value}</div>
     </div>
@@ -510,7 +510,7 @@ function InfoPill({ label, value }: { label: string; value: string }) {
   return (
     <div className="grid gap-1.5">
       <div className="text-[12px] font-semibold text-[#3B2F1E]">{label}</div>
-      <div className="rounded-xl border border-[#e8f8ff] bg-[#5bbbf3] px-3 py-2 text-[12px] font-bold text-[#7f7f7f]">
+      <div className="rounded-xl border border-[#ffedd5] bg-[#ff8a3d] px-3 py-2 text-[12px] font-bold text-[#7f7f7f]">
         {value}
       </div>
     </div>
@@ -528,7 +528,7 @@ function Row({
 }) {
   const vCls = tone === "danger" ? "text-[#ffffff]" : tone === "ok" ? "text-[#7f7f7f]" : "text-[#7f7f7f]";
   return (
-    <div className="flex items-center justify-between rounded-xl border border-[#e8f8ff] bg-[#f2fbff] px-3 py-2">
+    <div className="flex items-center justify-between rounded-xl border border-[#ffedd5] bg-[#fff7ed] px-3 py-2">
       <span className="text-[12px] font-semibold text-[#3B2F1E]">{label}</span>
       <span className={cn("text-[12px] font-bold", vCls)}>{value}</span>
     </div>
