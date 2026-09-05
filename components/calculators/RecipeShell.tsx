@@ -25,11 +25,11 @@ export function RecipeShell({
           <div className="mb-5 flex items-center justify-between gap-3">
             <Link
               href={backHref}
-              className="rounded-full border border-[#ffedd5] bg-[#fff7ed] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
+              className="rounded-full border border-[#dcefe5] bg-[#f1f8f4] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]"
             >
               ← 계산기 모음
             </Link>
-            <span className="rounded-full bg-[#ff8a3d] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
+            <span className="rounded-full bg-[#1f7a5b] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
               {badge}
             </span>
           </div>

@@ -75,7 +75,7 @@ export default function SiteFooter() {
                   로그인
                 </Link>
                 <Link
-                  href="/sign-in"
+                  href="/sign-up"
                   className="transition hover:text-slate-800"
                 >
                   회원가입

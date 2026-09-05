@@ -15,7 +15,7 @@ const UI = {
     "bg-[radial-gradient(circle,rgba(251,146,60,0.14)_1px,transparent_1px)] bg-[size:16px_16px] mx-auto w-full max-w-[1320px] px-3 py-4 sm:px-4 sm:py-6",
   ink: "text-[#3B2F1E]",
   inkSoft: "text-[#7f7f7f]",
-  card: "bg-[#fff7ed] border-[#ffedd5]",
+  card: "bg-[#f1f8f4] border-[#dcefe5]",
 };
 
 type SubItem = {
@@ -129,20 +129,20 @@ export default function SubscriptionTotalPage() {
           <div className="mb-5 flex items-center justify-between gap-3">
             <Link
               href="/calculators"
-              className="rounded-full border border-[#ffedd5] bg-[#fff7ed] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
+              className="rounded-full border border-[#dcefe5] bg-[#f1f8f4] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]"
             >
               ← 계산기 모음
             </Link>
 
-            <span className="rounded-full bg-[#ff8a3d] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
+            <span className="rounded-full bg-[#1f7a5b] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
               구독 점검
             </span>
           </div>
 
           {/* 헤더 */}
           <div className="mb-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#ffedd5] bg-[#fff7ed] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm">
-              <span className="inline-block h-2 w-2 rounded-full bg-[#ff8a3d]" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#dcefe5] bg-[#f1f8f4] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm">
+              <span className="inline-block h-2 w-2 rounded-full bg-[#1f7a5b]" />
               Recipe Calculator
             </div>
 
@@ -168,7 +168,7 @@ export default function SubscriptionTotalPage() {
 
                 <button
                   onClick={addItem}
-                  className="rounded-2xl bg-[#ff8a3d] px-3 py-2 text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+                  className="rounded-2xl bg-[#1f7a5b] px-3 py-2 text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
                 >
                   + 추가
                 </button>
@@ -178,7 +178,7 @@ export default function SubscriptionTotalPage() {
                 {items.map((it) => (
                   <div
                     key={it.id}
-                    className="rounded-2xl border border-[#ffedd5] bg-white p-4"
+                    className="rounded-2xl border border-[#dcefe5] bg-white p-4"
                   >
                     <div className="grid gap-3 sm:grid-cols-12 sm:items-end">
                       <div className="sm:col-span-5">
@@ -189,7 +189,7 @@ export default function SubscriptionTotalPage() {
                           placeholder="예: 넷플릭스"
                           className={cn(
                             "mt-1 h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
-                            "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
+                            "border-[#dcefe5] focus:border-[#1f7a5b] focus:ring-2 focus:ring-[#1f7a5b]/20"
                           )}
                         />
                       </div>
@@ -203,7 +203,7 @@ export default function SubscriptionTotalPage() {
                           }
                           className={cn(
                             "mt-1 h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
-                            "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
+                            "border-[#dcefe5] focus:border-[#1f7a5b] focus:ring-2 focus:ring-[#1f7a5b]/20"
                           )}
                         >
                           <option value="OTT">OTT</option>
@@ -227,7 +227,7 @@ export default function SubscriptionTotalPage() {
                             placeholder="0"
                             className={cn(
                               "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-[12px] outline-none",
-                              "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
+                              "border-[#dcefe5] focus:border-[#1f7a5b] focus:ring-2 focus:ring-[#1f7a5b]/20"
                             )}
                           />
                         </div>
@@ -241,7 +241,7 @@ export default function SubscriptionTotalPage() {
 
                       <button
                         onClick={() => removeItem(it.id)}
-                        className="rounded-xl border border-[#ffedd5] bg-[#ff8a3d] px-3 py-1.5 text-xs font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
+                        className="rounded-xl border border-[#dcefe5] bg-[#1f7a5b] px-3 py-1.5 text-xs font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]"
                       >
                         삭제
                       </button>
@@ -251,7 +251,7 @@ export default function SubscriptionTotalPage() {
               </div>
 
               {/* 연간 할인 옵션 */}
-              <div className="mt-5 rounded-2xl border border-[#ffedd5] bg-white p-4">
+              <div className="mt-5 rounded-2xl border border-[#dcefe5] bg-white p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className={cn("text-[12px] font-semibold", UI.ink)}>연간 결제 할인(선택)</div>
@@ -271,13 +271,13 @@ export default function SubscriptionTotalPage() {
                       placeholder="예: 15"
                       className={cn(
                         "mt-1 h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
-                        "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
+                        "border-[#dcefe5] focus:border-[#1f7a5b] focus:ring-2 focus:ring-[#1f7a5b]/20"
                       )}
                     />
                     <div className="mt-1 text-xs text-[#7f7f7f]">0~80% 범위로 자동 제한됩니다.</div>
                   </div>
 
-                  <div className="rounded-2xl bg-[#ff8a3d] p-3">
+                  <div className="rounded-2xl bg-[#1f7a5b] p-3">
                     <div className="text-xs font-semibold text-[#7f7f7f]">연간 절감 추정</div>
                     <div className="mt-1 text-lg font-bold text-[#ffffff]">
                       {formatKRW(calc.discount.yearlySave)}원
@@ -301,10 +301,10 @@ export default function SubscriptionTotalPage() {
               </div>
 
               {/* 할인 적용 시 */}
-              <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
+              <div className="mt-4 rounded-2xl border border-[#dcefe5] bg-white p-4">
                 <div className="flex items-center justify-between gap-3">
                   <div className={cn("text-[12px] font-semibold", UI.ink)}>연간 결제 가정(선택)</div>
-                  <span className="rounded-full bg-[#ff8a3d] px-3 py-1 text-xs font-semibold text-[#ffffff]">
+                  <span className="rounded-full bg-[#1f7a5b] px-3 py-1 text-xs font-semibold text-[#ffffff]">
                     할인 {pct(calc.discount.disc)}%
                   </span>
                 </div>
@@ -320,7 +320,7 @@ export default function SubscriptionTotalPage() {
               </div>
 
               {/* 카테고리 비중 */}
-              <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
+              <div className="mt-4 rounded-2xl border border-[#dcefe5] bg-white p-4">
                 <div className={cn("text-[12px] font-semibold", UI.ink)}>카테고리별 비중(월 기준)</div>
 
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -333,7 +333,7 @@ export default function SubscriptionTotalPage() {
               </div>
 
               {/* TOP 항목 */}
-              <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
+              <div className="mt-4 rounded-2xl border border-[#dcefe5] bg-white p-4">
                 <div className="flex items-center justify-between gap-3">
                   <div className={cn("text-[12px] font-semibold", UI.ink)}>월 지출 큰 항목 TOP</div>
                   <div className={cn("text-xs", UI.inkSoft)}>정리 우선순위 힌트</div>
@@ -346,10 +346,10 @@ export default function SubscriptionTotalPage() {
                     {calc.top.map((t, idx) => (
                       <li
                         key={t.id}
-                        className="flex items-center justify-between rounded-xl border border-[#ffedd5] bg-[#fff7ed] px-3 py-2"
+                        className="flex items-center justify-between rounded-xl border border-[#dcefe5] bg-[#f1f8f4] px-3 py-2"
                       >
                         <div className="flex items-center gap-2 min-w-0">
-                          <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-[#ff8a3d] text-xs font-bold text-[#ffffff]">
+                          <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-[#1f7a5b] text-xs font-bold text-[#ffffff]">
                             {idx + 1}
                           </span>
                           <div className="min-w-0">
@@ -372,13 +372,13 @@ export default function SubscriptionTotalPage() {
               <div className="mt-5 flex flex-col gap-2 sm:flex-row">
                 <Link
                   href="/calculators/annual-vs-monthly"
-                  className="rounded-2xl bg-[#ff8a3d] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+                  className="rounded-2xl bg-[#1f7a5b] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
                 >
                   다음: 연간 vs 월간 비교 →
                 </Link>
                 <Link
                   href="/calculators"
-                  className="rounded-2xl border border-[#ffedd5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
+                  className="rounded-2xl border border-[#dcefe5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]"
                 >
                   계산기 모음으로
                 </Link>
@@ -399,7 +399,7 @@ export default function SubscriptionTotalPage() {
 
 function MetricCard({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[#ffedd5] bg-white p-4">
+    <div className="rounded-2xl border border-[#dcefe5] bg-white p-4">
       <div className="text-xs font-semibold text-[#7f7f7f]">{title}</div>
       <div className="mt-1 text-xl font-bold text-[#3B2F1E]">{value}</div>
     </div>
@@ -416,7 +416,7 @@ function MiniCard({
   accent?: boolean;
 }) {
   return (
-    <div className={cn("rounded-2xl border p-4", accent ? "border-[#ff8a3d] bg-[#ff8a3d]" : "border-[#ffedd5] bg-white")}>
+    <div className={cn("rounded-2xl border p-4", accent ? "border-[#1f7a5b] bg-[#1f7a5b]" : "border-[#dcefe5] bg-white")}>
       <div className={cn("text-xs font-semibold", accent ? "text-[#ffffff]" : "text-[#7f7f7f]")}>{title}</div>
       <div className={cn("mt-1 text-lg font-bold", accent ? "text-[#ffffff]" : "text-[#3B2F1E]")}>{value}</div>
     </div>
@@ -436,15 +436,15 @@ function ShareRow({
 }) {
   const bar = clamp(pctValue, 0, 100);
   return (
-    <div className="rounded-xl border border-[#ffedd5] bg-[#fff7ed] p-3">
+    <div className="rounded-xl border border-[#dcefe5] bg-[#f1f8f4] p-3">
       <div className="flex items-center justify-between gap-2">
         <span className="text-[12px] font-semibold text-[#3B2F1E]">{label}</span>
         <span className="text-xs font-semibold text-[#7f7f7f]">
           {formatKRW(value)}원 · <span className="text-[#ffffff]">{pct(pctValue)}%</span>
         </span>
       </div>
-      <div className="mt-2 h-2 w-full rounded-full bg-[#ff8a3d]">
-        <div className="h-2 rounded-full bg-[#ff8a3d]" style={{ width: `${bar}%` }} />
+      <div className="mt-2 h-2 w-full rounded-full bg-[#1f7a5b]">
+        <div className="h-2 rounded-full bg-[#1f7a5b]" style={{ width: `${bar}%` }} />
       </div>
       {total === 0 && <div className="mt-1 text-xs text-[#7f7f7f]">총액이 0이면 비중이 계산되지 않습니다.</div>}
     </div>

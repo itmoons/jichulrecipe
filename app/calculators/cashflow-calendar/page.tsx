@@ -82,8 +82,8 @@ export default function CashflowCalendarPage() {
       dangerDays.length === 0
         ? { label: "안정", badge: "bg-[#34D399] text-white", msg: "위험일(적자/버퍼하회)이 없습니다." }
         : firstDeficit
-        ? { label: "위험", badge: "bg-[#ff8a3d] text-white", msg: `첫 적자 발생일: ${firstDeficit}일` }
-        : { label: "경고", badge: "bg-[#ff8a3d] text-[#ffffff]", msg: "버퍼 이하 위험일이 있습니다." };
+        ? { label: "위험", badge: "bg-[#1f7a5b] text-white", msg: `첫 적자 발생일: ${firstDeficit}일` }
+        : { label: "경고", badge: "bg-[#1f7a5b] text-[#ffffff]", msg: "버퍼 이하 위험일이 있습니다." };
 
     return {
       dim,
@@ -144,12 +144,12 @@ export default function CashflowCalendarPage() {
               />
             </div>
 
-            <div className="rounded-2xl border border-[#ffedd5] bg-white p-4">
+            <div className="rounded-2xl border border-[#dcefe5] bg-white p-4">
               <div className="flex items-center justify-between">
                 <div className="text-[12px] font-semibold text-[#3B2F1E]">급여/유입</div>
                 <button
                   onClick={addPayday}
-                  className="rounded-full border border-[#ffedd5] bg-white px-3 py-1 text-xs font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
+                  className="rounded-full border border-[#dcefe5] bg-white px-3 py-1 text-xs font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]"
                 >
                   + 추가
                 </button>
@@ -172,12 +172,12 @@ export default function CashflowCalendarPage() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-[#ffedd5] bg-white p-4">
+            <div className="rounded-2xl border border-[#dcefe5] bg-white p-4">
               <div className="flex items-center justify-between">
                 <div className="text-[12px] font-semibold text-[#3B2F1E]">결제/유출</div>
                 <button
                   onClick={addBilling}
-                  className="rounded-full border border-[#ffedd5] bg-white px-3 py-1 text-xs font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
+                  className="rounded-full border border-[#dcefe5] bg-white px-3 py-1 text-xs font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]"
                 >
                   + 추가
                 </button>
@@ -214,7 +214,7 @@ export default function CashflowCalendarPage() {
             <MetricCard title="위험일" value={`${calc.dangerDays.length}일`} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
+          <div className="mt-4 rounded-2xl border border-[#dcefe5] bg-white p-4">
             <div className="flex items-center justify-between gap-2">
               <div className={cn("text-[12px] font-semibold", UI.ink)}>월 캘린더</div>
               <div className="flex items-center gap-2">
@@ -231,10 +231,10 @@ export default function CashflowCalendarPage() {
                   const isLow = t.flags.includes("버퍼하회") && !isDef;
 
                   const bg = isDef
-                    ? "bg-[#ff8a3d] text-white border-[#ff8a3d]"
+                    ? "bg-[#1f7a5b] text-white border-[#1f7a5b]"
                     : isLow
-                    ? "bg-[#ff8a3d] text-[#3B2F1E] border-[#ff8a3d]"
-                    : "bg-[#ff8a3d] text-[#3B2F1E] border-[#ffedd5]";
+                    ? "bg-[#1f7a5b] text-[#3B2F1E] border-[#1f7a5b]"
+                    : "bg-[#1f7a5b] text-[#3B2F1E] border-[#dcefe5]";
 
                   return (
                     <div key={d} className={cn("rounded-2xl border p-2", bg)}>
@@ -254,10 +254,10 @@ export default function CashflowCalendarPage() {
                     className={cn(
                       "rounded-2xl border px-3 py-2",
                       t.flags.includes("적자")
-                        ? "border-[#ff8a3d] bg-[#FFF1EA]"
+                        ? "border-[#1f7a5b] bg-[#FFF1EA]"
                         : t.flags.includes("버퍼하회")
-                        ? "border-[#ff8a3d] bg-[#ff8a3d]"
-                        : "border-[#ffedd5] bg-[#fff7ed]"
+                        ? "border-[#1f7a5b] bg-[#1f7a5b]"
+                        : "border-[#dcefe5] bg-[#f1f8f4]"
                     )}
                   >
                     <div className="flex items-center justify-between">
@@ -279,13 +279,13 @@ export default function CashflowCalendarPage() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/calculators/card-billing-date-shift"
-              className="rounded-2xl bg-[#ff8a3d] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+              className="rounded-2xl bg-[#1f7a5b] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
             >
               다음: 카드 결제일 변경 효과 →
             </Link>
             <Link
               href="/calculators"
-              className="rounded-2xl border border-[#ffedd5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
+              className="rounded-2xl border border-[#dcefe5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]"
             >
               계산기 모음으로
             </Link>
@@ -312,12 +312,12 @@ function EventRow({
   type: "in" | "out";
 }) {
   return (
-    <div className="rounded-xl border border-[#ffedd5] bg-[#ff8a3d] p-3">
+    <div className="rounded-xl border border-[#dcefe5] bg-[#1f7a5b] p-3">
       <div className="flex items-center justify-between gap-2">
         <div className="text-xs font-extrabold text-[#7f7f7f]">{title}</div>
         <button
           onClick={onRemove}
-          className="rounded-full border border-[#ffedd5] bg-white px-3 py-1 text-xs font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
+          className="rounded-full border border-[#dcefe5] bg-white px-3 py-1 text-xs font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]"
         >
           삭제
         </button>

@@ -71,7 +71,7 @@ function ProfileCircle({
 }) {
   return (
     <div className="flex flex-col items-center">
-      <div className="relative h-[68px] w-[68px] overflow-hidden rounded-full border border-orange-100 bg-[#fff7ed] sm:h-[78px] sm:w-[78px]">
+      <div className="relative h-[68px] w-[68px] overflow-hidden rounded-full border border-orange-100 bg-[#f1f8f4] sm:h-[78px] sm:w-[78px]">
         {imageSrc ? (
           <Image
             src={imageSrc}
@@ -126,7 +126,7 @@ function QuickCard({
       <div className="flex h-full min-h-[190px] flex-col justify-between sm:min-h-[140px]">
         <div className="flex items-start justify-between gap-3">
           <div className="text-[28px]">{icon}</div>
-          <div className="rounded-full border border-orange-100 bg-[#fff7ed] px-3 py-1 text-[11px] font-semibold text-orange-700">
+          <div className="rounded-full border border-orange-100 bg-[#f1f8f4] px-3 py-1 text-[11px] font-semibold text-orange-700">
             바로가기
           </div>
         </div>
@@ -160,7 +160,7 @@ function BarRow({
         <div className="text-[13px] font-semibold text-slate-900">{money(amount)}원</div>
       </div>
       <div className="mt-2 h-2 rounded-full bg-orange-100/70">
-        <div className="h-2 rounded-full bg-[#ff8a3d]" style={{ width: `${width}%` }} />
+        <div className="h-2 rounded-full bg-[#1f7a5b]" style={{ width: `${width}%` }} />
       </div>
     </div>
   );
@@ -300,7 +300,7 @@ export default function CoupleLedgerPage() {
             <div className="mt-6">
               <Link
                 href="/sign-in"
-                className="inline-flex items-center justify-center rounded-[14px] bg-[#ff8a3d] px-5 py-3 text-[14px] font-medium text-white transition hover:bg-[#ff8a3d]"
+                className="inline-flex items-center justify-center rounded-[14px] bg-[#1f7a5b] px-5 py-3 text-[14px] font-medium text-white transition hover:bg-[#1f7a5b]"
               >
                 로그인하기
               </Link>
@@ -325,7 +325,7 @@ export default function CoupleLedgerPage() {
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 href="/couple-link"
-                className="inline-flex items-center justify-center rounded-[14px] bg-[#ff8a3d] px-5 py-3 text-[14px] font-medium text-white transition hover:bg-[#ff8a3d]"
+                className="inline-flex items-center justify-center rounded-[14px] bg-[#1f7a5b] px-5 py-3 text-[14px] font-medium text-white transition hover:bg-[#1f7a5b]"
               >
                 커플 연결하러 가기
               </Link>
@@ -343,123 +343,77 @@ export default function CoupleLedgerPage() {
   }
 
   return (
-    <div className="app-surface min-h-screen px-4 py-8 sm:px-6 sm:py-8">
-      <div className="mx-auto max-w-[1320px]">
-        <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+    <main className="min-h-screen bg-[#f5f8f6] px-4 py-7 sm:px-6 sm:py-10">
+      <div className="mx-auto max-w-[1180px]">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-[11px] font-bold tracking-[0.12em] text-orange-600">COUPLE LEDGER</p>
-            <h1 className="mt-1 text-[24px] font-bold tracking-[-0.04em] text-slate-900">우리의 공동 장부</h1>
-            <p className="mt-1 text-[13px] text-slate-600">이번 달 함께 쓴 돈을 기록하고, 필요한 순간에 분석하세요.</p>
+            <p className="text-[11px] font-bold tracking-[0.14em] text-[#1f7a5b]">SHARED MONEY</p>
+            <h1 className="mt-1 text-[26px] font-bold tracking-[-0.05em] text-slate-900">우리의 공동 지출</h1>
           </div>
-          <Link href="/couple-ledger/entry" className="inline-flex w-fit items-center justify-center rounded-[10px] bg-[#ff8a3d] px-4 py-2.5 text-[13px] font-bold text-white shadow-[0_3px_8px_rgba(211,92,16,0.18)] transition hover:bg-[#ff963f]">지출 기록하기</Link>
+          <Link href="/couple-settings" className="rounded-lg border border-[#dbe9e1] bg-white px-3.5 py-2 text-[12px] font-semibold text-slate-600 transition hover:bg-[#f1f8f4]">공동 장부 설정</Link>
         </div>
 
-        <Surface className="px-5 py-6 sm:px-8">
-          <div className="flex flex-col items-center justify-center gap-5 sm:flex-row sm:gap-8">
-            <ProfileCircle
-  label="내 프로필"
-  subLabel="내 프로필"
-  imageSrc="/images/couple/me.png"
-/>
-
-            <div className="flex flex-col items-center justify-center">
-              <div className="text-[24px] text-orange-500">♥</div>
-              <div className="mt-1 text-[11px] font-medium text-slate-500">공동 장부 연결됨</div>
+        <section className="overflow-hidden rounded-[24px] bg-[#1f7a5b] text-white shadow-[0_16px_36px_rgba(31,122,91,0.18)]">
+          <div className="grid gap-8 px-6 py-7 sm:px-9 sm:py-9 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
+            <div>
+              <div className="flex items-center gap-2 text-[12px] font-semibold text-white/75"><span className="h-2 w-2 rounded-full bg-[#9bd6bd]" /> 두 사람이 함께 기록 중</div>
+              <p className="mt-7 text-[13px] font-medium text-white/75">이번 달 공동 지출</p>
+              <div className="mt-1 text-[36px] font-bold tracking-[-0.06em] sm:text-[44px]">{money(summary.total)}<span className="ml-1 text-[18px] font-semibold">원</span></div>
+              <p className="mt-3 text-[13px] text-white/75">{summary.count}건을 함께 기록했어요. 필요한 지출은 바로 추가해보세요.</p>
+              <Link href="/couple-ledger/entry" className="mt-6 inline-flex rounded-lg bg-white px-4 py-3 text-[13px] font-bold text-[#176247] transition hover:bg-[#eaf5ef]">+ 공동 지출 기록</Link>
             </div>
 
-            <ProfileCircle
-  label="상대 프로필"
-  subLabel="상대 프로필"
-  imageSrc="/images/couple/partner.png"
-/>
-          </div>
-
-          <div className="mt-8 grid gap-3 sm:grid-cols-3">
-            <SummaryChip label="이번 달 공동지출" value={`${money(summary.total)}원`} />
-            <SummaryChip label="이번 달 기록 수" value={`${summary.count}건`} />
-            <SummaryChip label="가장 큰 카테고리" value={summary.topCategory} />
-          </div>
-        </Surface>
-
-        <Surface className="mt-5 overflow-hidden">
-          <div className="grid min-h-[160px] gap-0 lg:grid-cols-[1.2fr_0.8fr]">
-            <div className="flex flex-col justify-center px-6 py-7 sm:px-8 sm:py-8">
-              <div className="text-[20px] font-bold tracking-[-0.03em] text-slate-900 sm:text-[22px]">
-                이번 달 소비 흐름
+            <div className="grid grid-cols-2 gap-3 rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-sm">
+              <div className="rounded-xl bg-white/10 p-4">
+                <p className="text-[11px] text-white/65">내가 결제한 금액</p>
+                <p className="mt-2 text-[20px] font-bold tracking-[-0.04em]">{money(summary.myPaid)}원</p>
               </div>
-              <div className="mt-3 max-w-[620px] text-[10px] leading-7 text-slate-600">
-                이번 달 함께 사용한 금액의 흐름을 빠르게 확인하고, 카테고리별 소비 패턴과 결제 비중을 정리해볼 수 있습니다.
+              <div className="rounded-xl bg-white/10 p-4">
+                <p className="text-[11px] text-white/65">상대가 결제한 금액</p>
+                <p className="mt-2 text-[20px] font-bold tracking-[-0.04em]">{money(summary.partnerPaid)}원</p>
               </div>
-
-              <div className="mt-6 flex flex-wrap gap-2">
-                <Link
-                  href="/couple-ledger/analytics"
-                  className="inline-flex items-center justify-center rounded-[10px] bg-[#ff8a3d] px-4 py-2.5 text-[13px] font-bold text-white transition hover:bg-[#ff963f]"
-                >
-                  분석 보러가기
-                </Link>
-                <Link
-                  href="/couple-ledger/calendar"
-                  className="inline-flex items-center justify-center rounded-[10px] border border-orange-200 bg-white px-4 py-2.5 text-[13px] font-bold text-orange-800 transition hover:bg-[#fff7ed]"
-                >
-                  달력 보러가기
-                </Link>
-              </div>
-            </div>
-
-            <div className="border-t border-[#f3e5da] bg-[#fffaf6] px-6 py-7 lg:border-l lg:border-t-0 sm:px-8">
-              <div className="text-[14px] font-semibold text-slate-900">이번 달 카테고리 요약</div>
-              <div className="mt-4 space-y-4">
-                {summary.topCategories.length === 0 ? (
-                  <div className="rounded-[14px] border border-orange-100 bg-white p-5 text-[13px] text-slate-600">
-                    아직 이번 달 공동 지출 기록이 없습니다.
-                  </div>
-                ) : (
-                  summary.topCategories.map((row) => (
-                    <BarRow key={row.label} label={row.label} amount={row.amount} max={chartMax} />
-                  ))
-                )}
-              </div>
-
-              <div className="mt-6 grid grid-cols-2 gap-3">
-                <div className="rounded-[14px] border border-orange-100 bg-white px-4 py-4">
-                  <div className="text-[11px] text-slate-500">내 결제</div>
-                  <div className="mt-1 text-[15px] font-semibold text-slate-900">
-                    {money(summary.myPaid)}원
-                  </div>
-                </div>
-                <div className="rounded-[14px] border border-orange-100 bg-white px-4 py-4">
-                  <div className="text-[11px] text-slate-500">상대 결제</div>
-                  <div className="mt-1 text-[15px] font-semibold text-slate-900">
-                    {money(summary.partnerPaid)}원
-                  </div>
-                </div>
+              <div className="col-span-2 flex items-center justify-between rounded-xl bg-white/10 px-4 py-3">
+                <span className="text-[12px] text-white/70">가장 많이 쓴 항목</span>
+                <span className="text-[13px] font-bold">{summary.topCategory}</span>
               </div>
             </div>
           </div>
-        </Surface>
+        </section>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          <QuickCard
-            href="/couple-ledger/entry"
-            title="가계부 입력"
-            desc="오늘 사용한 지출을 빠르게 기록하고 수정할 수 있습니다."
-            icon="✍️"
-          />
-          <QuickCard
-            href="/couple-ledger/calendar"
-            title="가계부 달력"
-            desc="언제 얼마나 썼는지 월간 흐름으로 확인할 수 있습니다."
-            icon="🗓️"
-          />
-          <QuickCard
-            href="/couple-ledger/analytics"
-            title="지출 분석"
-            desc="카테고리, 결제 비중, 날짜별 패턴을 한눈에 분석합니다."
-            icon="📊"
-          />
+        <div className="mt-5 grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
+          <Surface className="overflow-hidden border-[#dbe9e1] shadow-none">
+            <div className="flex items-center justify-between border-b border-[#edf3ef] px-5 py-4 sm:px-6">
+              <div><h2 className="text-[16px] font-bold tracking-[-0.03em] text-slate-900">최근 공동 지출</h2><p className="mt-1 text-[11px] text-slate-500">함께 기록한 내역을 최신순으로 확인하세요.</p></div>
+              <Link href="/couple-ledger/calendar" className="text-[12px] font-bold text-[#1f7a5b]">전체 보기</Link>
+            </div>
+            {sharedList.length === 0 ? (
+              <div className="px-6 py-14 text-center"><p className="text-[14px] font-semibold text-slate-800">첫 공동 지출을 기록해보세요.</p><p className="mt-2 text-[12px] text-slate-500">기록하면 두 사람의 소비 흐름을 정리해드려요.</p><Link href="/couple-ledger/entry" className="mt-5 inline-flex rounded-lg bg-[#1f7a5b] px-3.5 py-2.5 text-[12px] font-bold text-white">지출 추가</Link></div>
+            ) : (
+              <div className="divide-y divide-[#edf3ef]">
+                {sharedList.slice(0, 5).reverse().map((item) => (
+                  <div key={item.id} className="flex items-center justify-between gap-4 px-5 py-4 sm:px-6">
+                    <div className="min-w-0"><p className="truncate text-[13px] font-semibold text-slate-800">{item.memo || item.category || "공동 지출"}</p><p className="mt-1 text-[11px] text-slate-500">{item.category || "기타"} · {item.expense_date}</p></div>
+                    <p className="shrink-0 text-[14px] font-bold text-slate-900">{money(Number(item.amount))}원</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Surface>
+
+          <Surface className="border-[#dbe9e1] p-5 shadow-none sm:p-6">
+            <div className="flex items-start justify-between"><div><h2 className="text-[16px] font-bold tracking-[-0.03em] text-slate-900">소비 비중</h2><p className="mt-1 text-[11px] text-slate-500">이번 달 카테고리별 합계예요.</p></div><Link href="/couple-ledger/analytics" className="rounded-lg bg-[#f1f8f4] px-2.5 py-2 text-[11px] font-bold text-[#176247]">분석 보기</Link></div>
+            <div className="mt-7 space-y-5">
+              {summary.topCategories.length === 0 ? <p className="py-7 text-center text-[12px] text-slate-500">아직 분석할 지출이 없어요.</p> : summary.topCategories.map((row) => <BarRow key={row.label} label={row.label} amount={row.amount} max={chartMax} />)}
+            </div>
+          </Surface>
+        </div>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          <Link href="/couple-ledger/entry" className="rounded-xl border border-[#dbe9e1] bg-white p-5 transition hover:border-[#8ec9ae] hover:bg-[#f7faf8]"><p className="text-[12px] font-bold text-[#1f7a5b]">01</p><p className="mt-5 text-[15px] font-bold text-slate-900">지출 기록</p><p className="mt-1 text-[12px] text-slate-500">오늘의 공동 지출을 추가해요.</p></Link>
+          <Link href="/couple-ledger/calendar" className="rounded-xl border border-[#dbe9e1] bg-white p-5 transition hover:border-[#8ec9ae] hover:bg-[#f7faf8]"><p className="text-[12px] font-bold text-[#1f7a5b]">02</p><p className="mt-5 text-[15px] font-bold text-slate-900">달력으로 보기</p><p className="mt-1 text-[12px] text-slate-500">날짜별 소비를 한눈에 확인해요.</p></Link>
+          <Link href="/couple-ledger/analytics" className="rounded-xl border border-[#dbe9e1] bg-white p-5 transition hover:border-[#8ec9ae] hover:bg-[#f7faf8]"><p className="text-[12px] font-bold text-[#1f7a5b]">03</p><p className="mt-5 text-[15px] font-bold text-slate-900">소비 분석</p><p className="mt-1 text-[12px] text-slate-500">두 사람의 소비 흐름을 살펴봐요.</p></Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

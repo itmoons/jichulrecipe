@@ -8,7 +8,8 @@ export function CalculatorSeoFrame({ slug, children }: { slug: string; children:
   const jsonLd = {
     "@context": "https://schema.org", "@type": "WebApplication", name: item.name,
     applicationCategory: "FinanceApplication", operatingSystem: "Web", url,
-    description: item.description,
+    description: item.description, isAccessibleForFree: true,
+    offers: { "@type": "Offer", price: "0", priceCurrency: "KRW" },
   };
   const breadcrumb = {
     "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [

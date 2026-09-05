@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabaseClient";
 
-const BRAND_BLUE = "#ff8a3d";
+const BRAND_BLUE = "#1f7a5b";
 
 function validatePassword(value: string) {
   if (!value) {
@@ -186,7 +186,7 @@ export default function ResetPasswordPage() {
           <button
             type="button"
             onClick={() => router.replace("/sign-in")}
-            className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-slate-900 shadow-md shadow-orange-100 hover:bg-[#fb923c]"
+            className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-slate-900 shadow-md shadow-orange-100 hover:bg-[#348f6c]"
             style={{ ["--brand-blue" as any]: BRAND_BLUE }}
           >
             로그인 페이지로 이동
@@ -223,7 +223,7 @@ export default function ResetPasswordPage() {
         </div>
 
         {successMsg && (
-          <div className="mb-3 rounded-xl border border border-[#ff8a3d]/30 bg-[#ff8a3d]/10 px-3 py-2 text-[11px] text-slate-700">
+          <div className="mb-3 rounded-xl border border border-[#1f7a5b]/30 bg-[#1f7a5b]/10 px-3 py-2 text-[11px] text-slate-700">
             {successMsg}
           </div>
         )}
@@ -264,7 +264,7 @@ export default function ResetPasswordPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="mt-2 flex w-full items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-slate-900 shadow-md shadow-orange-100 transition hover:bg-[#fb923c] disabled:cursor-not-allowed disabled:opacity-70"
+            className="mt-2 flex w-full items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-slate-900 shadow-md shadow-orange-100 transition hover:bg-[#348f6c] disabled:cursor-not-allowed disabled:opacity-70"
             style={{ ["--brand-blue" as any]: BRAND_BLUE }}
           >
             {isSubmitting ? "변경 중..." : "비밀번호 변경하기"}

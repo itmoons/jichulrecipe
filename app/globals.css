@@ -6,31 +6,39 @@
 */
 @source "../**/*.{js,ts,jsx,tsx,mdx}";
 
-/* 지출레시피 Theme — 로고의 오렌지를 중심으로 한 따뜻하고 신뢰감 있는 금융 UI */
+/* 지출레시피 Theme — 차분한 그린 기반의 정돈된 금융 UI */
 @theme {
-  --color-sky-50: #fffaf5;
-  --color-sky-100: #fff1e6;
-  --color-sky-200: #fed7aa;
-  --color-sky-400: #fb923c;
-  --color-sky-500: #f97316;
-  --color-sky-600: #ea580c;
-  --color-blue-50: #fffaf5;
-  --color-blue-100: #ffedd5;
-  --color-blue-200: #fed7aa;
-  --color-blue-400: #fb923c;
-  --color-blue-500: #f97316;
-  --color-blue-600: #ea580c;
+  --color-orange-50: #f1f8f4;
+  --color-orange-100: #dcefe5;
+  --color-orange-200: #c6e2d4;
+  --color-orange-400: #53a77f;
+  --color-orange-500: #1f7a5b;
+  --color-orange-600: #176247;
+  --color-orange-700: #13523b;
+  --color-orange-800: #0f4130;
+  --color-sky-50: #f7faf8;
+  --color-sky-100: #eaf5ef;
+  --color-sky-200: #c6e2d4;
+  --color-sky-400: #53a77f;
+  --color-sky-500: #1f7a5b;
+  --color-sky-600: #176247;
+  --color-blue-50: #f7faf8;
+  --color-blue-100: #dcefe5;
+  --color-blue-200: #c6e2d4;
+  --color-blue-400: #53a77f;
+  --color-blue-500: #1f7a5b;
+  --color-blue-600: #176247;
 }
 
 :root {
-  --background: #fff8f2;
+  --background: #f5f8f6;
   --foreground: #1f2937;
 
-  --recipe-orange: #ff8a3d;
-  --recipe-orange-strong: #ff8a3d;
-  --recipe-orange-soft: #fff7ed;
+  --recipe-orange: #1f7a5b;
+  --recipe-orange-strong: #176247;
+  --recipe-orange-soft: #f1f8f4;
 
-  --recipe-border: #fed7aa;
+  --recipe-border: #c6e2d4;
   --recipe-card: #ffffff;
 
   --recipe-muted: #6b7280;
@@ -39,40 +47,73 @@
 html,
 body {
   font-family: var(--font-pretendard), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  overflow-x: clip;
 }
 
 body {
-  background: #fff8f2;
+  background: #f5f8f6;
   color: var(--foreground);
 }
 
+img,
+video,
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+input,
+select,
+textarea {
+  min-width: 0;
+}
+
+@media (max-width: 639px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
 ::selection {
-  background: #fed7aa;
-  color: #ff8a3d;
+  background: #c6e2d4;
+  color: #1f7a5b;
 }
 
 :focus-visible {
-  outline: 3px solid #fdba74;
+  outline: 3px solid #8ec9ae;
   outline-offset: 3px;
+}
+
+/* 공통 CTA 대비: 짙은 브랜드 그린 위에는 항상 흰색 텍스트를 사용한다. */
+button[class~="bg-[#1f7a5b]"],
+a[class~="bg-[#1f7a5b]"] {
+  color: #fff;
+}
+
+button[class~="bg-[#1f7a5b]"] svg,
+a[class~="bg-[#1f7a5b]"] svg {
+  color: currentColor;
 }
 
 .bg-recipe {
   background:
-    radial-gradient(800px 320px at 10% 0%, rgba(255, 138, 61, 0.15), transparent 60%),
-    radial-gradient(800px 320px at 90% 20%, rgba(255, 193, 130, 0.16), transparent 60%),
-    linear-gradient(to bottom, #fffdfb, #fff8f2);
+    radial-gradient(800px 320px at 10% 0%, rgba(31, 122, 91, 0.10), transparent 60%),
+    radial-gradient(800px 320px at 90% 20%, rgba(83, 167, 127, 0.10), transparent 60%),
+    linear-gradient(to bottom, #ffffff, #f5f8f6);
 }
 
 .app-surface {
   background:
-    radial-gradient(780px 440px at 6% 0%, rgba(255, 138, 61, 0.14), transparent 68%),
-    radial-gradient(680px 400px at 96% 0%, rgba(255, 193, 130, 0.18), transparent 64%),
-    linear-gradient(135deg, #fffdfb, #fff8f2);
+    radial-gradient(780px 440px at 6% 0%, rgba(31, 122, 91, 0.09), transparent 68%),
+    radial-gradient(680px 400px at 96% 0%, rgba(83, 167, 127, 0.09), transparent 64%),
+    linear-gradient(135deg, #ffffff, #f5f8f6);
 }
 
 .landing-surface {
   background:
-    radial-gradient(780px 440px at 0% 0%, rgba(255, 138, 61, 0.16), transparent 65%),
-    radial-gradient(680px 400px at 100% 0%, rgba(255, 138, 61, 0.12), transparent 64%),
-    #fff8f2;
+    radial-gradient(780px 440px at 0% 0%, rgba(31, 122, 91, 0.10), transparent 65%),
+    radial-gradient(680px 400px at 100% 0%, rgba(83, 167, 127, 0.08), transparent 64%),
+    #f5f8f6;
 }

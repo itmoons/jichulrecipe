@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabaseClient";
 
-const BRAND_BLUE = "#ff8a3d";
+const BRAND_BLUE = "#1f7a5b";
 
 type AuthMode = "login" | "register";
 
@@ -305,7 +305,7 @@ function SignInInner() {
         </div>
 
         {successMsg && (
-          <div className="mb-3 rounded-xl border border border-[#ff8a3d]/30 bg-[#ff8a3d]/10 px-3 py-2 text-[11px] text-slate-700">
+          <div className="mb-3 rounded-xl border border border-[#1f7a5b]/30 bg-[#1f7a5b]/10 px-3 py-2 text-[11px] text-slate-700">
             <strong className="mr-1">🎉 안내 🎉</strong>
             <span>{successMsg}</span>
           </div>
@@ -372,7 +372,7 @@ function SignInInner() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="mt-1 flex w-full items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-slate-900 shadow-md shadow-orange-100 transition hover:bg-[#fb923c] disabled:cursor-not-allowed disabled:opacity-70"
+            className="mt-1 flex w-full items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-slate-900 shadow-md shadow-orange-100 transition hover:bg-[#348f6c] disabled:cursor-not-allowed disabled:opacity-70"
             style={{ ["--brand-blue" as any]: BRAND_BLUE }}
           >
             {isSubmitting
@@ -404,8 +404,13 @@ export default function SignInPage() {
     <Suspense
       fallback={
         <main className="flex min-h-screen items-center justify-center landing-surface px-4">
-          <div className="rounded-3xl bg-white/90 p-6 text-[12px] text-slate-600 shadow">
-            로그인 화면을 준비 중입니다...
+          <div className="w-full max-w-md rounded-3xl bg-white/90 p-6 shadow-lg shadow-orange-100" aria-label="로그인 화면 불러오는 중">
+            <div className="h-4 w-24 animate-pulse rounded bg-orange-100" />
+            <div className="mt-4 h-7 w-20 animate-pulse rounded bg-slate-100" />
+            <div className="mt-2 h-3 w-3/4 animate-pulse rounded bg-slate-100" />
+            <div className="mt-6 h-10 animate-pulse rounded-xl bg-slate-100" />
+            <div className="mt-3 h-10 animate-pulse rounded-xl bg-slate-100" />
+            <div className="mt-4 h-11 animate-pulse rounded-xl bg-orange-100" />
           </div>
         </main>
       }

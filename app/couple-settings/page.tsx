@@ -38,7 +38,7 @@ function Toggle({
         className={[
           "relative inline-flex h-8 w-14 items-center rounded-full border transition",
           value
-            ? "border-orange-200 bg-[#ff8a3d]"
+            ? "border-orange-200 bg-[#1f7a5b]"
             : "border-slate-200 bg-slate-100",
         ].join(" ")}
         aria-pressed={value}
@@ -158,7 +158,7 @@ export default function CoupleSettingsPage() {
           <div className="mt-4">
             <Link
               href="/sign-in"
-              className="inline-flex items-center justify-center rounded-xl bg-[#ff8a3d] px-4 py-2 text-[12px] font-bold text-white hover:bg-[#fb923c]"
+              className="inline-flex items-center justify-center rounded-xl bg-[#1f7a5b] px-4 py-2 text-[12px] font-bold text-white hover:bg-[#348f6c]"
             >
               로그인하기
             </Link>
@@ -181,7 +181,7 @@ export default function CoupleSettingsPage() {
             <div className="mt-4 flex flex-wrap gap-2">
               <Link
                 href="/couple-link"
-                className="inline-flex items-center justify-center rounded-xl bg-[#ff8a3d] px-4 py-2 text-[12px] font-bold text-white hover:bg-[#fb923c]"
+                className="inline-flex items-center justify-center rounded-xl bg-[#1f7a5b] px-4 py-2 text-[12px] font-bold text-white hover:bg-[#348f6c]"
               >
                 커플 연결하러 가기
               </Link>
@@ -204,7 +204,7 @@ export default function CoupleSettingsPage() {
               <div
                 className={`min-w-[220px] rounded-2xl px-4 py-3 text-[12px] font-semibold text-white shadow-xl ${
                   toast.type === "success"
-                    ? "bg-[#ff8a3d]"
+                    ? "bg-[#1f7a5b]"
                     : toast.type === "error"
                     ? "bg-red-500"
                     : "bg-slate-900"
@@ -275,7 +275,7 @@ export default function CoupleSettingsPage() {
           <button
             onClick={save}
             disabled={saving || !changed}
-            className="inline-flex items-center justify-center rounded-xl bg-[#ff8a3d] px-5 py-2 text-[12px] font-extrabold text-white hover:bg-[#fb923c] disabled:opacity-60"
+            className="inline-flex items-center justify-center rounded-xl bg-[#1f7a5b] px-5 py-2 text-[12px] font-extrabold text-white hover:bg-[#348f6c] disabled:opacity-60"
           >
             {saving ? "저장 중…" : changed ? "설정 저장" : "변경 없음"}
           </button>
@@ -304,7 +304,7 @@ export default function CoupleSettingsPage() {
           <div
             className={`min-w-[220px] rounded-2xl px-4 py-3 text-[12px] font-semibold text-white shadow-xl ${
               toast.type === "success"
-                ? "bg-[#ff8a3d]"
+                ? "bg-[#1f7a5b]"
                 : toast.type === "error"
                 ? "bg-red-500"
                 : "bg-slate-900"

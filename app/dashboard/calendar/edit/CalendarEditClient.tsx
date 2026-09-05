@@ -7,9 +7,9 @@ import { ArrowLeft, Check, Plus, X } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 
-const BRAND_blue = "#ff8a3d";
-const BRAND_BLUE1 = "#fed7aa";
-const BRAND_BLUE2 = "#ffedd5";
+const BRAND_blue = "#1f7a5b";
+const BRAND_BLUE1 = "#c6e2d4";
+const BRAND_BLUE2 = "#dcefe5";
 
 
 /** 항목 단위 (메모 + 금액 + 카테고리) */
@@ -37,6 +37,11 @@ type FormState = {
 };
 
 type SectionKey = "income" | "expense" | "saving";
+
+type MonthlyGoal = {
+  expense: number;
+  saving: number;
+};
 
 /** YYYY-MM-DD + delta일 이동 */
 function getAdjacentDate(dateStr: string, delta: number) {
@@ -176,6 +181,13 @@ export default function CalendarEditClient() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [monthlyGoal, setMonthlyGoal] = useState<MonthlyGoal>({ expense: 0, saving: 0 });
+  const [goalExpenseInput, setGoalExpenseInput] = useState("");
+  const [goalSavingInput, setGoalSavingInput] = useState("");
+  const [monthlyBaseTotals, setMonthlyBaseTotals] = useState({ expense: 0, saving: 0 });
+  const [savingGoal, setSavingGoal] = useState(false);
+
+  const monthKey = useMemo(() => dateParam?.slice(0, 7) ?? "", [dateParam]);
 
   /** 1) dateParam이 바뀔 때마다 Supabase에서 해당 날짜 데이터 조회 */
   useEffect(() => {
@@ -302,6 +314,48 @@ export default function CalendarEditClient() {
     };
   }, [dateParam]);
 
+  /** 현재 작성 중인 날짜를 제외한 월 누적과 목표를 불러온다. */
+  useEffect(() => {
+    if (!dateParam || !monthKey) return;
+    let cancelled = false;
+
+    const loadMonthlyGoalAndTotals = async () => {
+      const { data: authData } = await supabase.auth.getUser();
+      const user = authData.user;
+      if (!user || cancelled) return;
+
+      const savedGoals = (user.user_metadata?.monthly_goals ?? {}) as Record<string, MonthlyGoal>;
+      const savedGoal = savedGoals[monthKey] ?? { expense: 0, saving: 0 };
+      if (!cancelled) {
+        setMonthlyGoal(savedGoal);
+        setGoalExpenseInput(savedGoal.expense ? String(savedGoal.expense) : "");
+        setGoalSavingInput(savedGoal.saving ? String(savedGoal.saving) : "");
+      }
+
+      const monthStart = `${monthKey}-01`;
+      const [year, month] = monthKey.split("-").map(Number);
+      const nextMonth = new Date(year, month, 1);
+      const monthEnd = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, "0")}-01`;
+      const { data } = await supabase
+        .from("daily_recipes")
+        .select("expense_total, saving_total")
+        .eq("user_id", user.id)
+        .gte("date", monthStart)
+        .lt("date", monthEnd)
+        .neq("date", dateParam);
+
+      if (!cancelled) {
+        setMonthlyBaseTotals({
+          expense: (data ?? []).reduce((sum, row) => sum + Number(row.expense_total || 0), 0),
+          saving: (data ?? []).reduce((sum, row) => sum + Number(row.saving_total || 0), 0),
+        });
+      }
+    };
+
+    loadMonthlyGoalAndTotals();
+    return () => { cancelled = true; };
+  }, [dateParam, monthKey]);
+
   /** 섹션별 아이템 접근용 유틸 */
   const getItems = (section: SectionKey) =>
     section === "income"
@@ -332,6 +386,10 @@ export default function CalendarEditClient() {
     () => form.savingItems.reduce((s, i) => s + (i.amount || 0), 0),
     [form.savingItems]
   );
+  const monthlyExpense = monthlyBaseTotals.expense + expenseTotal;
+  const monthlySaving = monthlyBaseTotals.saving + savingTotal;
+  const expenseRate = monthlyGoal.expense > 0 ? (monthlyExpense / monthlyGoal.expense) * 100 : 0;
+  const savingRate = monthlyGoal.saving > 0 ? (monthlySaving / monthlyGoal.saving) * 100 : 0;
 
   /** 아이템 추가/변경/삭제 */
   const handleAddItem = (section: SectionKey) => {
@@ -399,6 +457,33 @@ export default function CalendarEditClient() {
       section,
       items.filter((item) => item.id !== id)
     );
+  };
+
+  const saveMonthlyGoal = async () => {
+    if (!monthKey) return;
+    const nextGoal = {
+      expense: Number(goalExpenseInput.replace(/\D/g, "")) || 0,
+      saving: Number(goalSavingInput.replace(/\D/g, "")) || 0,
+    };
+    setSavingGoal(true);
+    const { data: authData } = await supabase.auth.getUser();
+    const user = authData.user;
+    if (!user) {
+      setSavingGoal(false);
+      toast.error("목표는 로그인 후 저장할 수 있어요.");
+      return;
+    }
+    const monthlyGoals = { ...(user.user_metadata?.monthly_goals ?? {}), [monthKey]: nextGoal };
+    const { error } = await supabase.auth.updateUser({ data: { monthly_goals: monthlyGoals } });
+    setSavingGoal(false);
+    if (error) {
+      toast.error("목표를 저장하지 못했어요. 잠시 후 다시 시도해 주세요.");
+      return;
+    }
+    setMonthlyGoal(nextGoal);
+    setGoalExpenseInput(nextGoal.expense ? String(nextGoal.expense) : "");
+    setGoalSavingInput(nextGoal.saving ? String(nextGoal.saving) : "");
+    toast.success(`${monthKey.replace("-", "년 ")}월 목표를 저장했어요.`);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -504,8 +589,8 @@ export default function CalendarEditClient() {
         "[background-size:18px_18px]",
       ].join(" ")}
     >
-      <div className="w-full max-w-full lg:max-w-[1320px] mx-auto flex flex-col">
-        <header className="flex items-center justify-between px-4 sm:px-8 lg:px-0 py-4 bg-white/90">
+      <div className="w-full max-w-full lg:max-w-[1180px] mx-auto flex flex-col">
+        <header className="flex items-center justify-between px-4 py-5 sm:px-8 lg:px-0">
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push("/dashboard/calendar")}
@@ -516,11 +601,11 @@ export default function CalendarEditClient() {
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
                 <h1 className="text-base sm:text-lg font-semibold tracking-tight">
-                  하루 지출 레시피 작성
+                  오늘의 지출 기록
                 </h1>
               </div>
               <p className="text-[11px] sm:text-xs text-neutral-500">
-                구분/세부는 드롭다운으로 정리하고, 메모는 선택으로 남겨요.
+                금액부터 입력한 뒤, 필요한 경우에만 분류와 메모를 더해보세요.
               </p>
             </div>
           </div>
@@ -529,27 +614,27 @@ export default function CalendarEditClient() {
             type="submit"
             form="daily-recipe-form"
             className="inline-flex min-w-[120px] items-center justify-center gap-1.5 rounded-[10px] px-3 sm:px-4 py-1.5 text-xs sm:text-[12px] font-medium shadow-sm"
-            style={{ backgroundColor: BRAND_blue, color: "#111827" }}
+            style={{ backgroundColor: BRAND_blue, color: "#ffffff" }}
           >
             <Check size={16} />
             레시피 저장
           </button>
         </header>
 
-        <section className="w-full max-w-full lg:max-w-[90vw] mx-auto flex flex-col">
+        <section className="w-full max-w-full mx-auto flex flex-col px-4 pb-8 sm:px-8 lg:px-0">
           <form id="daily-recipe-form" onSubmit={handleSubmit} className="w-full space-y-4">
-            <div className="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 shadow-sm">
+            <div className="rounded-2xl border border-[#c6e2d4] bg-[#eaf5ef] px-4 py-3.5 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="flex flex-col">
-                  <span className="text-[11px] font-medium text-[#lab(38 6.8 -34.85)]-700">
-                    오늘의 레시피 날짜
+                  <span className="text-[11px] font-semibold text-[#176247]">
+                    기록할 날짜
                   </span>
-                  <span className="text-[12px] sm:text-base font-semibold text-blue-900">
+                  <span className="text-[12px] sm:text-base font-bold text-slate-900">
                     {prettyDate}
                   </span>
                 </div>
                 {dateParam && (
-                  <span className="text-[11px] text-blue-700/80">
+                  <span className="text-[11px] text-[#176247]">
                     {dateParam.replace(/-/g, ".")}
                   </span>
                 )}
@@ -562,7 +647,7 @@ export default function CalendarEditClient() {
                     onClick={() =>
                       router.push(`/dashboard/calendar/edit?date=${getAdjacentDate(dateParam, -1)}`)
                     }
-                    className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-white/70 px-3 py-1 hover:bg-blue-50"
+                    className="inline-flex items-center gap-1 rounded-full border border-[#b9dfcb] bg-transparent px-3 py-1.5 font-medium transition hover:bg-white/60"
                   >
                     <ArrowLeft size={12} />
                     전날로 이동
@@ -572,7 +657,7 @@ export default function CalendarEditClient() {
                     onClick={() =>
                       router.push(`/dashboard/calendar/edit?date=${getAdjacentDate(dateParam, +1)}`)
                     }
-                    className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-white/70 px-3 py-1 hover:bg-blue-50"
+                    className="inline-flex items-center gap-1 rounded-full border border-[#b9dfcb] bg-transparent px-3 py-1.5 font-medium transition hover:bg-white/60"
                   >
                     다음날로 이동
                     <ArrowLeft size={12} className="rotate-180" />
@@ -581,7 +666,33 @@ export default function CalendarEditClient() {
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <p className="px-1 text-[11px] font-medium text-slate-500">
+              <span className="font-bold text-[#176247]">빠른 기록</span> · 1. 금액 입력 → 2. 구분 선택 → 3. 메모는 필요할 때만 입력
+            </p>
+
+            <section className="grid overflow-hidden rounded-2xl border border-[#dbe9e1] bg-white lg:grid-cols-[0.9fr_1.1fr]">
+              <div className="border-b border-[#edf3ef] p-4 lg:border-b-0 lg:border-r sm:p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h2 className="text-[14px] font-bold text-slate-900">이번 달 목표</h2>
+                    <p className="mt-1 text-[11px] leading-5 text-slate-500">매달 원하는 지출 한도와 저축액을 설정하세요.</p>
+                  </div>
+                  <span className="shrink-0 rounded-full bg-[#eaf5ef] px-2 py-1 text-[10px] font-bold text-[#176247]">{monthKey.replace("-", ".")}</span>
+                </div>
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  <label className="min-w-0"><span className="mb-1 block text-[10px] font-semibold text-slate-500">지출 목표</span><input inputMode="numeric" value={goalExpenseInput ? Number(goalExpenseInput).toLocaleString("ko-KR") : ""} onChange={(e) => setGoalExpenseInput(e.target.value.replace(/\D/g, ""))} placeholder="예: 150만" className="h-9 w-full rounded-lg border border-[#dbe9e1] px-2.5 text-[12px] outline-none placeholder:text-slate-300 focus:border-[#1f7a5b]" /></label>
+                  <label className="min-w-0"><span className="mb-1 block text-[10px] font-semibold text-slate-500">저축 목표</span><input inputMode="numeric" value={goalSavingInput ? Number(goalSavingInput).toLocaleString("ko-KR") : ""} onChange={(e) => setGoalSavingInput(e.target.value.replace(/\D/g, ""))} placeholder="예: 50만" className="h-9 w-full rounded-lg border border-[#dbe9e1] px-2.5 text-[12px] outline-none placeholder:text-slate-300 focus:border-[#1f7a5b]" /></label>
+                </div>
+                <button type="button" onClick={saveMonthlyGoal} disabled={savingGoal} className="mt-3 h-9 w-full rounded-lg bg-[#1f7a5b] text-[12px] font-bold text-white disabled:opacity-50">{savingGoal ? "저장 중…" : "이번 달 목표 저장"}</button>
+              </div>
+
+              <div className="grid gap-4 p-4 sm:grid-cols-2 sm:p-5">
+                <GoalProgress label="지출" current={monthlyExpense} target={monthlyGoal.expense} rate={expenseRate} mode="expense" />
+                <GoalProgress label="저축" current={monthlySaving} target={monthlyGoal.saving} rate={savingRate} mode="saving" />
+              </div>
+            </section>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
               <RecipeCard
                 sectionKey="income"
                 title="들어온 재료 (수입)"
@@ -659,6 +770,41 @@ type RecipeCardProps = {
   placeholderAmount: string;
 };
 
+function GoalProgress({
+  label,
+  current,
+  target,
+  rate,
+  mode,
+}: {
+  label: "지출" | "저축";
+  current: number;
+  target: number;
+  rate: number;
+  mode: "expense" | "saving";
+}) {
+  const hasTarget = target > 0;
+  const isOver = mode === "expense" && hasTarget && current > target;
+  const color = isOver ? "bg-rose-500" : "bg-[#1f7a5b]";
+  const remaining = mode === "expense" ? Math.max(target - current, 0) : Math.max(target - current, 0);
+
+  return (
+    <div>
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-[12px] font-bold text-slate-800">이번 달 {label}</p>
+        <span className={`text-[11px] font-bold ${isOver ? "text-rose-600" : "text-[#176247]"}`}>{hasTarget ? `${rate.toFixed(0)}%` : "목표 없음"}</span>
+      </div>
+      <p className="mt-2 text-[17px] font-bold tracking-[-0.04em] text-slate-900">{current.toLocaleString("ko-KR")}원</p>
+      {hasTarget ? (
+        <>
+          <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#eaf5ef]"><div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${Math.min(rate, 100)}%` }} /></div>
+          <p className="mt-2 text-[10px] text-slate-500">목표 {target.toLocaleString("ko-KR")}원 · {mode === "expense" ? (isOver ? `${(current - target).toLocaleString("ko-KR")}원 초과` : `${remaining.toLocaleString("ko-KR")}원 남음`) : (current >= target ? "목표 달성" : `${remaining.toLocaleString("ko-KR")}원 더 모으면 달성`)}</p>
+        </>
+      ) : <p className="mt-2 text-[10px] text-slate-400">왼쪽에서 목표 금액을 설정해보세요.</p>}
+    </div>
+  );
+}
+
 function RecipeCard({
   sectionKey,
   title,
@@ -674,24 +820,24 @@ function RecipeCard({
 }: RecipeCardProps) {
   const toneStyle =
     tone === "income"
-      ? "border-sky-200 bg-sky-50/80"
+      ? "border-[#c6e2d4] bg-white"
       : tone === "expense"
-      ? "border-blue-200 bg-blue-50/80"
-      : "border-blue-200 bg-blue-50/80";
+      ? "border-[#dbe9e1] bg-white"
+      : "border-[#c6e2d4] bg-[#f7fcf9]";
 
   const totalColor =
     tone === "income"
-      ? "text-sky-700"
+      ? "text-[#176247]"
       : tone === "expense"
-      ? "text-blue-700"
-      : "text-blue-700";
+      ? "text-slate-800"
+      : "text-[#176247]";
 
   const optionMap = CATEGORY_OPTIONS[sectionKey];
 
   return (
     <section
       className={[
-        "rounded-2xl border shadow-sm px-3.5 py-3 flex flex-col gap-2.5",
+        "rounded-2xl border px-4 py-4 shadow-[0_3px_12px_rgba(31,122,91,0.05)] flex flex-col gap-3",
         toneStyle,
       ].join(" ")}
     >
@@ -723,17 +869,19 @@ function RecipeCard({
               ].join(" ")}
             >
               {/* ✅ 구분/세부: 1개 드롭다운(단계형) */}
-              <CategoryCascadeSelect
-                disabled={recurring}
-                category={item.category || ""}
-                subcategory={item.subcategory || ""}
-                optionMap={optionMap}
-                onChangeCategory={(v) => onChange(item.id, "category", v)}
-                onChangeSubcategory={(v) => onChange(item.id, "subcategory", v)}
-              />
+              <div className="order-2">
+                <CategoryCascadeSelect
+                  disabled={recurring}
+                  category={item.category || ""}
+                  subcategory={item.subcategory || ""}
+                  optionMap={optionMap}
+                  onChangeCategory={(v) => onChange(item.id, "category", v)}
+                  onChangeSubcategory={(v) => onChange(item.id, "subcategory", v)}
+                />
+              </div>
 
               {/* ✅ 메모(label) */}
-              <div className="flex-1 flex items-center gap-1">
+              <div className="order-3 flex flex-1 items-center gap-1">
                 <input
                   type="text"
                   readOnly={recurring}
@@ -756,10 +904,11 @@ function RecipeCard({
               </div>
 
               {/* 금액 */}
-              <div className="relative w-24 shrink-0">
+              <div className="order-1 relative w-28 shrink-0">
                 <input
                   type="number"
                   min={0}
+                  inputMode="numeric"
                   className={[
                     "w-full rounded-md border px-2 py-1 pr-7 text-[11px] text-right outline-none focus:border-neutral-400",
                     "border-neutral-200 bg-white",
@@ -835,7 +984,8 @@ function CategoryCascadeSelect({
   const rootRef = React.useRef<HTMLDivElement | null>(null);
 
   const [open, setOpen] = React.useState(false);
-  const [step, setStep] = React.useState<1 | 2>(1);
+  const [step, setStep] = React.useState<1 | 2 | 3>(1);
+  const [customCategory, setCustomCategory] = React.useState("");
 
   // 드롭다운 내부에서 즉시 보여줄 임시 category
   const [activeCategory, setActiveCategory] = React.useState<string>(category || "");
@@ -892,6 +1042,16 @@ function CategoryCascadeSelect({
     setStep(1);
   };
 
+  const saveCustomCategory = () => {
+    const value = customCategory.trim();
+    if (!value) return;
+    setActiveCategory(value);
+    onChangeCategory(value);
+    setOpen(false);
+    setStep(1);
+    setCustomCategory("");
+  };
+
   return (
     <div ref={rootRef} className="relative shrink-0" data-cascade-root="1">
       <button
@@ -902,9 +1062,10 @@ function CategoryCascadeSelect({
           setOpen((v) => !v);
           setStep(1);
           setActiveCategory(category || "");
+          setCustomCategory("");
         }}
         className={[
-          "h-[30px] w-[6rem] rounded-md border px-2",
+          "h-[32px] w-[7.25rem] rounded-md border px-2",
           "text-[11px] flex items-center justify-between gap-2",
           "outline-none focus:border-neutral-400",
           disabled
@@ -918,14 +1079,14 @@ function CategoryCascadeSelect({
       </button>
 
       {open && !disabled && (
-        <div className="absolute z-50 mt-1 w-[240px] rounded-xl border border-neutral-200 bg-white shadow-lg overflow-hidden">
+        <div className="absolute right-0 z-50 mt-1 w-[240px] overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-lg sm:left-0 sm:right-auto">
           {/* Header */}
           <div className="flex items-center justify-between px-3 py-2 border-b border-neutral-100">
             <div className="text-[10px] text-neutral-500">
-              {step === 1 ? "1) 구분 선택" : "2) 세부 선택"}
+              {step === 1 ? "구분 선택" : step === 2 ? "세부 선택" : "새 구분 직접 입력"}
             </div>
             <div className="flex items-center gap-1">
-              {step === 2 && (
+              {step !== 1 && (
                 <button
                   type="button"
                   onClick={() => setStep(1)}
@@ -977,6 +1138,14 @@ function CategoryCascadeSelect({
                     </div>
                   </button>
                 ))}
+                <button
+                  type="button"
+                  onClick={() => setStep(3)}
+                  className="mt-1 flex w-full items-center gap-2 border-t border-[#edf3ef] px-3 py-3 text-left text-[11px] font-semibold text-[#176247] hover:bg-[#f1f8f4]"
+                >
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#eaf5ef] text-[14px]">+</span>
+                  목록에 없는 구분 직접 입력
+                </button>
               </>
             )}
 
@@ -1010,6 +1179,34 @@ function CategoryCascadeSelect({
                   ))
                 )}
               </>
+            )}
+
+            {step === 3 && (
+              <div className="p-3">
+                <p className="mb-2 text-[10px] leading-4 text-neutral-500">예: 반려동물, 부모님 용돈, 프로젝트 비용</p>
+                <input
+                  autoFocus
+                  value={customCategory}
+                  onChange={(e) => setCustomCategory(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      saveCustomCategory();
+                    }
+                  }}
+                  maxLength={20}
+                  placeholder="새 구분 이름"
+                  className="h-9 w-full rounded-lg border border-[#c6e2d4] bg-white px-3 text-[12px] outline-none placeholder:text-neutral-400 focus:border-[#1f7a5b]"
+                />
+                <button
+                  type="button"
+                  onClick={saveCustomCategory}
+                  disabled={!customCategory.trim()}
+                  className="mt-2 h-9 w-full rounded-lg bg-[#1f7a5b] text-[12px] font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  이 구분으로 선택
+                </button>
+              </div>
             )}
           </div>
 

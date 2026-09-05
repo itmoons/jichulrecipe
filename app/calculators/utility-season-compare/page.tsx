@@ -15,7 +15,7 @@ const UI = {
     "bg-[radial-gradient(circle,rgba(251,146,60,0.14)_1px,transparent_1px)] bg-[size:16px_16px] mx-auto w-full max-w-[1320px] px-3 py-4 sm:px-4 sm:py-6",
   ink: "text-[#3B2F1E]",
   inkSoft: "text-[#7f7f7f]",
-  card: "bg-[#fff7ed] border-[#ffedd5]",
+  card: "bg-[#f1f8f4] border-[#dcefe5]",
 };
 
 type MonthBlock = {
@@ -74,13 +74,13 @@ function signalFrom(momPct: number, yoyPct: number) {
   if (absYoY <= 20 && absMoM <= 30) {
     return {
       label: "주의",
-      badge: "bg-[#ff8a3d] text-[#ffffff]",
+      badge: "bg-[#1f7a5b] text-[#ffffff]",
       msg: "변동이 눈에 띕니다. YoY가 크면 요금/사용량 변화, MoM이 크면 단기 이벤트(폭염/한파/여행/시설수리) 가능성을 점검하세요.",
     };
   }
   return {
     label: "점검 필요",
-    badge: "bg-[#ff8a3d] text-white",
+    badge: "bg-[#1f7a5b] text-white",
     msg: "변동이 큽니다. 고지서 내역(사용량/단가/할인)과 관리비 항목(수선충당금/공용전기 등)을 분해해서 확인하는 게 좋습니다.",
   };
 }
@@ -166,20 +166,20 @@ export default function UtilitySeasonComparePage() {
           <div className="mb-5 flex items-center justify-between gap-3">
             <Link
               href="/calculators"
-              className="rounded-full border border-[#ffedd5] bg-[#fff7ed] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
+              className="rounded-full border border-[#dcefe5] bg-[#f1f8f4] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]"
             >
               ← 계산기 모음
             </Link>
 
-            <span className="rounded-full bg-[#ff8a3d] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
+            <span className="rounded-full bg-[#1f7a5b] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
               공과금 점검
             </span>
           </div>
 
           {/* 헤더 */}
           <div className="mb-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#ffedd5] bg-[#fff7ed] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm">
-              <span className="inline-block h-2 w-2 rounded-full bg-[#ff8a3d]" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#dcefe5] bg-[#f1f8f4] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm">
+              <span className="inline-block h-2 w-2 rounded-full bg-[#1f7a5b]" />
               Recipe Calculator
             </div>
 
@@ -202,13 +202,13 @@ export default function UtilitySeasonComparePage() {
 
               <div className="mt-4 grid gap-4">
                 <MonthBox title="이번 달(기준)" block={current} onChange={setCurrent} chip="기준" />
-                <div className="h-px bg-[#ffedd5]" />
+                <div className="h-px bg-[#dcefe5]" />
                 <MonthBox title="전월" block={prev} onChange={setPrev} chip="MoM" />
-                <div className="h-px bg-[#ffedd5]" />
+                <div className="h-px bg-[#dcefe5]" />
                 <MonthBox title="전년동월" block={lastYear} onChange={setLastYear} chip="YoY" />
               </div>
 
-              <div className="mt-5 rounded-2xl border border-[#ffedd5] bg-white p-4">
+              <div className="mt-5 rounded-2xl border border-[#dcefe5] bg-white p-4">
                 <div className={cn("text-[12px] font-semibold", UI.ink)}>해석 가이드</div>
                 <ul className={cn("mt-2 list-disc pl-5 text-[12px] leading-relaxed", UI.inkSoft)}>
                   <li><b>YoY</b>는 계절성/기저효과를 어느 정도 제거해 “구조적 변화(요금/사용량)”를 보기 좋습니다.</li>
@@ -242,7 +242,7 @@ export default function UtilitySeasonComparePage() {
                 />
               </div>
 
-              <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
+              <div className="mt-4 rounded-2xl border border-[#dcefe5] bg-white p-4">
                 <div className={cn("text-[12px] font-semibold", UI.ink)}>증감(핵심)</div>
 
                 <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -264,7 +264,7 @@ export default function UtilitySeasonComparePage() {
               </div>
 
               {/* 항목별 기여 */}
-              <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
+              <div className="mt-4 rounded-2xl border border-[#dcefe5] bg-white p-4">
                 <div className="flex items-center justify-between gap-3">
                   <div className={cn("text-[12px] font-semibold", UI.ink)}>항목별 기여도(증감액)</div>
                   <div className={cn("text-xs", UI.inkSoft)}>MoM / YoY</div>
@@ -286,13 +286,13 @@ export default function UtilitySeasonComparePage() {
               <div className="mt-5 flex flex-col gap-2 sm:flex-row">
                 <Link
                   href="/calculators/food-budget-cap"
-                  className="rounded-2xl bg-[#ff8a3d] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+                  className="rounded-2xl bg-[#1f7a5b] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
                 >
                   다음: 식비 상한선 계산기 →
                 </Link>
                 <Link
                   href="/calculators"
-                  className="rounded-2xl border border-[#ffedd5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
+                  className="rounded-2xl border border-[#dcefe5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]"
                 >
                   계산기 모음으로
                 </Link>
@@ -325,13 +325,13 @@ function MonthBox({
   const patch = (k: keyof MonthBlock, v: string) => onChange({ ...block, [k]: v });
 
   return (
-    <div className="rounded-2xl border border-[#ffedd5] bg-white p-4">
+    <div className="rounded-2xl border border-[#dcefe5] bg-white p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-[12px] font-semibold text-[#3B2F1E]">{title}</div>
           <div className="mt-1 text-xs text-[#7f7f7f]">전기/가스/수도/관리비/기타</div>
         </div>
-        <span className="rounded-full bg-[#ff8a3d] px-3 py-1 text-xs font-semibold text-[#ffffff]">
+        <span className="rounded-full bg-[#1f7a5b] px-3 py-1 text-xs font-semibold text-[#ffffff]">
           {chip}
         </span>
       </div>
@@ -344,7 +344,7 @@ function MonthBox({
         <MoneyInput label="기타" value={block.etc} setValue={(v) => patch("etc", v)} hint="난방비/공용시설 등" />
       </div>
 
-      <div className="mt-3 rounded-xl border border-[#ffedd5] bg-[#ff8a3d] px-3 py-2 text-xs font-semibold text-[#7f7f7f]">
+      <div className="mt-3 rounded-xl border border-[#dcefe5] bg-[#1f7a5b] px-3 py-2 text-xs font-semibold text-[#7f7f7f]">
         합계(미리보기):{" "}
         <span className="text-[#ffffff]">
           {formatKRW(sumBlock(block).total)}원
@@ -382,7 +382,7 @@ function MoneyInput({
           placeholder="0"
           className={cn(
             "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-[12px] outline-none",
-            "border-[#ffedd5] focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ff8a3d]/20"
+            "border-[#dcefe5] focus:border-[#1f7a5b] focus:ring-2 focus:ring-[#1f7a5b]/20"
           )}
         />
       </div>
@@ -392,7 +392,7 @@ function MoneyInput({
 
 function MetricCard({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[#ffedd5] bg-white p-4">
+    <div className="rounded-2xl border border-[#dcefe5] bg-white p-4">
       <div className="text-xs font-semibold text-[#7f7f7f]">{title}</div>
       <div className="mt-1 text-xl font-bold text-[#3B2F1E]">{value}</div>
     </div>
@@ -411,11 +411,11 @@ function DeltaCard({
   const up = diff > 0;
   const down = diff < 0;
 
-  const badge = up ? "bg-[#ff8a3d] text-white" : down ? "bg-[#34D399] text-white" : "bg-[#ff8a3d] text-[#ffffff]";
+  const badge = up ? "bg-[#1f7a5b] text-white" : down ? "bg-[#34D399] text-white" : "bg-[#1f7a5b] text-[#ffffff]";
   const sign = diff >= 0 ? "+" : "";
 
   return (
-    <div className="rounded-2xl border border-[#ffedd5] bg-[#fff7ed] p-4">
+    <div className="rounded-2xl border border-[#dcefe5] bg-[#f1f8f4] p-4">
       <div className="flex items-center justify-between">
         <div className="text-[12px] font-semibold text-[#3B2F1E]">{title}</div>
         <span className={cn("rounded-full px-3 py-1 text-xs font-semibold", badge)}>
@@ -442,7 +442,7 @@ function ContribRow({ label, mom, yoy }: { label: string; mom: number; yoy: numb
   const yoySign = yoy >= 0 ? "+" : "";
 
   return (
-    <div className="flex items-center justify-between rounded-xl border border-[#ffedd5] bg-[#fff7ed] px-3 py-2">
+    <div className="flex items-center justify-between rounded-xl border border-[#dcefe5] bg-[#f1f8f4] px-3 py-2">
       <span className="text-[12px] font-semibold text-[#3B2F1E]">{label}</span>
       <div className="flex items-center gap-3 text-[12px] font-semibold">
         <span className={cn("min-w-[110px] text-right", momTone)}>
@@ -460,7 +460,7 @@ function ContribRow({ label, mom, yoy }: { label: string; mom: number; yoy: numb
 
 function TopBox({ title, rows }: { title: string; rows: Array<{ k: string; v: number }> }) {
   return (
-    <div className="rounded-2xl border border-[#ffedd5] bg-[#fff7ed] p-4">
+    <div className="rounded-2xl border border-[#dcefe5] bg-[#f1f8f4] p-4">
       <div className="text-[12px] font-semibold text-[#3B2F1E]">{title}</div>
       <div className="mt-2 grid gap-2">
         {rows.map((r) => {
@@ -469,7 +469,7 @@ function TopBox({ title, rows }: { title: string; rows: Array<{ k: string; v: nu
           return (
             <div
               key={r.k}
-              className="flex items-center justify-between rounded-xl border border-[#ffedd5] bg-white px-3 py-2"
+              className="flex items-center justify-between rounded-xl border border-[#dcefe5] bg-white px-3 py-2"
             >
               <span className="text-xs font-semibold text-[#7f7f7f]">{r.k}</span>
               <span className={cn("text-[12px] font-bold", tone)}>

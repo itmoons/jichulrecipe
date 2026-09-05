@@ -181,7 +181,7 @@ export default function CoupleLinkPage() {
           <div className="mt-4">
             <Link
               href="/sign-in"
-              className="inline-flex items-center justify-center rounded-xl bg-[#ff8a3d] px-4 py-2 text-[12px] font-bold text-white hover:bg-[#fb923c]"
+              className="inline-flex items-center justify-center rounded-xl bg-[#1f7a5b] px-4 py-2 text-[12px] font-bold text-white hover:bg-[#348f6c]"
             >
               로그인하기
             </Link>
@@ -241,7 +241,7 @@ export default function CoupleLinkPage() {
 
               <Link
                 href="/couple-ledger"
-                className="inline-flex items-center justify-center rounded-xl bg-[#ff8a3d] px-4 py-2 text-[12px] font-bold text-white hover:bg-[#fb923c]"
+                className="inline-flex items-center justify-center rounded-xl bg-[#1f7a5b] px-4 py-2 text-[12px] font-bold text-white hover:bg-[#348f6c]"
               >
                 커플 장부로 이동
               </Link>
@@ -256,7 +256,7 @@ export default function CoupleLinkPage() {
               <button
                 onClick={createInvite}
                 disabled={creating}
-                className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-[#ff8a3d] px-4 py-2 text-[12px] font-bold text-white hover:bg-[#fb923c] disabled:opacity-60"
+                className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-[#1f7a5b] px-4 py-2 text-[12px] font-bold text-white hover:bg-[#348f6c] disabled:opacity-60"
               >
                 {creating ? "생성 중…" : "인증코드 만들기"}
               </button>
@@ -323,7 +323,7 @@ export default function CoupleLinkPage() {
           <div
             className={`min-w-[220px] rounded-2xl px-4 py-3 text-[12px] font-semibold text-white shadow-xl ${
               toast.type === "success"
-                ? "bg-[#ff8a3d]"
+                ? "bg-[#1f7a5b]"
                 : toast.type === "error"
                 ? "bg-red-500"
                 : "bg-slate-900"

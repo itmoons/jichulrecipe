@@ -39,12 +39,12 @@ export default function PrepaymentFeeBreakevenPage() {
 
     const verdict =
       P <= 0
-        ? { label: "입력 필요", badge: "bg-[#ff8a3d] text-[#ffffff]" }
+        ? { label: "입력 필요", badge: "bg-[#1f7a5b] text-[#ffffff]" }
         : net > 0
         ? { label: "손익상 유리", badge: "bg-[#34D399] text-white" }
         : net < 0
-        ? { label: "손익상 불리", badge: "bg-[#ff8a3d] text-white" }
-        : { label: "비슷", badge: "bg-[#ff8a3d] text-[#ffffff]" };
+        ? { label: "손익상 불리", badge: "bg-[#1f7a5b] text-white" }
+        : { label: "비슷", badge: "bg-[#1f7a5b] text-[#ffffff]" };
 
     return { P, n, pay, interestRemain, fee, net, verdict };
   }, [remainingPrincipal, annualRate, remainingMonths, prepayFeeRate]);
@@ -92,7 +92,7 @@ export default function PrepaymentFeeBreakevenPage() {
             <MetricCard title="단순 손익(이자-수수료)" value={`${formatKRW(calc.net)}원`} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
+          <div className="mt-4 rounded-2xl border border-[#dcefe5] bg-white p-4">
             <div className={cn("text-[12px] font-semibold", UI.ink)}>해석</div>
             <div className="mt-3 grid gap-2">
               <Row
@@ -109,13 +109,13 @@ export default function PrepaymentFeeBreakevenPage() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/calculators/refinance-compare"
-              className="rounded-2xl bg-[#ff8a3d] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+              className="rounded-2xl bg-[#1f7a5b] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
             >
               다음: 대환 비교 →
             </Link>
             <Link
               href="/calculators"
-              className="rounded-2xl border border-[#ffedd5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
+              className="rounded-2xl border border-[#dcefe5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]"
             >
               계산기 모음으로
             </Link>

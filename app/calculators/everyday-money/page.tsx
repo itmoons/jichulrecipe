@@ -120,12 +120,12 @@ export default function EverydayMoneyPage() {
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.05fr_1fr]">
           <section className="rounded-3xl border border-white/80 bg-white/72 p-5 shadow-[0_16px_40px_rgba(255,138,61,0.08)] backdrop-blur-xl sm:p-7">
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {tools.map((item) => <button key={item.id} onClick={() => activateTool(item.id)} className={`rounded-2xl border p-4 text-left transition ${tool === item.id ? "border-[#ff8a3d] bg-[#ff8a3d] text-slate-900 shadow-md shadow-orange-100" : "border-slate-200 bg-white text-slate-700 hover:border-orange-200 hover:bg-orange-50"}`}><span className="text-xl font-bold">{item.icon}</span><span className="mt-3 block text-sm font-bold">{item.title}</span><span className={`mt-1 block text-xs leading-5 ${tool === item.id ? "text-slate-700" : "text-slate-500"}`}>{item.description}</span></button>)}
+              {tools.map((item) => <button key={item.id} onClick={() => activateTool(item.id)} className={`rounded-2xl border p-4 text-left transition ${tool === item.id ? "border-[#1f7a5b] bg-[#1f7a5b] text-slate-900 shadow-md shadow-orange-100" : "border-slate-200 bg-white text-slate-700 hover:border-orange-200 hover:bg-orange-50"}`}><span className="text-xl font-bold">{item.icon}</span><span className="mt-3 block text-sm font-bold">{item.title}</span><span className={`mt-1 block text-xs leading-5 ${tool === item.id ? "text-slate-700" : "text-slate-500"}`}>{item.description}</span></button>)}
             </div>
             <div className="mt-7 space-y-5">{fields[tool].map((field) => <Field key={field.label} {...field} onChange={field.setter} />)}</div>
           </section>
 
-          <aside className="rounded-3xl border border-orange-100 bg-[#ffedd5] p-6 text-slate-900 shadow-xl shadow-orange-100/60 sm:p-8">
+          <aside className="rounded-3xl border border-orange-100 bg-[#dcefe5] p-6 text-slate-900 shadow-xl shadow-orange-100/60 sm:p-8">
             <p className="text-sm font-semibold text-orange-600">계산 결과</p>
             <div className="mt-4 border-b border-orange-200 pb-6"><p className="text-sm text-slate-600">{result.label}</p><p className="mt-2 text-4xl font-bold tracking-tight sm:text-5xl">{result.headline}</p></div>
             <dl className="mt-6 space-y-4">{result.rows.map(([label, value]) => <div key={label} className="flex items-center justify-between gap-4 text-sm"><dt className="text-slate-600">{label}</dt><dd className="font-bold text-slate-900">{value}</dd></div>)}</dl>

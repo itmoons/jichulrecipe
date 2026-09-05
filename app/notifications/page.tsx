@@ -45,7 +45,7 @@ export default function NotificationsPage() {
           </p>
           <Link
             href="/sign-in"
-            className="mt-4 inline-flex rounded-lg bg-[#ff8a3d] px-4 py-2 text-sm font-semibold text-white"
+            className="mt-4 inline-flex rounded-lg bg-[#1f7a5b] px-4 py-2 text-sm font-semibold text-white"
           >
             로그인하러 가기
           </Link>

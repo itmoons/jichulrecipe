@@ -518,7 +518,7 @@ export default function NotificationsPanel({
           <div
             className={`min-w-[220px] rounded-2xl px-4 py-3 text-[12px] font-semibold text-white shadow-xl ${
               toast.type === "success"
-                ? "bg-[#ff8a3d]"
+                ? "bg-[#1f7a5b]"
                 : toast.type === "error"
                 ? "bg-red-500"
                 : "bg-slate-900"

@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
-const BRAND_blue = "#ff8a3d"; // 지출레시피 메인 컬러
+const BRAND_blue = "#1f7a5b"; // 지출레시피 메인 컬러
 
 /** edit 페이지와 유사한 MoneyItem 타입 (DB JSON과 호환) */
 type MoneyItem = {
@@ -31,6 +31,18 @@ type DailyStore = {
   /** key: YYYY-MM-DD */
   [date: string]: DailyRecipe;
 };
+
+type AccountingPeriod = { basis: "calendar" | "payday"; payday: number };
+
+const DEFAULT_ACCOUNTING_PERIOD: AccountingPeriod = { basis: "calendar", payday: 25 };
+
+function normalizeAccountingPeriod(value: unknown): AccountingPeriod {
+  const data = value as Partial<AccountingPeriod> | null;
+  return {
+    basis: data?.basis === "payday" ? "payday" : "calendar",
+    payday: Math.max(1, Math.min(28, Number(data?.payday) || 25)),
+  };
+}
 
 /** 오늘의 메모용 타입 (Supabase daily_memos) */
 type TodayMemo = {
@@ -222,6 +234,23 @@ function stripRecurringItems(items: any[]) {
   });
 }
 
+function getAccountingRangeKeys(monthKey: string, period: AccountingPeriod) {
+  const [year, month] = monthKey.split("-").map(Number);
+
+  if (period.basis === "calendar") {
+    return {
+      firstKey: getDateKey(new Date(year, month - 1, 1)),
+      lastKey: getDateKey(new Date(year, month, 0)),
+    };
+  }
+
+  // 선택한 월을 마감 월로 계산합니다. 예: 9월 25일 기준 = 8/25 ~ 9/24
+  return {
+    firstKey: getDateKey(new Date(year, month - 2, period.payday)),
+    lastKey: getDateKey(new Date(year, month - 1, period.payday - 1)),
+  };
+}
+
 /** 이 월(rangeStart~rangeEnd)에 대해 모든 정기 규칙을 daily_recipes에 반영 */
 async function applyRecurringTblue(params: {
   userId: string;
@@ -371,6 +400,7 @@ export default function SpendingCalendarPage() {
   const [dailyStore, setDailyStore] = useState<DailyStore>({});
   const [dailyLoading, setDailyLoading] = useState(false);
   const [dailyError, setDailyError] = useState<string | null>(null);
+  const [accountingPeriod, setAccountingPeriod] = useState<AccountingPeriod>(DEFAULT_ACCOUNTING_PERIOD);
 
   /** 오늘 날짜 key (YYYY-MM-DD) */
   const todayKey = useMemo(() => getDateKey(new Date()), []);
@@ -391,6 +421,22 @@ export default function SpendingCalendarPage() {
   const [memoFormError, setMemoFormError] = useState<string | null>(null);
 
   const currentMonthKey = getMonthKey(currentDate);
+  const accountingRange = useMemo(
+    () => getAccountingRangeKeys(currentMonthKey, accountingPeriod),
+    [currentMonthKey, accountingPeriod]
+  );
+  // 달력 칸에는 선택한 달의 모든 기록을 보이고, 요약만 집계 기준에 맞춥니다.
+  const calendarRange = useMemo(
+    () => getAccountingRangeKeys(currentMonthKey, DEFAULT_ACCOUNTING_PERIOD),
+    [currentMonthKey]
+  );
+  const loadRange = useMemo(
+    () => ({
+      firstKey: accountingRange.firstKey < calendarRange.firstKey ? accountingRange.firstKey : calendarRange.firstKey,
+      lastKey: accountingRange.lastKey > calendarRange.lastKey ? accountingRange.lastKey : calendarRange.lastKey,
+    }),
+    [accountingRange, calendarRange]
+  );
 
   /** ⬇ 이 달의 daily_recipes를 Supabase에서 불러오기 (+ 정기 납부 자동 반영) */
   useEffect(() => {
@@ -426,14 +472,13 @@ export default function SpendingCalendarPage() {
           return;
         }
 
-        // 해당 월의 시작일과 마지막일 계산
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth(); // 0~11
-        const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0);
+        const savedPeriod = normalizeAccountingPeriod(user.user_metadata?.accounting_period);
+        if (JSON.stringify(savedPeriod) !== JSON.stringify(accountingPeriod)) {
+          setAccountingPeriod(savedPeriod);
+          return;
+        }
 
-        const firstKey = getDateKey(firstDay); // YYYY-MM-01
-        const lastKey = getDateKey(lastDay); // YYYY-MM-마지막날
+        const { firstKey, lastKey } = loadRange;
 
         // ✅ 정기 납부를 먼저 daily_recipes에 반영(실패해도 달력은 열리게)
         try {
@@ -507,7 +552,7 @@ export default function SpendingCalendarPage() {
     return () => {
       mounted = false;
     };
-  }, [currentDate]);
+  }, [accountingPeriod, currentDate, loadRange]);
 
   /** 오늘의 메모 Supabase에서 불러오기 */
   useEffect(() => {
@@ -578,14 +623,14 @@ export default function SpendingCalendarPage() {
     };
   }, [todayKey]);
 
-  /** 이 달에 해당하는 날짜만 필터링해서 월 합계 계산 */
+  /** 선택한 집계 기간에 해당하는 날짜만 필터링해서 합계 계산 */
   const totals = useMemo(() => {
     let income = 0;
     let expense = 0;
     let saving = 0;
 
     Object.entries(dailyStore).forEach(([date, recipe]) => {
-      if (!date.startsWith(currentMonthKey)) return;
+      if (date < accountingRange.firstKey || date > accountingRange.lastKey) return;
       income += Number(recipe.incomeTotal || 0);
       expense += Number(recipe.expenseTotal || 0);
       saving += Number(recipe.savingTotal || 0);
@@ -593,7 +638,7 @@ export default function SpendingCalendarPage() {
 
     const net = income - expense - saving;
     return { income, expense, saving, net };
-  }, [dailyStore, currentMonthKey]);
+  }, [accountingRange, dailyStore]);
 
   const cells = useMemo(() => buildCalendar(currentDate), [currentDate]);
 
@@ -827,14 +872,14 @@ export default function SpendingCalendarPage() {
       className="landing-surface min-h-screen flex flex-col items-stretch overflow-x-hidden text-neutral-900"
     >
       {/* 가운데 고정 폭 컨테이너 */}
-      <div className="w-full lg:w-[1320px] mx-auto flex flex-col min-w-0 px-4 sm:px-6 lg:px-0 pb-16">
+      <div className="mx-auto flex w-full max-w-[1320px] min-w-0 flex-col px-4 pb-24 sm:px-6 lg:px-0 lg:pb-16">
         {/* 상단 바 - 레시피 타이틀 */}
         <header className="mt-4 flex flex-col gap-4 rounded-3xl border border-white/90 bg-white/70 px-4 py-4 shadow-[0_12px_32px_rgba(255,138,61,0.08)] backdrop-blur sm:mt-6 sm:flex-row sm:items-center sm:justify-between sm:px-5">
           <div className="flex items-start sm:items-center gap-3">
             <span
               className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[12px] font-semibold shadow-sm shrink-0"
               style={{
-                backgroundColor: "#ffedd5",
+                backgroundColor: "#dcefe5",
                 color: "#9A3412",
               }}
             >
@@ -888,6 +933,21 @@ export default function SpendingCalendarPage() {
           </div>
         </header>
 
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-[#dbe9e1] bg-white/80 px-4 py-2.5 text-[11px] text-slate-600">
+          <p>
+            {accountingPeriod.basis === "calendar"
+              ? `매월 1일 기준 · ${accountingRange.firstKey} ~ ${accountingRange.lastKey}`
+              : `매월 ${accountingPeriod.payday}일 월급일 기준 · ${accountingRange.firstKey} ~ ${accountingRange.lastKey}`}
+          </p>
+          <button
+            type="button"
+            onClick={() => router.push("/dashboard")}
+            className="font-semibold text-[#1f7a5b] hover:underline"
+          >
+            집계 기준 변경
+          </button>
+        </div>
+
         {/* 전체 레이아웃 */}
         <section className="mt-4 flex flex-1 flex-col gap-5 lg:flex-row">
           {/* 좌측: 달력 + 요약 */}
@@ -896,15 +956,15 @@ export default function SpendingCalendarPage() {
             <div className="grid min-w-0 grid-cols-2 gap-3 text-xs sm:grid-cols-3 sm:text-[12px]">
               <div className="col-span-2 sm:col-span-1 min-w-0">
                 <SummaryChip
-                  label="이번 달 완성된 레시피(순 잔액)"
+                  label="집계 기간 순 잔액"
                   value={formatMoney(totals.net)}
                   emphasis
-                  note="수입 - 지출 - 적금"
+                  note="수입 - 지출 - 저축"
                 />
               </div>
               <div className="min-w-0">
                 <SummaryChip
-                  label="들어온 재료(수입 합계)"
+                  label="집계 기간 수입"
                   value={formatMoney(totals.income)}
                   tone="income"
                   note="월급·용돈·부수입"
@@ -912,7 +972,7 @@ export default function SpendingCalendarPage() {
               </div>
               <div className="min-w-0">
                 <SummaryChip
-                  label="사용한 재료(지출 합계)"
+                  label="집계 기간 지출"
                   value={formatMoney(totals.expense)}
                   tone="expense"
                   note="고정·변동 지출"
@@ -1008,7 +1068,7 @@ export default function SpendingCalendarPage() {
                       ].join(" ")}
                     >
                       <div className="mb-1 flex items-center justify-between">
-                        <span className={isTodayKey ? "inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#ff8a3d] px-1.5 text-[10px] font-bold text-slate-900" : "text-[11px] font-semibold text-neutral-700"}>
+                        <span className={isTodayKey ? "inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#1f7a5b] px-1.5 text-[10px] font-bold text-slate-900" : "text-[11px] font-semibold text-neutral-700"}>
                           {cell.getDate()}
                         </span>
                         {(income > 0 || expense > 0 || saving > 0) && (
@@ -1091,7 +1151,7 @@ export default function SpendingCalendarPage() {
 
           {/* 우측: 오늘의 메모 */}
           <aside className="flex w-full min-w-0 lg:flex-[0.3]">
-            <div className="flex min-w-0 w-full flex-col rounded-[28px] border border-orange-100 bg-[#fff7ed] shadow-[0_14px_28px_#ff8a3d18]">
+            <div className="flex min-w-0 w-full flex-col rounded-[28px] border border-orange-100 bg-[#f1f8f4] shadow-[0_14px_28px_#1f7a5b18]">
               <div className="flex items-center justify-between gap-3 border-b border-orange-100 px-5 py-4">
                 <div className="flex flex-col gap-0.5 min-w-0">
                   <span className="text-xs font-semibold text-orange-900">
@@ -1243,7 +1303,7 @@ export default function SpendingCalendarPage() {
                 <button
                   type="submit"
                   disabled={memoSubmitting}
-                  className="rounded-full bg-[color:var(--brand-blue)] px-4 py-1.5 text-[11px] font-semibold text-white shadow-sm hover:bg-[#ff8a3d] disabled:opacity-60"
+                  className="rounded-full bg-[color:var(--brand-blue)] px-4 py-1.5 text-[11px] font-semibold text-white shadow-sm hover:bg-[#1f7a5b] disabled:opacity-60"
                   style={{ ["--brand-blue" as any]: BRAND_blue }}
                 >
                   {memoSubmitting

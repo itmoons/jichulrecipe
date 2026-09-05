@@ -32,8 +32,8 @@ export default function CoupleLedgerNav({
         className={cx(
           baseClass,
           active === "entry"
-            ? "bg-[#ff8a3d] text-white hover:bg-[#ff8a3d]"
-            : "border border-[#fed7aa] bg-white text-[#ff8a3d] hover:bg-[#fff7ed]"
+            ? "bg-[#1f7a5b] text-white hover:bg-[#1f7a5b]"
+            : "border border-[#c6e2d4] bg-white text-[#1f7a5b] hover:bg-[#f1f8f4]"
         )}
       >
         기록
@@ -44,8 +44,8 @@ export default function CoupleLedgerNav({
         className={cx(
           baseClass,
           active === "calendar"
-            ? "bg-[#ff8a3d] text-white hover:bg-[#ff8a3d]"
-            : "border border-[#fed7aa] bg-white text-[#ff8a3d] hover:bg-[#fff7ed]"
+            ? "bg-[#1f7a5b] text-white hover:bg-[#1f7a5b]"
+            : "border border-[#c6e2d4] bg-white text-[#1f7a5b] hover:bg-[#f1f8f4]"
         )}
       >
         달력
@@ -56,8 +56,8 @@ export default function CoupleLedgerNav({
         className={cx(
           baseClass,
           active === "analytics"
-            ? "bg-[#ff8a3d] text-white hover:bg-[#ff8a3d]"
-            : "border border-[#fed7aa] bg-white text-[#ff8a3d] hover:bg-[#fff7ed]"
+            ? "bg-[#1f7a5b] text-white hover:bg-[#1f7a5b]"
+            : "border border-[#c6e2d4] bg-white text-[#1f7a5b] hover:bg-[#f1f8f4]"
         )}
       >
         분석

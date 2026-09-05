@@ -18,7 +18,7 @@ const UI = {
   line: "border-slate-200",
   card: "bg-white border-slate-200",
   accent: "text-[#ffffff]",
-  accentBg: "bg-[#ff8a3d]",
+  accentBg: "bg-[#1f7a5b]",
 };
 
 type CalcLink = { title: string; slug: string; group: "A" | "B" | "C" | "D" };

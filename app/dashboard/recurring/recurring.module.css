@@ -154,7 +154,7 @@
   height: 36px;
   border-radius: 9px;
   border: 1px solid #f47a28;
-  background: #ff8a3d;
+  background: #1f7a5b;
   color: #fff;
   font-size: 11px;
   font-weight: 750;
@@ -178,7 +178,7 @@
 
 .btnPrimary:hover {
   background: #ff963f;
-  border-color: #ff8a3d;
+  border-color: #1f7a5b;
   box-shadow: 0 6px 12px rgba(211, 92, 16, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.25);
   transform: translateY(-1px);
 }
@@ -353,7 +353,7 @@
 .page input[type="checkbox"] {
   width: 14px;
   height: 14px;
-  accent-color: #ff8a3d;
+  accent-color: #1f7a5b;
 }
 
 .topbar {
@@ -404,7 +404,7 @@
 
 /* 탭 active 표시 (기존 inline style 제거용) */
 .btnPrimary[data-active="true"] {
-  background: #ff8a3d;
+  background: #1f7a5b;
 }
 
 .tabButtons .btnPrimary, .tabButtons .btnSecondary { height: 34px; border-radius: 8px; }
@@ -412,8 +412,8 @@
 .tabButtons .btnSecondary:not([data-active="true"]) { border-color: transparent; color: #64748b; box-shadow: none; }
 
 .btnSecondary[data-active="true"] {
-  background: #ff8a3d;
-  border-color: #ff8a3d;
+  background: #1f7a5b;
+  border-color: #1f7a5b;
   color: #fff;
   box-shadow: 0 2px 5px rgba(211, 92, 16, 0.16);
 }

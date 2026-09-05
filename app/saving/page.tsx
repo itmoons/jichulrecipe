@@ -4,9 +4,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { PageContainer } from "@/components/layout/PageContainer";
-import { RecurringManagerPage } from "@/app/dashboard/recurring/page";
+import { applyRecurringTblue, RecurringManagerPage } from "@/app/dashboard/recurring/page";
 
-const BRAND_BLUE = "#ff8a3deb";
+const BRAND_BLUE = "#1f7a5beb";
 
 type SavingPlan = {
   id: number;
@@ -428,7 +428,22 @@ export default function SavingPage() {
       if (error) throw error;
 
       setRecurringVersion((version) => version + 1);
-      setLinkMsg(`‘${plan.name}’을 정기 저축으로 등록했습니다. 아래 정기 레시피에서 선택한 달에 적용하세요.`);
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      const toDateKey = (date: Date) =>
+        `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+      try {
+        const result = await applyRecurringTblue({
+          userId,
+          rangeStart: toDateKey(monthStart),
+          rangeEnd: toDateKey(monthEnd),
+        });
+        setLinkMsg(`‘${plan.name}’을 정기 저축으로 등록하고 이번 달 달력에 반영했습니다. (${result.applied}일 업데이트)`);
+      } catch (syncError) {
+        console.error("정기 저축 등록 후 달력 반영 실패:", syncError);
+        setLinkMsg(`‘${plan.name}’ 정기 저축 규칙은 등록됐습니다. 달력 반영은 아래 ‘선택 월에 적용’으로 다시 시도해 주세요.`);
+      }
       document.getElementById("recurring")?.scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (err) {
       console.error(err);

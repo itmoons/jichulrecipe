@@ -97,7 +97,7 @@ export default function NotificationsPanel({ userId }: Props) {
               style={{
                 padding: 10,
                 borderRadius: 10,
-                background: isUnread ? "#fff7ed" : "#f6f6f6",
+                background: isUnread ? "#f1f8f4" : "#f6f6f6",
               }}
             >
               <div

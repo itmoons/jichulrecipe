@@ -25,8 +25,8 @@ const UI = {
   paperDots: "",
   ink: "text-slate-900",
   inkSoft: "text-slate-600",
-  blue: "#ff8a3d",
-  blueDark: "#ff8a3d",
+  blue: "#1f7a5b",
+  blueDark: "#1f7a5b",
   card: "bg-white border-slate-200",
 };
 
@@ -287,7 +287,13 @@ export default function CalculatorsHubPage() {
   const filtered = useMemo(() => {
     const query = q.trim().toLowerCase();
     return allItems.filter((it) => {
-      const inCat = activeCat === "all" ? true : it.categoryKey === activeCat;
+      const inCat = activeCat === "all"
+        ? true
+        : activeCat === "saving"
+        ? `${it.title} ${it.desc} ${it.tags.join(" ")}`.includes("저축") || it.tags.includes("적금")
+        : activeCat === "subscription"
+        ? `${it.title} ${it.desc} ${it.tags.join(" ")}`.includes("구독")
+        : it.categoryKey === activeCat;
       if (!inCat) return false;
       if (!query) return true;
       const hay = `${it.title} ${it.desc} ${it.tags.join(" ")}`.toLowerCase();
@@ -313,10 +319,10 @@ export default function CalculatorsHubPage() {
       <div className={cn("min-h-screen", UI.paperDots)}>
         <div className="mx-auto px-0 py-8 sm:py-10">
 
-          <section className="mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <div className="relative overflow-hidden border-b border-orange-100 bg-gradient-to-br from-[#fffaf5] via-[#fff3e8] to-[#ffedd5] px-6 py-8 sm:px-9 sm:py-10">
-              <div className="absolute -right-16 -top-20 h-64 w-64 rounded-full border-[28px] border-[#ff8a3d]/15" />
-              <div className="absolute bottom-0 right-24 h-28 w-px bg-[#ff8a3d]/20" />
+          <section className="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="relative overflow-hidden border-b border-orange-100 bg-gradient-to-br from-[#f7faf8] via-[#eaf5ef] to-[#dcefe5] px-6 py-8 sm:px-9 sm:py-10">
+              <div className="absolute -right-16 -top-20 h-64 w-64 rounded-full border-[28px] border-[#1f7a5b]/15" />
+              <div className="absolute bottom-0 right-24 h-28 w-px bg-[#1f7a5b]/20" />
               <p className="relative text-xs font-semibold tracking-[0.14em] text-orange-600">JICUL RECIPE · MONEY TOOLS</p>
               <h1 className="relative mt-3 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">돈 계산을 가장 쉽게.</h1>
               <p className="relative mt-3 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">자주 찾는 계산을 빠르게 확인하고, 필요한 경우 더 자세한 가계부 관리로 이어갈 수 있습니다.</p>
@@ -331,12 +337,27 @@ export default function CalculatorsHubPage() {
             </div>
           </section>
 
+          <section className="mb-5 rounded-2xl border border-orange-100 bg-white p-4 sm:p-5">
+            <p className="text-xs font-bold text-orange-700">처음이라면 이것부터</p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-3">
+              {[
+                ["월 고정비 비율 계산기", "/calculators/fixed-cost-ratio"],
+                ["구독 총액 계산기", "/calculators/subscription-total"],
+                ["월 예산 자동 배분 계산기", "/calculators/monthly-budget-split"],
+              ].map(([label, href]) => (
+                <Link key={href} href={href} className="flex min-h-11 items-center justify-between rounded-xl border border-orange-100 bg-[#f7faf8] px-3 text-sm font-semibold text-slate-800 transition hover:border-orange-300">
+                  {label}<span className="text-orange-600">→</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+
           {/* 검색 + 필터(모바일 최적) */}
           <div className="mb-8 sm:mb-10">
             <div className="grid gap-3 sm:gap-4">
               <div className={cn("rounded-2xl border p-5 sm:p-6", UI.card)}>
                 <div className="flex flex-col gap-2">
-                  <label className={cn("text-[12px] font-semibold", UI.ink)}>검색</label>
+                  <label className={cn("text-[14px] font-bold", UI.ink)}>어떤 돈 고민이 있으신가요?</label>
 
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-600">
@@ -359,27 +380,34 @@ export default function CalculatorsHubPage() {
                   </div>
 
                   {/* ✅ 카테고리 칩(모바일 가로 스크롤) */}
-                  <div className="hidden mt-2 -mx-1 sm:flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  <div className="mt-2 -mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     <button
                       onClick={() => setActiveCat("all")}
                       className={cn(
                         "shrink-0 rounded-lg border px-4 py-2 text-[12px] font-medium transition",
                         activeCat === "all"
-                          ? "border-[#ff8a3d] bg-[#ff8a3d] text-slate-900 shadow-sm"
+                          ? "border-[#1f7a5b] bg-[#1f7a5b] text-slate-900 shadow-sm"
                           : "border-slate-200 bg-white text-slate-600 hover:border-orange-300 hover:text-orange-700"
                       )}
                     >
                       전체
                     </button>
 
-                    {categories.map((c) => (
+                    {[
+                      { id: "living", key: "fixed", title: "생활비" },
+                      { id: "subscription", key: "subscription", title: "구독" },
+                      { id: "budget", key: "budget", title: "예산" },
+                      { id: "saving", key: "saving", title: "저축" },
+                      { id: "debt", key: "debt", title: "대출" },
+                      { id: "tax", key: "tax", title: "세금·보험" },
+                    ].map((c) => (
                       <button
-                        key={c.key}
+                        key={c.id}
                         onClick={() => setActiveCat(c.key)}
                         className={cn(
                           "shrink-0 rounded-lg border px-4 py-2 text-[12px] font-medium transition",
                           activeCat === c.key
-                            ? "border-[#ff8a3d] bg-[#ff8a3d] text-slate-900 shadow-sm"
+                            ? "border-[#1f7a5b] bg-[#1f7a5b] text-slate-900 shadow-sm"
                             : "border-slate-200 bg-white text-slate-600 hover:border-orange-300 hover:text-orange-700"
                         )}
                       >
@@ -396,7 +424,7 @@ export default function CalculatorsHubPage() {
           <div className="space-y-8 sm:space-y-10">
             {categories.map((cat, index) => {
               const items = grouped.get(cat.key) ?? [];
-              if (activeCat !== "all" && activeCat !== cat.key) return null;
+              if (activeCat !== "all" && activeCat !== "saving" && activeCat !== "subscription" && activeCat !== cat.key) return null;
               if (items.length === 0) return null;
 
               return (
@@ -411,7 +439,7 @@ export default function CalculatorsHubPage() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-[#ff8a3d] text-xs font-bold text-slate-900">
+                          <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-[#1f7a5b] text-xs font-bold text-slate-900">
                             {String(index + 1).padStart(2, "0")}
                           </span>
                           <h2 className={cn("text-lg sm:text-xl font-semibold", UI.ink)}>
@@ -503,7 +531,7 @@ export default function CalculatorsHubPage() {
                   href="/"
                   className={cn(
                     "rounded-2xl border bg-white px-4 py-2 text-[12px] font-semibold transition",
-                    "border-[#fff7ed] text-[#7f7f7f] hover:border-[#ff8a3d]"
+                    "border-[#f1f8f4] text-[#7f7f7f] hover:border-[#1f7a5b]"
                   )}
                 >
                   지출레시피 홈으로
@@ -512,7 +540,7 @@ export default function CalculatorsHubPage() {
                   href="/calculators/subscription-total"
                   className={cn(
                     "rounded-2xl px-4 py-2 text-[12px] font-semibold text-white transition shadow-sm",
-                    "bg-[#ff8a3d] text-slate-900 hover:bg-[#fb923c]"
+                    "bg-[#1f7a5b] text-slate-900 hover:bg-[#348f6c]"
                   )}
                 >
                   구독 총액 계산부터

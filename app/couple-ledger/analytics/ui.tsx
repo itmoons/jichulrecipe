@@ -139,9 +139,9 @@ function Pill({
       className={cx(
         "inline-flex items-center gap-1 rounded-[10px] px-3 py-1 text-[11px] font-medium",
         tone === "accent" &&
-          "border border-[#fed7aa] bg-[#fff7ed] text-[#ff8a3d]",
+          "border border-[#c6e2d4] bg-[#f1f8f4] text-[#1f7a5b]",
         tone === "soft" &&
-          "border border-[#E5E7EB] bg-white text-[#ff8a3d]",
+          "border border-[#E5E7EB] bg-white text-[#1f7a5b]",
         tone === "muted" &&
           "border border-slate-200 bg-slate-50 text-slate-600"
       )}
@@ -174,14 +174,14 @@ function DataCard({
 }
 
 const primaryButtonClass =
-  "inline-flex items-center justify-center rounded-[12px] bg-[#ff8a3d] px-4 py-2.5 text-[13px] font-medium text-white transition hover:bg-[#ff8a3d] disabled:opacity-60";
+  "inline-flex items-center justify-center rounded-[12px] bg-[#1f7a5b] px-4 py-2.5 text-[13px] font-medium text-white transition hover:bg-[#1f7a5b] disabled:opacity-60";
 
 const neutralButtonClass =
   "inline-flex items-center justify-center rounded-[12px] border border-slate-200 bg-white px-4 py-2.5 text-[13px] font-medium text-slate-700 transition hover:bg-slate-50";
 
-const PIE_COLORS = ["#ff8a3d", "#94a3b8"];
+const PIE_COLORS = ["#1f7a5b", "#94a3b8"];
 const CATEGORY_COLORS = [
-  "#ff8a3d",
+  "#1f7a5b",
   "#94a3b8",
   "#f59e0b",
   "#34d399",
@@ -714,7 +714,7 @@ export default function CoupleLedgerAnalyticsUI() {
                       <Line
                         type="monotone"
                         dataKey="amount"
-                        stroke="#ff8a3d"
+                        stroke="#1f7a5b"
                         strokeWidth={3}
                         dot={{ r: 4 }}
                         activeDot={{ r: 6 }}
@@ -732,7 +732,7 @@ export default function CoupleLedgerAnalyticsUI() {
               </div>
 
               <div className="mt-5 overflow-x-auto">
-                <table className="min-w-full border-separate border-spacing-0 overflow-hidden rounded-[18px] border border-[#E5E7EB]">
+                <table className="min-w-[620px] border-separate border-spacing-0 overflow-hidden rounded-[18px] border border-[#E5E7EB] sm:min-w-full">
                   <thead>
                     <tr className="bg-slate-50">
                       <th className="px-4 py-3 text-left text-[12px] font-medium text-slate-600">
@@ -779,7 +779,7 @@ export default function CoupleLedgerAnalyticsUI() {
           <div
             className={cx(
               "min-w-[220px] rounded-[10px] px-4 py-2.5 text-[12px] font-medium text-white shadow-[0_12px_30px_rgba(0,0,0,0.16)]",
-              toast.type === "success" && "bg-[#ff8a3d]",
+              toast.type === "success" && "bg-[#1f7a5b]",
               toast.type === "error" && "bg-[#d84b4b]",
               toast.type === "info" && "bg-slate-900"
             )}

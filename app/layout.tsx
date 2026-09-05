@@ -7,6 +7,8 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { ToasterHost } from "@/components/ui/toaster-host";
 import SiteFooter from "@/components/layout/SiteFooter";
+import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
+import { SiteSidebar } from "@/components/layout/SiteSidebar";
 
 const pretendard = localFont({
   src: "./fonts/PretendardVariable.woff2",
@@ -48,6 +50,9 @@ export const metadata: Metadata = {
   },
   verification: {
     google: "RAjkr0_ylgNzStxYF2VE4HNNWU9hVEaBqX6jHMaijiY",
+    other: process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION
+      ? { "naver-site-verification": process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION }
+      : undefined,
   },
   robots: {
     index: true,
@@ -98,11 +103,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     inLanguage: "ko-KR",
     description:
       "무료 가계부 지출레시피: 지출/수입 기록, 월별·카테고리 통계, 소비습관 분석, 예산 관리",
-    potentialAction: {
-      "@type": "SearchAction",
-      target: `${SITE_URL}/search?q={search_term_string}`,
-      "query-input": "required name=search_term_string",
-    },
   };
 
   const jsonLdOrganization = {
@@ -111,6 +111,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     name: SITE_NAME,
     url: SITE_URL,
     logo: `${SITE_URL}/logo/logo.png`,
+  };
+
+  const jsonLdApplication = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: SITE_NAME,
+    url: SITE_URL,
+    applicationCategory: "FinanceApplication",
+    operatingSystem: "Web",
+    inLanguage: "ko-KR",
+    isAccessibleForFree: true,
+    description: "수입·지출 기록, 월별 소비 분석, 정기 지출 및 저축 목표 관리를 제공하는 무료 웹 가계부입니다.",
+    offers: { "@type": "Offer", price: "0", priceCurrency: "KRW" },
+    publisher: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
   };
 
   return (
@@ -126,6 +140,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           id="jsonld-org"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrganization) }}
+        />
+        <Script
+          id="jsonld-application"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdApplication) }}
         />
 
         <Script
@@ -144,7 +163,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-762XP39BW8"></script>
       </head>
 
-      <body className="min-h-screen bg-slate-50 text-slate-900 font-sans">
+      <body className="min-h-screen bg-[#f5f8f6] pb-20 text-slate-900 font-sans lg:pb-0">
         <noscript>
           <iframe
             src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
@@ -154,11 +173,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           />
         </noscript>
 
-        <SiteHeader />
-        {children}
-        <ToasterHost />
-        
-      <SiteFooter />
+        <SiteSidebar />
+        <div className="xl:pl-60">
+          {/* 모바일·태블릿에서만 상단 메뉴를 제공하고, 데스크톱은 왼쪽 사이드바로 통합한다. */}
+          <div className="xl:hidden"><SiteHeader /></div>
+          {children}
+          <ToasterHost />
+          <SiteFooter />
+        </div>
+        <MobileBottomNav />
       </body>
     </html>
   );

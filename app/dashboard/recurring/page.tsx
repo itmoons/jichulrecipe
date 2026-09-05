@@ -198,7 +198,7 @@ async function chunkedUpsertDailyRecipes(rows: any[], chunkSize = 200) {
    - 그 위에 규칙+예외로 정기항목 다시 생성
    - (중복 방지) rule_id + date 기반 고정 id로 덮어쓰기
    ========================= */
-async function applyRecurringTblue(params: { userId: string; rangeStart: string; rangeEnd: string }) {
+export async function applyRecurringTblue(params: { userId: string; rangeStart: string; rangeEnd: string }) {
   const { userId, rangeStart, rangeEnd } = params;
 
   // 1) rules
@@ -611,21 +611,37 @@ export function RecurringManagerPage({ embedded = false }: { embedded?: boolean 
       };
 
       if (editingId) {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from("recurring_rules")
           .update(payload)
           .eq("id", editingId)
-          .eq("user_id", userId);
+          .eq("user_id", userId)
+          .select("id")
+          .maybeSingle();
         if (error) throw error;
+        if (!data) throw new Error("수정할 규칙을 찾지 못했습니다. 목록을 새로고침한 뒤 다시 시도하세요.");
       } else {
-        const { error } = await supabase.from("recurring_rules").insert(payload);
+        const { data, error } = await supabase
+          .from("recurring_rules")
+          .insert(payload)
+          .select("id")
+          .single();
         if (error) throw error;
+        if (!data) throw new Error("규칙 저장 결과를 확인하지 못했습니다.");
       }
 
       await refreshRules(userId);
       resetForm();
 
-      setLog("규칙 저장 완료. (달력 반영은 ‘선택 월에 적용(동기화)’에서 실행하세요.)");
+      // 저장만 하고 끝내면 달력에 보이지 않아 실패로 오해하기 쉽습니다.
+      // 선택한 달을 곧바로 동기화해 규칙과 화면의 결과를 일치시킵니다.
+      try {
+        const { start, end, applied } = await applySelectedMonth(userId);
+        setLog(`규칙 저장 및 달력 반영 완료: ${start} ~ ${end} (${applied}일 업데이트)`);
+      } catch (syncError: any) {
+        console.error("규칙 저장 후 달력 동기화 실패:", syncError);
+        setLog(`규칙은 저장됐지만 달력 반영에 실패했습니다: ${syncError?.message ?? String(syncError)}`);
+      }
     } catch (e: any) {
       setLog(`오류: ${e?.message ?? String(e)}`);
     } finally {
@@ -875,7 +891,7 @@ export function RecurringManagerPage({ embedded = false }: { embedded?: boolean 
               <div className={styles.cardTitleRow}>
                 <div>
                   <div className={styles.cardTitle}>{editingId ? "정기 규칙 수정" : "정기 규칙 추가"}</div>
-                  <div className={styles.cardDesc}>규칙을 저장한 뒤 선택한 달에 적용하세요.</div>
+                  <div className={styles.cardDesc}>저장하면 선택한 달력에 바로 반영됩니다.</div>
                 </div>
               </div>
 
@@ -999,7 +1015,7 @@ export function RecurringManagerPage({ embedded = false }: { embedded?: boolean 
               <div className={styles.cardTitleRow}>
                 <div>
                   <div className={styles.cardTitle}>등록된 정기 규칙</div>
-                  <div className={styles.cardDesc}>여기서는 규칙만 관리합니다. (달력 반영은 동기화 버튼)</div>
+                  <div className={styles.cardDesc}>저장 시 자동 반영되며, 필요할 때 선택 월을 다시 동기화할 수 있습니다.</div>
                 </div>
 
                 {/* Sorting / Filtering controls */}

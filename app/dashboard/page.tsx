@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { supabase } from "@/lib/supabaseClient";
 
-const BRAND_blue = "#ff8a3d";
+const BRAND_blue = "#1f7a5b";
 const BRAND_GREEN = "#22C55E";
 
 /** ✅ edit 페이지와 맞추는 타입 (category/subcategory 추가) */
@@ -77,6 +77,18 @@ type MonthStats = {
 
 type HealthLevel = "no-data" | "no-income" | "excellent" | "moderate" | "warning";
 
+type AccountingPeriod = { basis: "calendar" | "payday"; payday: number };
+
+const DEFAULT_ACCOUNTING_PERIOD: AccountingPeriod = { basis: "calendar", payday: 25 };
+
+function normalizeAccountingPeriod(value: unknown): AccountingPeriod {
+  const data = value as Partial<AccountingPeriod> | null;
+  return {
+    basis: data?.basis === "payday" ? "payday" : "calendar",
+    payday: Math.max(1, Math.min(28, Number(data?.payday) || 25)),
+  };
+}
+
 function getYearMonth(date = new Date()) {
   const y = date.getFullYear();
   const m = `${date.getMonth() + 1}`.padStart(2, "0");
@@ -129,6 +141,17 @@ function getTodayKeyKST() {
 
 function compareDateKey(a: string, b: string) {
   return a < b ? -1 : a > b ? 1 : 0;
+}
+
+function getAccountingRangeKeys(ym: string, period: AccountingPeriod) {
+  if (period.basis === "calendar") return getMonthRangeKeys(ym);
+  const [year, month] = ym.split("-").map(Number);
+  // 선택한 월을 "마감 월"로 봅니다. 예: 9월 25일 기준은 8/25 ~ 9/24입니다.
+  // 그래서 월급일 전에도 현재 진행 중인 기간을 바로 확인할 수 있습니다.
+  const start = new Date(year, month - 2, period.payday);
+  const end = new Date(year, month - 1, period.payday - 1);
+  const fmt = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  return { firstKey: fmt(start), lastKey: fmt(end) };
 }
 
 function getRecurringRuleId(item: MoneyItem): number | null {
@@ -262,8 +285,8 @@ function normalizeDaily(date: string, entry: any): NormalizedDaily | null {
   };
 }
 
-function buildMonthStats(store: DailyStore, ym: string): MonthStats | null {
-  const entries = Object.entries(store).filter(([date]) => date.startsWith(ym));
+function buildMonthStats(store: DailyStore, firstKey: string, lastKey: string): MonthStats | null {
+  const entries = Object.entries(store).filter(([date]) => date >= firstKey && date <= lastKey);
   if (entries.length === 0) return null;
 
   const normalized: NormalizedDaily[] = [];
@@ -325,7 +348,7 @@ function getHealthStatus(stats: MonthStats | null): {
   emoji: string;
   subtitle: string;
 } {
-  if (!stats) {
+  if (!stats || stats.days.length === 0) {
     return {
       level: "no-data",
       title: "이번 달 데이터 없음",
@@ -446,6 +469,8 @@ function DashboardInner() {
   const [dailyStore, setDailyStore] = useState<DailyStore>({});
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [accountingPeriod, setAccountingPeriod] = useState<AccountingPeriod>(DEFAULT_ACCOUNTING_PERIOD);
+  const [savingPeriod, setSavingPeriod] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -476,7 +501,12 @@ function DashboardInner() {
           return;
         }
 
-        const { firstKey, lastKey } = getMonthRangeKeys(monthParam);
+        const savedPeriod = normalizeAccountingPeriod(user.user_metadata?.accounting_period);
+        if (JSON.stringify(savedPeriod) !== JSON.stringify(accountingPeriod)) {
+          setAccountingPeriod(savedPeriod);
+          return;
+        }
+        const { firstKey, lastKey } = getAccountingRangeKeys(monthParam, accountingPeriod);
 
         /** ✅ 오늘 포함, 오늘 이후 미래는 제외 */
         const todayKey = getTodayKeyKST();
@@ -576,9 +606,10 @@ function DashboardInner() {
     return () => {
       mounted = false;
     };
-  }, [monthParam]);
+  }, [monthParam, accountingPeriod]);
 
-  const stats = useMemo(() => buildMonthStats(dailyStore, monthParam), [dailyStore, monthParam]);
+  const accountingRange = useMemo(() => getAccountingRangeKeys(monthParam, accountingPeriod), [monthParam, accountingPeriod]);
+  const stats = useMemo(() => buildMonthStats(dailyStore, accountingRange.firstKey, accountingRange.lastKey), [dailyStore, accountingRange]);
   const health = useMemo(() => getHealthStatus(stats), [stats]);
   const dailySeries = useMemo(() => getDailySeries(stats), [stats]);
 
@@ -589,12 +620,24 @@ function DashboardInner() {
   const totalExpense = stats?.totalExpense ?? 0;
   const totalSaving = stats?.totalSaving ?? 0;
   const baseIncome = totalIncome > 0 ? totalIncome : undefined;
+  const monthlyBalance = totalIncome - totalExpense - totalSaving;
 
   const expenseRatio = baseIncome && totalExpense > 0 ? (totalExpense / baseIncome) * 100 : 0;
   const savingRatio = baseIncome && totalSaving > 0 ? (totalSaving / baseIncome) * 100 : 0;
-  const [year, month] = monthParam.split("-").map(Number);
-  const monthDays = new Date(year, month, 0).getDate();
+  const monthDays = Math.max(1, Math.round((new Date(`${accountingRange.lastKey}T00:00:00`).getTime() - new Date(`${accountingRange.firstKey}T00:00:00`).getTime()) / 86400000) + 1);
   const recordingRate = Math.round(((stats?.days.length ?? 0) / monthDays) * 100);
+
+  const saveAccountingPeriod = async (next: AccountingPeriod) => {
+    setSavingPeriod(true);
+    const { data: authData } = await supabase.auth.getUser();
+    const user = authData.user;
+    if (user) {
+      const { error } = await supabase.auth.updateUser({ data: { ...(user.user_metadata ?? {}), accounting_period: next } });
+      if (error) console.warn("회계 기간 저장 실패:", error.message);
+    }
+    setAccountingPeriod(next);
+    setSavingPeriod(false);
+  };
 
   const handleMoveMonth = (delta: number) => {
     const next = shiftMonth(monthParam, delta);
@@ -609,8 +652,14 @@ function DashboardInner() {
     return (
       <PageContainer title="">
         <div className="pointer-events-none fixed inset-0 -z-10 landing-surface" />
-        <div className="flex min-h-[60vh] items-center justify-center">
-          <p className="text-xs text-slate-500">달력에서 기록한 하루 레시피를 불러오고 있어요...</p>
+        <div className="mx-auto min-h-[60vh] w-full max-w-6xl space-y-4 px-4 py-10" aria-label="대시보드 불러오는 중">
+          <div className="h-28 animate-pulse rounded-3xl bg-white/80" />
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="h-28 animate-pulse rounded-2xl bg-white/80" />
+            <div className="h-28 animate-pulse rounded-2xl bg-white/80" />
+            <div className="h-28 animate-pulse rounded-2xl bg-white/80" />
+          </div>
+          <div className="h-64 animate-pulse rounded-3xl bg-white/80" />
         </div>
       </PageContainer>
     );
@@ -622,10 +671,10 @@ function DashboardInner() {
         <div className="pointer-events-none fixed inset-0 -z-10 landing-surface" />
         <main className="min-h-[70vh] px-4 py-10 sm:py-16">
           <div className="mx-auto w-full max-w-3xl overflow-hidden rounded-[32px] border border-orange-100 bg-white/95 shadow-[0_20px_55px_rgba(255,138,61,0.14)]">
-            <div className="flex flex-col gap-4 border-b border-orange-100 bg-gradient-to-r from-[#fffaf5] to-[#ffedd5] px-6 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+            <div className="flex flex-col gap-4 border-b border-orange-100 bg-gradient-to-r from-[#f7faf8] to-[#dcefe5] px-6 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-8">
               <div>
                 <p className="text-xs font-bold tracking-[0.14em] text-orange-600">MONTHLY MONEY REPORT</p>
-                <h1 className="mt-2 text-xl font-bold tracking-tight text-slate-900">{ymToText(monthParam)} 소비 흐름을 시작해 볼까요?</h1>
+                <h1 className="mt-2 text-xl font-bold tracking-tight text-slate-900">아직 기록이 없어요.</h1>
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -647,13 +696,18 @@ function DashboardInner() {
             </div>
 
             <div className="px-6 py-7 sm:px-8 sm:py-8">
-              {loadError && <p className="mb-4 rounded-xl bg-red-50 px-3 py-2 text-xs text-red-600">{loadError}</p>}
-              <p className="max-w-xl text-sm leading-7 text-slate-600">수입·지출·저축을 날짜별로 기록하면, 이곳에서 월별 소비 비율과 지출이 컸던 날, 카테고리별 흐름을 바로 확인할 수 있습니다.</p>
+              {loadError && (
+                <div className="mb-4 flex flex-wrap items-center gap-3 rounded-xl bg-red-50 px-3 py-2 text-xs text-red-600">
+                  <span>데이터를 불러오지 못했어요.</span>
+                  <button type="button" onClick={() => window.location.reload()} className="font-bold underline underline-offset-2">다시 시도</button>
+                </div>
+              )}
+              <p className="max-w-xl text-sm leading-7 text-slate-600">첫 지출을 기록하면 이번 달 소비 흐름을 분석해드릴게요.</p>
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                {[['01', '하루 기록', '달력에서 수입·지출·저축을 입력하세요.'], ['02', '자동 집계', '기록한 금액을 월간 기준으로 모읍니다.'], ['03', '소비 점검', '지출 비중과 추이를 확인하세요.']].map(([number, title, text]) => <div key={number} className="rounded-2xl border border-orange-100 bg-[#fffaf5] p-4"><span className="text-xs font-bold text-orange-600">{number}</span><p className="mt-3 text-sm font-bold text-slate-900">{title}</p><p className="mt-1 text-xs leading-5 text-slate-500">{text}</p></div>)}
+                {[['01', '하루 기록', '달력에서 수입·지출·저축을 입력하세요.'], ['02', '자동 집계', '기록한 금액을 월간 기준으로 모읍니다.'], ['03', '소비 점검', '지출 비중과 추이를 확인하세요.']].map(([number, title, text]) => <div key={number} className="rounded-2xl border border-orange-100 bg-[#f7faf8] p-4"><span className="text-xs font-bold text-orange-600">{number}</span><p className="mt-3 text-sm font-bold text-slate-900">{title}</p><p className="mt-1 text-xs leading-5 text-slate-500">{text}</p></div>)}
               </div>
               <div className="mt-6 flex flex-wrap gap-2">
-                <button type="button" onClick={() => router.push(`/dashboard/calendar?month=${monthParam}`)} className="inline-flex items-center justify-center rounded-xl bg-[#ff8a3d] px-4 py-3 text-sm font-bold text-slate-900 shadow-md shadow-orange-100 transition hover:bg-[#fb923c]">🍳 {ymToText(monthParam)} 기록하기</button>
+                <button type="button" onClick={() => router.push(`/dashboard/calendar/edit?date=${getTodayKeyKST()}`)} className="inline-flex items-center justify-center rounded-xl bg-[#1f7a5b] px-4 py-3 text-sm font-bold text-white shadow-md shadow-orange-100 transition hover:bg-[#348f6c]">첫 기록 추가하기</button>
                 <button type="button" onClick={handleGoToCurrentMonth} className="rounded-xl border border-orange-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-orange-50">이번 달로 이동</button>
                 <button type="button" onClick={() => router.push('/calculators')} className="rounded-xl border border-orange-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-orange-50">계산기 둘러보기</button>
               </div>
@@ -666,12 +720,12 @@ function DashboardInner() {
 
   const summaryChips = [
     {
-      label: "이번 달 수입 합계",
-      value: `${totalIncome.toLocaleString()}원`,
+      label: "이번 달 남은 금액",
+      value: `${monthlyBalance.toLocaleString()}원`,
       sub:
-        baseIncome && (totalIncome > 0 || totalExpense > 0 || totalSaving > 0)
-          ? `지출 ${expenseRatio.toFixed(1)}% · 저축 ${savingRatio.toFixed(1)}%`
-          : "소득 미입력 시 단순 지출 통계만 표시됩니다.",
+        baseIncome
+          ? `수입에서 지출·저축을 제외한 금액이에요.`
+          : "수입을 기록하면 남은 금액을 계산해드려요.",
     },
     {
       label: "지출 + 저축",
@@ -694,26 +748,50 @@ function DashboardInner() {
     <main className="min-h-screen pb-7 pt-3 lg:pb-10 lg:pt-5">
       <div className="mx-auto w-full max-w-[1320px]">
         {/* 상단 헤더 */}
-        <section className="mb-4 flex flex-col gap-3 lg:mb-5 lg:flex-row lg:items-end lg:justify-between">
+        <section className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <div className="inline-flex items-center gap-1 rounded-full bg-white/80 border border-orange-100 px-2 py-1 text-[10px] text-orange-700 shadow-sm">
-              <span>🍲</span>
-              <span>{ymToText(monthParam)} 지출 레시피</span>
-            </div>
-            <h1 className="mt-1 text-lg font-semibold text-slate-900 sm:text-xl lg:text-2xl">
-              이번 달 소비 분석 대시보드
+            <p className="text-[11px] font-bold tracking-[0.12em] text-orange-600">MONTHLY OVERVIEW</p>
+            <h1 className="mt-1 text-xl font-bold tracking-[-0.04em] text-slate-900 sm:text-2xl">
+              {ymToText(monthParam)} 소비 흐름
             </h1>
-            <p className="mt-0.5 text-[8px] text-slate-600 lg:mt-1 lg:text-xs">
-              달력에 기록한 하루 레시피를 모아서, 한 달 전체의 흐름을 한 번에 확인합니다.
+            <p className="mt-1 text-[12px] text-slate-500">
+              기록한 지출을 기준으로 이번 달의 돈 흐름을 확인하세요.
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="inline-flex items-center gap-1 rounded-full bg-white/90 border border-slate-200 px-2 py-1 text-[10px] text-slate-700 shadow-sm">
+          <div className="flex flex-wrap items-center gap-2">
+            <label className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#dbe9e1] bg-white px-2.5 text-[11px] font-semibold text-slate-600">
+              <span className="hidden sm:inline">집계 기준</span>
+              <select
+                value={accountingPeriod.basis}
+                disabled={savingPeriod}
+                onChange={(e) => saveAccountingPeriod({ ...accountingPeriod, basis: e.target.value === "payday" ? "payday" : "calendar" })}
+                className="bg-transparent outline-none"
+                aria-label="월간 집계 기준"
+              >
+                <option value="calendar">매월 1일 기준</option>
+                <option value="payday">월급일 기준</option>
+              </select>
+            </label>
+            {accountingPeriod.basis === "payday" && (
+              <label className="inline-flex h-10 items-center gap-1 rounded-lg border border-[#dbe9e1] bg-white px-2.5 text-[11px] font-semibold text-slate-600">
+                <select
+                  value={accountingPeriod.payday}
+                  disabled={savingPeriod}
+                  onChange={(e) => saveAccountingPeriod({ ...accountingPeriod, payday: Number(e.target.value) })}
+                  className="bg-transparent outline-none"
+                  aria-label="월급일"
+                >
+                  {Array.from({ length: 28 }, (_, index) => index + 1).map((day) => <option key={day} value={day}>{day}일</option>)}
+                </select>
+                기준
+              </label>
+            )}
+            <div className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#f1e7df] bg-white px-2 text-[12px] font-semibold text-slate-700">
               <button
                 type="button"
                 onClick={() => handleMoveMonth(-1)}
-                className="h-5 w-5 flex items-center justify-center rounded-full hover:bg-slate-100"
+                className="h-7 w-7 flex items-center justify-center rounded-md hover:bg-orange-50"
               >
                 ←
               </button>
@@ -721,7 +799,7 @@ function DashboardInner() {
               <button
                 type="button"
                 onClick={() => handleMoveMonth(1)}
-                className="h-5 w-5 flex items-center justify-center rounded-full hover:bg-slate-100"
+                className="h-7 w-7 flex items-center justify-center rounded-md hover:bg-orange-50"
               >
                 →
               </button>
@@ -730,23 +808,29 @@ function DashboardInner() {
             <button
               type="button"
               onClick={() => router.push(`/dashboard/calendar?month=${monthParam}`)}
-              className="inline-flex items-center gap-1 rounded-full bg-[#ff8a3d] px-3 py-1.5 text-[11px] font-medium text-slate-900 shadow shadow-orange-100 hover:bg-[#fb923c]"
+              className="inline-flex h-10 items-center gap-1 rounded-lg bg-[#1f7a5b] px-4 text-[12px] font-bold text-white transition hover:bg-[#ff963f]"
             >
               ✏️ 달력 레시피 수정
             </button>
           </div>
         </section>
 
+        <p className="-mt-3 mb-4 text-[11px] text-slate-500">
+          {accountingPeriod.basis === "calendar" ? `${accountingRange.firstKey} ~ ${accountingRange.lastKey} 기준으로 집계 중` : `${accountingRange.firstKey} ~ ${accountingRange.lastKey} (월급일 기준)으로 집계 중`}
+        </p>
+
         {/* 요약칩 */}
-        <section className="mb-4 grid gap-3 md:grid-cols-3 lg:mb-5">
-          {summaryChips.map((chip) => (
+        <section className="mb-5 grid gap-3 md:grid-cols-2 lg:grid-cols-4 lg:gap-4">
+          {summaryChips.map((chip, index) => (
             <div
               key={chip.label}
-              className="rounded-2xl border border-orange-100 bg-white/95 px-3.5 py-3 shadow-sm shadow-orange-100/60 flex flex-col justify-between w-auto lg:min-h-[108px] lg:px-5 lg:py-4"
+              className={index === 0
+                ? "flex min-h-[150px] flex-col justify-between rounded-2xl bg-[#1f7a5b] px-5 py-5 text-white shadow-[0_10px_24px_rgba(211,92,16,0.18)] lg:col-span-2 lg:px-6"
+                : "flex min-h-[150px] flex-col justify-between rounded-2xl border border-[#f1e7df] bg-white px-5 py-5 shadow-[0_4px_16px_rgba(85,47,18,0.04)]"}
             >
-              <span className="text-[11px] text-slate-500 lg:text-xs">{chip.label}</span>
-              <span className="mt-1 text-base font-semibold text-slate-900 lg:text-[22px]">{chip.value}</span>
-              <span className="mt-1 text-[10px] text-slate-500 lg:text-[11px]">{chip.sub}</span>
+              <span className={index === 0 ? "text-[12px] font-semibold text-white/85" : "text-[12px] font-semibold text-slate-500"}>{chip.label}</span>
+              <span className={index === 0 ? "mt-2 text-3xl font-bold tracking-[-0.04em]" : "mt-2 text-2xl font-bold tracking-[-0.04em] text-slate-900"}>{chip.value}</span>
+              <span className={index === 0 ? "mt-2 text-[12px] text-white/85" : "mt-2 text-[12px] text-slate-500"}>{chip.sub}</span>
             </div>
           ))}
         </section>
@@ -870,7 +954,7 @@ function DashboardInner() {
                 </div>
 
                 <div className="overflow-x-auto rounded-2xl border border-slate-200 max-h-64 lg:max-h-[420px]">
-                  <table className="min-w-full text-[8px] sm:text-[11px] lg:text-xs">
+                  <table className="min-w-[560px] text-[8px] sm:min-w-full sm:text-[11px] lg:text-xs">
                     <thead className="bg-slate-50 text-slate-500">
                       <tr>
                         <th className="px-2 py-2 text-left w-1/6 lg:px-3 lg:py-2.5">날짜</th>
@@ -1144,7 +1228,7 @@ function PieChartCard({ items, total }: PieChartProps) {
   const radius = 48;
   const circumference = 2 * Math.PI * radius;
 
-  const palette = ["#ff8a3d", "#facc15", "#4ade80", "#ff8a3d", "#fdba74", "#f97373", "#94a3b8"];
+  const palette = ["#1f7a5b", "#facc15", "#4ade80", "#1f7a5b", "#8ec9ae", "#f97373", "#94a3b8"];
 
   let currentOffset = 0;
 
@@ -1195,8 +1279,10 @@ export default function DashboardPage() {
       fallback={
         <PageContainer title="">
           <div className="pointer-events-none fixed inset-0 -z-10 landing-surface" />
-          <div className="flex min-h-[60vh] items-center justify-center">
-            <p className="text-xs text-slate-500">이 달의 지출 레시피 대시보드를 준비하고 있어요...</p>
+          <div className="mx-auto min-h-[60vh] w-full max-w-6xl space-y-4 px-4 py-10" aria-label="대시보드 불러오는 중">
+            <div className="h-28 animate-pulse rounded-3xl bg-white/80" />
+            <div className="grid gap-4 sm:grid-cols-3"><div className="h-28 animate-pulse rounded-2xl bg-white/80" /><div className="h-28 animate-pulse rounded-2xl bg-white/80" /><div className="h-28 animate-pulse rounded-2xl bg-white/80" /></div>
+            <div className="h-64 animate-pulse rounded-3xl bg-white/80" />
           </div>
         </PageContainer>
       }

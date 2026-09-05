@@ -96,7 +96,7 @@ export default function LoanPaymentPage() {
             />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
+          <div className="mt-4 rounded-2xl border border-[#dcefe5] bg-white p-4">
             <div className="text-[12px] font-semibold text-[#3B2F1E]">개념</div>
             <ul className="mt-2 list-disc pl-5 text-[12px] text-[#6d6d6d]">
               <li>원리금균등: 매달 상환액이 거의 고정(초기 이자 비중 큼)</li>
@@ -116,7 +116,7 @@ export default function LoanPaymentPage() {
             <MetricCard title="총이자(더 적은 쪽)" value={interestWinner} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
+          <div className="mt-4 rounded-2xl border border-[#dcefe5] bg-white p-4">
             <div className={cn("text-[12px] font-semibold", UI.ink)}>총비용 비교</div>
             <div className="mt-3 grid gap-2">
               <Row
@@ -135,13 +135,13 @@ export default function LoanPaymentPage() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/calculators/rate-sensitivity"
-              className="rounded-2xl bg-[#ff8a3d] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+              className="rounded-2xl bg-[#1f7a5b] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
             >
               다음: 금리 인상 민감도 →
             </Link>
             <Link
               href="/calculators"
-              className="rounded-2xl border border-[#ffedd5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
+              className="rounded-2xl border border-[#dcefe5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]"
             >
               계산기 모음으로
             </Link>

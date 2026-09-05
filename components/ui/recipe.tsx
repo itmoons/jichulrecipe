@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 export function RecipePage({ children }: { children: React.ReactNode }) {
   return (
     <div className="bg-recipe min-h-screen">
-      <div className="mx-auto w-[1320px] px-4 py-6">{children}</div>
+      <div className="mx-auto w-full max-w-[1320px] px-4 py-4 sm:px-6 sm:py-6">{children}</div>
     </div>
   );
 }
@@ -80,7 +80,7 @@ export function RecipeButton({
 
   const v =
     variant === "primary"
-      ? "bg-[#ff8a3d] text-slate-900 hover:bg-[#fb923c] shadow-sm"
+      ? "bg-[#1f7a5b] text-slate-900 hover:bg-[#348f6c] shadow-sm"
       : variant === "danger"
       ? "bg-red-500 text-white hover:bg-red-600"
       : variant === "outline"

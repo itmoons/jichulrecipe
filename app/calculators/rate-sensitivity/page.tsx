@@ -86,7 +86,7 @@ export default function RateSensitivityPage() {
             <MetricCard title="기간(개월)" value={`${calc.n}개월`} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#ffedd5] bg-white p-4">
+          <div className="mt-4 rounded-2xl border border-[#dcefe5] bg-white p-4">
             <div className={cn("text-[12px] font-semibold", UI.ink)}>증가분</div>
             <div className="mt-3 grid gap-2">
               <Row label="+0.5%p 월 증가" value={`${formatKRW(calc.diff05)}원`} tone={calc.diff05 > 0 ? "danger" : "ok"} />
@@ -102,13 +102,13 @@ export default function RateSensitivityPage() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/calculators/prepayment-fee-breakeven"
-              className="rounded-2xl bg-[#ff8a3d] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+              className="rounded-2xl bg-[#1f7a5b] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
             >
               다음: 중도상환수수료 손익 →
             </Link>
             <Link
               href="/calculators"
-              className="rounded-2xl border border-[#ffedd5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#ff8a3d]"
+              className="rounded-2xl border border-[#dcefe5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]"
             >
               계산기 모음으로
             </Link>

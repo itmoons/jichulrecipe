@@ -41,7 +41,7 @@ type MonthlyStore = {
 
 const LS_KEY_MONTHLY = "jichulrecipe_setup_monthly_v1";
 
-const BRAND_blue = "#ff8a3d";
+const BRAND_blue = "#1f7a5b";
 const BRAND_GREEN = "#4CAF50";
 
 const DETAIL_LABELS: Record<
@@ -444,7 +444,7 @@ export default function YearlyDashboardClient() {
           <button
             type="button"
             onClick={handleGoSetup}
-            className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-slate-900 shadow-md shadow-orange-100 hover:bg-[#fb923c] transition"
+            className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-slate-900 shadow-md shadow-orange-100 hover:bg-[#348f6c] transition"
             style={{ ["--brand-blue" as any]: BRAND_blue }}
           >
             🍽 기본 레시피 입력하러 가기

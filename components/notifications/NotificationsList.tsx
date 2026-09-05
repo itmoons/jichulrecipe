@@ -121,7 +121,7 @@ export default function NotificationsList({
               onClick={() => setFilter("all")}
               className={`rounded-lg px-3 py-1.5 text-xs font-medium ${
                 filter === "all"
-                  ? "bg-[#ff8a3d] text-slate-900"
+                  ? "bg-[#1f7a5b] text-slate-900"
                   : "bg-zinc-100 text-zinc-700"
               }`}
             >
@@ -133,7 +133,7 @@ export default function NotificationsList({
               onClick={() => setFilter("unread")}
               className={`rounded-lg px-3 py-1.5 text-xs font-medium ${
                 filter === "unread"
-                  ? "bg-[#ff8a3d] text-slate-900"
+                  ? "bg-[#1f7a5b] text-slate-900"
                   : "bg-zinc-100 text-zinc-700"
               }`}
             >
@@ -195,7 +195,7 @@ export default function NotificationsList({
                   <button
                     onClick={() => approve(coupleLinkId, n.id)}
                     disabled={loadingAction === `approve:${coupleLinkId}`}
-                    className="rounded-lg bg-[#ff8a3d] px-3 py-2 text-xs font-semibold text-slate-900 disabled:opacity-60"
+                    className="rounded-lg bg-[#1f7a5b] px-3 py-2 text-xs font-semibold text-slate-900 disabled:opacity-60"
                   >
                     승인
                   </button>
