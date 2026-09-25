@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { createPortal } from "react-dom";
 import { supabase } from "@/lib/supabaseClient";
 
 type CoupleContext = {
@@ -34,6 +35,12 @@ function cx(...classes: Array<string | false | null | undefined>) {
 function money(n: number | bigint) {
   const v = typeof n === "bigint" ? Number(n) : n;
   return (v || 0).toLocaleString("ko-KR");
+}
+
+function compactMoney(n: number) {
+  if (n >= 100000000) return `${Number((n / 100000000).toFixed(1))}억`;
+  if (n >= 10000) return `${Number((n / 10000).toFixed(1))}만`;
+  return money(n);
 }
 
 function formatMonthLabel(date: Date) {
@@ -105,7 +112,7 @@ function Surface({
   return (
     <section
       className={cx(
-        "rounded-[20px] md:rounded-[24px] border border-[#F3F4F6] bg-white shadow-[0_8px_24px_rgba(15,23,42,0.04)]",
+        "rounded-xl md:rounded-xl border border-[#F3F4F6] bg-white shadow-sm",
         className
       )}
     >
@@ -174,6 +181,18 @@ export default function CoupleLedgerCalendarUI() {
     const t = setTimeout(() => setToast(null), 2400);
     return () => clearTimeout(t);
   }, [toast]);
+
+  useEffect(() => {
+    if (!selectedDateKey) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        if (receiptPreviewUrl) setReceiptPreviewUrl(null);
+        else setSelectedDateKey(null);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [selectedDateKey, receiptPreviewUrl]);
 
   const loadContext = async (): Promise<CoupleContext> => {
     const { data: u } = await supabase.auth.getUser();
@@ -322,7 +341,7 @@ export default function CoupleLedgerCalendarUI() {
 
   if (checking) {
     return (
-      <div className="mx-auto max-w-[1180px] landing-surface min-h-screen p-6 text-[14px] text-slate-600">
+      <div className="mx-auto w-full max-w-[1320px] landing-surface min-h-screen p-6 text-[14px] text-slate-600">
         불러오는 중…
       </div>
     );
@@ -351,7 +370,7 @@ export default function CoupleLedgerCalendarUI() {
   if (!ctx?.couple_link_id) {
     return (
       <div className="landing-surface min-h-screen">
-        <div className="mx-auto max-w-5xl px-4 py-6 md:px-6 md:py-8">
+        <div className="mx-auto w-full max-w-[1320px] px-4 py-6 sm:px-6 md:py-8 lg:px-0">
           <Surface className="p-5 md:p-6">
             <div className="text-[20px] md:text-[22px] font-semibold tracking-[-0.02em] text-slate-900">
               지출 달력
@@ -378,7 +397,7 @@ export default function CoupleLedgerCalendarUI() {
 
   return (
     <div className="landing-surface min-h-screen pb-10">
-      <div className="mx-auto max-w-[1320px] px-4 py-5 md:px-6 md:py-8">
+      <div className="mx-auto w-full max-w-[1320px] px-4 py-5 sm:px-6 md:py-8 lg:px-0">
         <Surface className="overflow-hidden">
           <div className="border-b border-[#F3F4F6] bg-white px-4 py-5 md:px-6 md:py-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -388,21 +407,6 @@ export default function CoupleLedgerCalendarUI() {
                 </div>
                 <div className="mt-2 max-w-2xl text-[13px] md:text-[14px] leading-6 text-slate-600">
                   언제 얼마나 썼는지 날짜 흐름으로 확인하는 커플 가계부 달력입니다.
-                </div>
-
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <Link href="/couple-ledger" className={secondaryButtonClass}>
-                    기록
-                  </Link>
-                  <Link href="/couple-ledger/calendar" className={primaryButtonClass}>
-                    달력
-                  </Link>
-                  <Link href="/couple-ledger/analytics" className={secondaryButtonClass}>
-                    분석
-                  </Link>
-                  <Link href="/couple-settings" className={neutralButtonClass}>
-                    설정
-                  </Link>
                 </div>
               </div>
 
@@ -416,21 +420,21 @@ export default function CoupleLedgerCalendarUI() {
           </div>
 
           <div className="grid gap-3 px-4 py-4 md:grid-cols-3 md:px-6 md:py-5">
-            <div className="rounded-[18px] border border-[#d5f9ff] bg-[#f9fdff] px-4 py-4">
+            <div className="rounded-xl border border-[#d5f9ff] bg-[#f9fdff] px-4 py-4">
               <div className="text-[11px] font-medium text-slate-500">이번 달 총 공동지출</div>
               <div className="mt-1 text-[15px] font-semibold text-slate-900">
                 {money(monthSummary.total)}원
               </div>
             </div>
 
-            <div className="rounded-[18px] border border-[#d5f9ff] bg-[#f9fdff] px-4 py-4">
+            <div className="rounded-xl border border-[#d5f9ff] bg-[#f9fdff] px-4 py-4">
               <div className="text-[11px] font-medium text-slate-500">이번 달 기록 건수</div>
               <div className="mt-1 text-[15px] font-semibold text-slate-900">
                 {monthSummary.count}건
               </div>
             </div>
 
-            <div className="rounded-[18px] border border-[#d5f9ff] bg-[#f9fdff] px-4 py-4">
+            <div className="rounded-xl border border-[#d5f9ff] bg-[#f9fdff] px-4 py-4">
               <div className="text-[11px] font-medium text-slate-500">가장 큰 비중의 카테고리</div>
               <div className="mt-1 text-[15px] font-semibold text-slate-900">
                 {monthSummary.topCategory}
@@ -472,19 +476,19 @@ export default function CoupleLedgerCalendarUI() {
           </div>
 
           {sharedLocked ? (
-            <div className="mt-5 rounded-[20px] border border-slate-200 bg-slate-50 p-4 text-[14px] text-slate-700">
+            <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 text-[14px] text-slate-700">
               공동 공유가 꺼져 있어 달력에 공동 지출을 표시할 수 없습니다.
             </div>
           ) : (
             <>
-              <div className="mt-5 overflow-x-auto">
-                <div className="min-w-[760px]">
-                  <div className="grid grid-cols-7 gap-2">
+              <div className="mt-4 min-w-0">
+                <div className="min-w-0">
+                  <div className="grid grid-cols-7 gap-1 sm:gap-2">
                     {weekdayLabels.map((day, idx) => (
                       <div
                         key={day}
                         className={cx(
-                          "rounded-[14px] border border-slate-200 bg-slate-50 px-3 py-2 text-center text-[12px] font-medium",
+                          "rounded-lg border border-slate-200 bg-slate-50 px-1 py-1.5 text-center text-[11px] font-medium sm:text-[12px]",
                           idx === 0 && "text-rose-500",
                           idx === 6 && "text-blue-500"
                         )}
@@ -494,7 +498,7 @@ export default function CoupleLedgerCalendarUI() {
                     ))}
                   </div>
 
-                  <div className="mt-2 grid grid-cols-7 gap-2">
+                  <div className="mt-1 grid grid-cols-7 gap-1 sm:mt-2 sm:gap-2">
                     {calendarDays.map((day) => {
                       const dateKey = formatDateKey(day);
                       const items = groupedByDate[dateKey] || [];
@@ -504,18 +508,6 @@ export default function CoupleLedgerCalendarUI() {
                         (sum, x) => sum + Number(x.amount || 0),
                         0
                       );
-
-                      const categoryMap: Record<string, number> = {};
-                      for (const item of items) {
-                        const key = item.category || "기타";
-                        categoryMap[key] =
-                          (categoryMap[key] || 0) + Number(item.amount || 0);
-                      }
-
-                      const topCategories = Object.entries(categoryMap)
-                        .sort((a, b) => b[1] - a[1])
-                        .slice(0, 2)
-                        .map(([name]) => name);
 
                       const mePaid = items.reduce((sum, x) => {
                         return x.created_by === ctx.partner_user_id
@@ -534,14 +526,15 @@ export default function CoupleLedgerCalendarUI() {
                           key={dateKey}
                           type="button"
                           onClick={() => setSelectedDateKey(dateKey)}
+                          aria-label={`${formatDateLabel(dateKey)}, ${items.length}건, ${money(total)}원`}
                           className={cx(
-                            "min-h-[122px] rounded-[18px] border p-3 text-left transition",
+                            "h-[68px] min-w-0 overflow-hidden rounded-lg border p-1.5 text-left transition sm:h-[82px] sm:p-2 lg:h-[clamp(56px,7vh,76px)]",
                             isCurrentMonth
                               ? "border-[#E5E7EB] bg-white hover:border-[#c6e2d4] hover:bg-[#fbfdff]"
                               : "border-slate-100 bg-slate-50 text-slate-400",
                             selectedDateKey === dateKey &&
                               "border-[#1f7a5b] ring-2 ring-[#d9efff]",
-                            isToday && "shadow-[inset_0_0_0_1px_#1f7a5b]"
+                            isToday && "shadow-sm"
                           )}
                         >
                           <div className="flex items-start justify-between gap-2">
@@ -572,31 +565,19 @@ export default function CoupleLedgerCalendarUI() {
                             )}
                           </div>
 
-                          <div className="mt-3">
+                          <div className="mt-1.5 min-w-0 sm:mt-2">
                             {items.length > 0 ? (
                               <>
-                                <div className="text-[13px] font-semibold text-[#1f7a5b]">
-                                  {money(total)}원
+                                <div className="truncate text-[10px] font-semibold text-[#1f7a5b] sm:text-[12px]">
+                                  <span className="sm:hidden">{compactMoney(total)}</span>
+                                  <span className="hidden sm:inline">{money(total)}원</span>
                                 </div>
-                                <div className="mt-1 text-[11px] text-slate-500">
+                                <div className="mt-0.5 text-[10px] text-slate-500">
                                   {items.length}건
-                                </div>
-
-                                <div className="mt-2 flex flex-wrap gap-1">
-                                  {topCategories.map((cat) => (
-                                    <span
-                                      key={cat}
-                                      className="rounded-[9px] bg-[#f1f8f4] px-2 py-1 text-[10px] font-medium text-[#1f7a5b]"
-                                    >
-                                      {cat}
-                                    </span>
-                                  ))}
                                 </div>
                               </>
                             ) : (
-                              <div className="mt-7 text-[11px] text-slate-300">
-                                기록 없음
-                              </div>
+                              <div className="hidden text-[10px] text-slate-300 sm:block">기록 없음</div>
                             )}
                           </div>
                         </button>
@@ -606,22 +587,15 @@ export default function CoupleLedgerCalendarUI() {
                 </div>
               </div>
 
-              <div className="mt-4 rounded-[20px] border border-[#d5f9ff] bg-[#f9fdff] p-4 text-[12px] leading-6 text-slate-600">
-                <div>
-                  <b className="text-slate-900">읽는 법</b>
-                </div>
-                <div className="mt-1">- 파란 점은 내가 결제한 내역이 있는 날입니다.</div>
-                <div>- 회색 점은 상대가 결제한 내역이 있는 날입니다.</div>
-                <div>- 날짜를 누르면 당일 상세 내역을 확인할 수 있습니다.</div>
-              </div>
+              <p className="mt-3 text-[11px] text-slate-500">초록 점: 내 결제 · 회색 점: 상대 결제 · 날짜를 누르면 상세 내역을 볼 수 있습니다.</p>
             </>
           )}
         </Surface>
       </div>
 
-      {selectedDateKey && (
-        <div className="fixed inset-0 z-50 bg-black/35">
-          <div className="absolute inset-x-0 bottom-0 mx-auto max-w-2xl rounded-t-[10px] bg-white p-5 shadow-[0_-16px_40px_rgba(15,23,42,0.18)] md:bottom-70 md:rounded-[10px]">
+      {selectedDateKey && createPortal(
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-3 sm:p-6" onClick={() => setSelectedDateKey(null)}>
+          <div role="dialog" aria-modal="true" aria-label={`${formatDateLabel(selectedDateKey)} 공동 지출 상세`} onClick={(event) => event.stopPropagation()} className="w-full max-w-2xl max-h-[calc(100dvh-24px)] overflow-y-auto rounded-xl bg-white p-4 shadow-xl sm:max-h-[calc(100dvh-48px)] sm:p-5">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <div className="text-[18px] font-semibold text-slate-900">
@@ -642,21 +616,21 @@ export default function CoupleLedgerCalendarUI() {
             </div>
 
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              <div className="rounded-[16px] border border-[#d5f9ff] bg-[#f9fdff] px-4 py-3">
+              <div className="rounded-xl border border-[#d5f9ff] bg-[#f9fdff] px-4 py-3">
                 <div className="text-[11px] text-slate-500">당일 총액</div>
                 <div className="mt-1 text-[15px] font-semibold text-slate-900">
                   {money(selectedDateSummary.total)}원
                 </div>
               </div>
 
-              <div className="rounded-[16px] border border-[#d5f9ff] bg-[#f9fdff] px-4 py-3">
+              <div className="rounded-xl border border-[#d5f9ff] bg-[#f9fdff] px-4 py-3">
                 <div className="text-[11px] text-slate-500">건수</div>
                 <div className="mt-1 text-[15px] font-semibold text-slate-900">
                   {selectedDateSummary.count}건
                 </div>
               </div>
 
-              <div className="rounded-[16px] border border-[#d5f9ff] bg-[#f9fdff] px-4 py-3">
+              <div className="rounded-xl border border-[#d5f9ff] bg-[#f9fdff] px-4 py-3">
                 <div className="text-[11px] text-slate-500">대표 카테고리</div>
                 <div className="mt-1 text-[15px] font-semibold text-slate-900">
                   {selectedDateSummary.topCategory}
@@ -664,9 +638,9 @@ export default function CoupleLedgerCalendarUI() {
               </div>
             </div>
 
-            <div className="mt-5 max-h-[42vh] overflow-y-auto pr-1">
+            <div className="mt-5">
               {selectedItems.length === 0 ? (
-                <div className="rounded-[18px] border border-slate-200 bg-slate-50 p-6 text-center text-[14px] text-slate-600">
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-6 text-center text-[14px] text-slate-600">
                   이 날짜에는 기록이 없습니다.
                 </div>
               ) : (
@@ -674,7 +648,7 @@ export default function CoupleLedgerCalendarUI() {
                   {selectedItems.map((item) => (
                     <div
                       key={item.id}
-                      className="rounded-[18px] border border-[#F3F4F6] bg-white px-4 py-4"
+                      className="rounded-xl border border-[#F3F4F6] bg-white px-4 py-4"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
@@ -731,17 +705,17 @@ export default function CoupleLedgerCalendarUI() {
               </Link>
             </div>
           </div>
-        </div>
+        </div>, document.body
       )}
 
-      {receiptPreviewUrl && (
+      {receiptPreviewUrl && createPortal(
         <div
           className="fixed inset-0 z-[70] bg-black/55 p-4"
           onClick={() => setReceiptPreviewUrl(null)}
         >
           <div className="flex min-h-full items-center justify-center">
             <div
-              className="w-full max-w-3xl rounded-[20px] bg-white p-4 shadow-[0_20px_60px_rgba(15,23,42,0.25)]"
+              className="w-full max-w-3xl rounded-xl bg-white p-4 shadow-sm"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between gap-3">
@@ -765,7 +739,7 @@ export default function CoupleLedgerCalendarUI() {
                 </div>
               </div>
 
-              <div className="mt-4 overflow-hidden rounded-[16px] border border-slate-200 bg-slate-50">
+              <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
                 <img
                   src={receiptPreviewUrl}
                   alt="영수증 미리보기"
@@ -774,14 +748,14 @@ export default function CoupleLedgerCalendarUI() {
               </div>
             </div>
           </div>
-        </div>
+        </div>, document.body
       )}
 
       {toast && (
         <div className="fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 px-4">
           <div
             className={cx(
-              "min-w-[220px] rounded-[10px] px-4 py-2.5 text-[12px] font-medium text-white shadow-[0_12px_30px_rgba(0,0,0,0.16)]",
+              "min-w-[220px] rounded-[10px] px-4 py-2.5 text-[12px] font-medium text-white shadow-sm",
               toast.type === "success" && "bg-[#1f7a5b]",
               toast.type === "error" && "bg-[#d84b4b]",
               toast.type === "info" && "bg-slate-900"

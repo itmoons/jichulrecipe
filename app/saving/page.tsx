@@ -498,7 +498,7 @@ export default function SavingPage() {
 
             {/* 에러 */}
             {errorMsg && (
-              <section className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-[10px] text-red-700 sm:text-[8px]">
+              <section className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-[10px] text-red-700 sm:text-[8px]">
                 {errorMsg}
               </section>
             )}
@@ -526,7 +526,7 @@ export default function SavingPage() {
             </section>
 
             {/* 목록 */}
-            <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
               <div className="flex flex-col gap-3 border-b border-slate-100 px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4">
                 <div className="min-w-0">
                   <h2 className="text-[10px] font-semibold text-slate-900 sm:text-[16px]">
@@ -951,7 +951,7 @@ export default function SavingPage() {
 
 function SummaryCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-blue-200 bg-white px-4 py-4 shadow-sm">
+    <div className="rounded-lg border border-blue-200 bg-white px-4 py-4 shadow-sm">
       <div className="text-[10px] font-medium text-slate-500 sm:text-xs">
         {label}
       </div>
@@ -1006,7 +1006,7 @@ function SavingPlanModal({
       />
 
       <div className="absolute inset-0 flex items-end justify-center p-0 sm:items-center sm:p-4">
-        <div className="flex h-[92vh] w-full flex-col overflow-hidden rounded-t-2xl border border-slate-200 bg-white shadow-xl sm:h-auto sm:max-h-[90vh] sm:max-w-[640px] sm:rounded-2xl">
+        <div className="flex h-[92vh] w-full flex-col overflow-hidden rounded-t-2xl border border-slate-200 bg-white shadow-sm sm:h-auto sm:max-h-[90vh] sm:max-w-[640px] sm:rounded-lg">
           <div className="flex items-center justify-between border-b border-slate-100 px-4 py-4 sm:px-5">
             <div className="min-w-0">
               <div className="text-[10px] font-semibold text-slate-900 sm:text-[8px]">

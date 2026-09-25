@@ -190,6 +190,11 @@ export function SiteHeader() {
       active: pathname === "/dashboard" || pathname?.startsWith("/dashboard/yearly"),
     },
     {
+      href: "/dashboard/memos",
+      label: "오늘의 메모",
+      active: pathname?.startsWith("/dashboard/memos"),
+    },
+    {
       href: "/saving",
       label: "저축 · 정기관리",
       active: pathname?.startsWith("/saving"),
@@ -212,7 +217,7 @@ export function SiteHeader() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-[#dbe9e1] bg-white/95 backdrop-blur">
+    <header className="sticky top-0 z-40 w-full border-b border-[#e2e5e1] bg-white ">
       {/* 1차 헤더 */}
       <div className="mx-auto flex h-[60px] w-full max-w-[1180px] items-center justify-between px-4 sm:h-[68px] sm:px-6">
           {/* 좌측 */}
@@ -235,7 +240,7 @@ export function SiteHeader() {
                 closeNotif();
               }}
             >
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#dbe9e1] bg-[#f7faf8] p-1.5 sm:h-10 sm:w-10">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#e2e5e1] bg-[#f7faf8] p-1.5 sm:h-10 sm:w-10">
                 <div className="relative h-full w-full">
                   <Image
                     src="/logo/logo.png"
@@ -249,7 +254,7 @@ export function SiteHeader() {
               </div>
 
               <div className="min-w-0 leading-tight">
-                <div className="truncate text-[15px] font-extrabold tracking-[-0.04em] text-slate-800 sm:text-[17px]">
+                <div className="truncate text-[15px] font-bold tracking-[-0.04em] text-slate-800 sm:text-[17px]">
                   지출<span className="text-orange-500">recipe</span>
                 </div>
                 <div className="hidden text-[11px] text-slate-400 sm:block">
@@ -392,9 +397,9 @@ export function SiteHeader() {
 
                 {isNotifOpen && (
                   <div className="absolute right-0 mt-2 w-[min(560px,92vw)]">
-                    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+                    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
                       <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-                        <div className="text-[14px] font-extrabold text-slate-900">
+                        <div className="text-[14px] font-bold text-slate-900">
                           알림 센터
                         </div>
 
@@ -431,7 +436,7 @@ export function SiteHeader() {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="inline-flex h-9 items-center justify-center rounded-lg border border-[#dbe9e1] bg-white px-3 text-[11px] font-semibold text-slate-700 transition hover:bg-orange-50"
+                  className="inline-flex h-9 items-center justify-center rounded-lg border border-[#e2e5e1] bg-white px-3 text-[11px] font-semibold text-slate-700 transition hover:bg-orange-50"
                 >
                   로그아웃
                 </button>
@@ -456,11 +461,11 @@ export function SiteHeader() {
 
       {/* 모바일 메뉴 */}
       {isNavOpen && (
-        <div className="border-t border-[#dbe9e1] bg-white px-4 py-4 lg:hidden">
+        <div className="border-t border-[#e2e5e1] bg-white px-4 py-4 lg:hidden">
           <div className="mx-auto max-w-[1180px]">
             <nav>
               <div className="border-b border-slate-100 px-4 py-3">
-                <div className="text-[14px] font-extrabold text-slate-900">메뉴</div>
+                <div className="text-[14px] font-bold text-slate-900">메뉴</div>
                 <div className="mt-1 text-[10px] leading-5 text-slate-500">
                   원하는 가계부 기능으로 바로 이동하세요.
                 </div>
@@ -475,7 +480,7 @@ export function SiteHeader() {
                       "rounded-lg border px-3 py-3 text-[12px] font-semibold transition",
                       item.active
                         ? "border-orange-200 bg-orange-50 text-orange-800"
-                        : "border-[#dbe9e1] bg-white text-slate-700 hover:bg-orange-50",
+                        : "border-[#e2e5e1] bg-white text-slate-700 hover:bg-orange-50",
                     ].join(" ")}
                     onClick={() => {
                       closeNav();

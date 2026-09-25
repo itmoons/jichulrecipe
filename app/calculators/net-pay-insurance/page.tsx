@@ -28,7 +28,7 @@ export default function NetPayInsurancePage() {
 
     const status =
       g <= 0
-        ? { label: "입력 필요", badge: "bg-[#1f7a5b] text-[#ffffff]" }
+        ? { label: "입력 필요", badge: "bg-[#1f7a5b] text-white" }
         : { label: "범위 추정", badge: "bg-[#1f7a5b] text-white" };
 
     return { g, lowDeduct, highDeduct, netLow, netHigh, status };
@@ -46,7 +46,7 @@ export default function NetPayInsurancePage() {
     >
       <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
         {/* 입력 */}
-        <section className={cn("rounded-3xl border p-4 sm:p-6 shadow-sm", UI.card)}>
+        <section className={cn("rounded-xl border p-4 sm:p-6 shadow-sm", UI.card)}>
           <div className="flex items-start justify-between gap-3">
             <div>
               <h2 className={cn("text-lg font-semibold", UI.ink)}>입력</h2>
@@ -63,7 +63,7 @@ export default function NetPayInsurancePage() {
             <MoneyInput label="월급(세전)" value={grossMonthly} setValue={setGrossMonthly} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#dcefe5] bg-white p-4">
+          <div className="mt-4 rounded-lg border border-[#e2e5e1] bg-white p-4">
             <div className="text-[12px] font-semibold text-[#3B2F1E]">안내</div>
             <p className="mt-2 text-[12px] text-[#6d6d6d]">
               개인별 과세/비과세, 급여항목, 보험료 상한/기준소득월액 등으로 실제 실수령은 달라집니다.
@@ -73,7 +73,7 @@ export default function NetPayInsurancePage() {
         </section>
 
         {/* 결과 */}
-        <section className={cn("rounded-3xl border p-4 sm:p-6 shadow-sm", UI.card)}>
+        <section className={cn("rounded-xl border p-4 sm:p-6 shadow-sm", UI.card)}>
           <h2 className={cn("text-lg font-semibold", UI.ink)}>결과(대략)</h2>
 
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -86,7 +86,7 @@ export default function NetPayInsurancePage() {
             />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#dcefe5] bg-white p-4">
+          <div className="mt-4 rounded-lg border border-[#e2e5e1] bg-white p-4">
             <div className={cn("text-[12px] font-semibold", UI.ink)}>예산에 쓰는 법</div>
             <div className="mt-3 grid gap-2">
               <Row label="보수적 계획" value="실수령 하단(낮은 값) 기준으로 고정비를 맞추세요" tone="ok" />
@@ -97,13 +97,13 @@ export default function NetPayInsurancePage() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/calculators/insurance-ratio-check"
-              className="rounded-2xl bg-[#1f7a5b] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+              className="rounded-lg bg-[#1f7a5b] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#176247]"
             >
               다음: 보험료 점검 →
             </Link>
             <Link
               href="/calculators"
-              className="rounded-2xl border border-[#dcefe5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]"
+              className="rounded-lg border border-[#e2e5e1] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]"
             >
               계산기 모음으로
             </Link>

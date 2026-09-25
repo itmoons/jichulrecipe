@@ -10,12 +10,11 @@ function cn(...xs: Array<string | false | null | undefined>) {
 
 /** 레시피북 톤(연노랑 + 주황) */
 const UI = {
-  paperBg: "bg-[#ffffff]",
-  paperDots:
-    "bg-[radial-gradient(circle,rgba(251,146,60,0.14)_1px,transparent_1px)] bg-[size:16px_16px] mx-auto w-full max-w-[1320px] px-3 py-4 sm:px-4 sm:py-6",
-  ink: "text-[#3B2F1E]",
-  inkSoft: "text-[#7f7f7f]",
-  card: "bg-[#f1f8f4] border-[#dcefe5]",
+  paperBg: "bg-transparent",
+  paperDots: "w-full",
+  ink: "text-slate-900",
+  inkSoft: "text-slate-600",
+  card: "bg-white border-[#dce5dd]",
 };
 
 function toNumberSafe(v: string) {
@@ -50,7 +49,7 @@ function ratioStatus(ratio: number) {
   if (ratio <= 50) {
     return {
       label: "주의",
-      badge: "bg-[#1f7a5b] text-[#ffffff]", // 옐로
+      badge: "bg-[#1f7a5b] text-white", // 옐로
       title: "고정비가 소득 대비 꽤 큰 편입니다.",
       desc: "통신·구독·보험처럼 ‘작게 여러 개’ 쌓인 항목부터 정리하면 효과가 빠릅니다. 결제일/자동결제도 같이 확인하세요.",
     };
@@ -127,19 +126,19 @@ export default function FixedCostRatioPage() {
           <div className="mb-5 flex items-center justify-between">
             <Link
               href="/calculators"
-              className="rounded-full border border-[#dcefe5] bg-[#f1f8f4] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]"
+              className="rounded-full border border-[#e2e5e1] bg-[#f1f8f4] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]"
             >
               ← 계산기 모음
             </Link>
 
-            <span className="rounded-full bg-[#1f7a5b] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
+            <span className="rounded-full bg-[#1f7a5b] px-3 py-1.5 text-[12px] font-semibold text-white">
               고정비 점검
             </span>
           </div>
 
           {/* 헤더 */}
           <div className="mb-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#dcefe5] bg-[#f1f8f4] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#e2e5e1] bg-[#f1f8f4] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm">
               <span className="inline-block h-2 w-2 rounded-full bg-[#1f7a5b]" />
               Recipe Calculator
             </div>
@@ -155,7 +154,7 @@ export default function FixedCostRatioPage() {
           {/* 본문: 입력 / 결과 */}
           <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
             {/* 입력 카드 */}
-            <section className={cn("rounded-3xl border p-4 sm:p-6 shadow-sm", UI.card)}>
+            <section className={cn("rounded-xl border p-4 sm:p-6 shadow-sm", UI.card)}>
               <h2 className={cn("text-lg font-semibold", UI.ink)}>입력</h2>
               <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>
                 금액은 월 기준으로 입력하세요. (예: 월세 80만, 관리비 15만 → 95만)
@@ -169,7 +168,7 @@ export default function FixedCostRatioPage() {
                   hint="급여 + 고정적으로 들어오는 수입"
                 />
 
-                <div className="h-px bg-[#dcefe5]" />
+                <div className="h-px bg-[#e2e5e1]" />
 
                 <MoneyInput
                   label="주거/대출/관리"
@@ -183,7 +182,7 @@ export default function FixedCostRatioPage() {
                 <MoneyInput label="기타 고정비" value={etc} setValue={setEtc} hint="정기후원/정액서비스 등" />
               </div>
 
-              <div className="mt-5 rounded-2xl border border-[#dcefe5] bg-white p-4">
+              <div className="mt-5 rounded-lg border border-[#e2e5e1] bg-white p-4">
                 <div className={cn("text-[12px] font-semibold", UI.ink)}>빠른 팁</div>
                 <ul className={cn("mt-2 list-disc pl-5 text-[12px] leading-relaxed", UI.inkSoft)}>
                   <li>고정비는 한 번 늘면 줄이기 어렵습니다. “자동결제·결제일”부터 점검하세요.</li>
@@ -193,7 +192,7 @@ export default function FixedCostRatioPage() {
             </section>
 
             {/* 결과 카드 */}
-            <section className={cn("rounded-3xl border p-4 sm:p-6 shadow-sm", UI.card)}>
+            <section className={cn("rounded-xl border p-4 sm:p-6 shadow-sm", UI.card)}>
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h2 className={cn("text-lg font-semibold", UI.ink)}>결과</h2>
@@ -214,7 +213,7 @@ export default function FixedCostRatioPage() {
               </div>
 
               {/* 바(시각화) */}
-              <div className="mt-4 rounded-2xl border border-[#dcefe5] bg-white p-4">
+              <div className="mt-4 rounded-lg border border-[#e2e5e1] bg-white p-4">
                 <div className="flex items-center justify-between">
                   <div className={cn("text-[12px] font-semibold", UI.ink)}>고정비 비율 게이지</div>
                   <div className={cn("text-xs", UI.inkSoft)}>0% ~ 100% (100% 초과는 100%로 표시)</div>
@@ -233,7 +232,7 @@ export default function FixedCostRatioPage() {
               </div>
 
               {/* 구성 비중 */}
-              <div className="mt-4 rounded-2xl border border-[#dcefe5] bg-white p-4">
+              <div className="mt-4 rounded-lg border border-[#e2e5e1] bg-white p-4">
                 <div className={cn("text-[12px] font-semibold", UI.ink)}>고정비 구성 비중(%)</div>
                 <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                   <ShareRow label="주거/대출/관리" pct={calc.shares.housing} />
@@ -245,7 +244,7 @@ export default function FixedCostRatioPage() {
               </div>
 
               {/* TOP 3 */}
-              <div className="mt-4 rounded-2xl border border-[#dcefe5] bg-white p-4">
+              <div className="mt-4 rounded-lg border border-[#e2e5e1] bg-white p-4">
                 <div className="flex items-center justify-between">
                   <div className={cn("text-[12px] font-semibold", UI.ink)}>비중이 큰 항목 TOP 3</div>
                   <div className={cn("text-xs", UI.inkSoft)}>정리 우선순위 힌트</div>
@@ -258,10 +257,10 @@ export default function FixedCostRatioPage() {
                     {calc.top3.map((p, idx) => (
                       <li
                         key={p.key}
-                        className="flex items-center justify-between rounded-xl border border-[#dcefe5] bg-[#f1f8f4] px-3 py-2"
+                        className="flex items-center justify-between rounded-xl border border-[#e2e5e1] bg-[#f1f8f4] px-3 py-2"
                       >
                         <div className="flex items-center gap-2">
-                          <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-[#1f7a5b] text-xs font-bold text-[#ffffff]">
+                          <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-[#1f7a5b] text-xs font-bold text-white">
                             {idx + 1}
                           </span>
                           <span className={cn("text-[12px] font-semibold", UI.ink)}>{p.label}</span>
@@ -277,13 +276,13 @@ export default function FixedCostRatioPage() {
               <div className="mt-5 flex flex-col gap-2 sm:flex-row">
                 <Link
                   href="/calculators/subscription-total"
-                  className="rounded-2xl bg-[#1f7a5b] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+                  className="rounded-lg bg-[#1f7a5b] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#176247]"
                 >
                   다음: 구독 총액 계산기 →
                 </Link>
                 <Link
                   href="/"
-                  className="rounded-2xl border border-[#dcefe5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]"
+                  className="rounded-lg border border-[#e2e5e1] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]"
                 >
                   지출레시피 홈으로
                 </Link>
@@ -333,7 +332,7 @@ function MoneyInput({
           placeholder="0"
           className={cn(
             "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-[12px] outline-none",
-            "border-[#dcefe5] focus:border-[#1f7a5b] focus:ring-2 focus:ring-[#1f7a5b]/20"
+            "border-[#e2e5e1] focus:border-[#1f7a5b] focus:ring-2 focus:ring-[#1f7a5b]/20"
           )}
         />
       </div>
@@ -343,7 +342,7 @@ function MoneyInput({
 
 function MetricCard({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[#dcefe5] bg-white p-4">
+    <div className="rounded-lg border border-[#e2e5e1] bg-white p-4">
       <div className="text-xs font-semibold text-[#7f7f7f]">{title}</div>
       <div className="mt-1 text-xl font-bold text-[#3B2F1E]">{value}</div>
     </div>
@@ -353,7 +352,7 @@ function MetricCard({ title, value }: { title: string; value: string }) {
 function ShareRow({ label, pct }: { label: string; pct: number }) {
   const bar = clamp(pct, 0, 100);
   return (
-    <div className="rounded-xl border border-[#dcefe5] bg-[#f1f8f4] p-3">
+    <div className="rounded-xl border border-[#e2e5e1] bg-[#f1f8f4] p-3">
       <div className="flex items-center justify-between">
         <span className="text-[12px] font-semibold text-[#3B2F1E]">{label}</span>
         <span className="text-[12px] font-semibold text-[#ffffff]">{pct.toFixed(1)}%</span>

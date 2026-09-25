@@ -29,16 +29,15 @@ export function RecipeCard({
   return (
     <div
       className={cn(
-        "rounded-2xl border bg-white shadow-sm",
+        "rounded-lg border bg-white shadow-sm",
         "border-blue-100/70",
-        "backdrop-blur supports-[backdrop-filter]:bg-white/80",
         className
       )}
     >
       {(title || description || right) && (
         <div className="flex items-start justify-between gap-3 border-b border-blue-100/70 px-4 py-3">
           <div>
-            {title && <div className="text-base font-extrabold text-zinc-900">{title}</div>}
+            {title && <div className="text-base font-bold text-zinc-900">{title}</div>}
             {description && <div className="text-xs text-zinc-500 mt-0.5">{description}</div>}
           </div>
           {right}
@@ -80,7 +79,7 @@ export function RecipeButton({
 
   const v =
     variant === "primary"
-      ? "bg-[#1f7a5b] text-slate-900 hover:bg-[#348f6c] shadow-sm"
+      ? "bg-[#1f7a5b] text-white hover:bg-[#176247] shadow-sm"
       : variant === "danger"
       ? "bg-red-500 text-white hover:bg-red-600"
       : variant === "outline"

@@ -391,9 +391,9 @@ export default function NotificationsPanel({
             <div
   key={n.id}
   className={[
-    "relative rounded-2xl border p-4 transition",
+    "relative rounded-lg border p-4 transition",
     isUnread
-      ? "border-orange-200 bg-gradient-to-br from-blue-50 to-blue-50 shadow-sm"
+      ? "border-orange-200 bg-[#f6f7f5] shadow-sm"
       : "border-zinc-200 bg-white",
   ].join(" ")}
   onClick={stopBubble}
@@ -417,7 +417,7 @@ export default function NotificationsPanel({
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="text-lg">{meta.icon}</span>
-                    <div className="text-[12px] font-extrabold text-zinc-900">
+                    <div className="text-[12px] font-bold text-zinc-900">
                       {meta.title}
                     </div>
                     {isUnread && <RecipeBadge variant="blue">NEW</RecipeBadge>}
@@ -442,7 +442,7 @@ export default function NotificationsPanel({
 
               {body && (
                 <div
-                  className="mt-3 rounded-xl bg-white/80 px-3 py-2 text-[12px] text-zinc-800"
+                  className="mt-3 rounded-xl bg-white px-3 py-2 text-[12px] text-zinc-800"
                   onClick={stopBubble}
                   onPointerDown={stopBubble}
                 >
@@ -495,7 +495,7 @@ export default function NotificationsPanel({
 
           {todayItems.length > 0 && (
             <div>
-              <div className="mb-3 text-xs font-extrabold tracking-wide text-zinc-500">
+              <div className="mb-3 text-xs font-bold tracking-wide text-zinc-500">
                 오늘
               </div>
               {renderList(todayItems)}
@@ -504,7 +504,7 @@ export default function NotificationsPanel({
 
           {previousItems.length > 0 && (
             <div className={todayItems.length > 0 ? "mt-6" : ""}>
-              <div className="mb-3 text-xs font-extrabold tracking-wide text-zinc-500">
+              <div className="mb-3 text-xs font-bold tracking-wide text-zinc-500">
                 이전
               </div>
               {renderList(previousItems)}
@@ -516,7 +516,7 @@ export default function NotificationsPanel({
       {toast && (
         <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 px-4">
           <div
-            className={`min-w-[220px] rounded-2xl px-4 py-3 text-[12px] font-semibold text-white shadow-xl ${
+            className={`min-w-[220px] rounded-lg px-4 py-3 text-[12px] font-semibold text-white shadow-sm ${
               toast.type === "success"
                 ? "bg-[#1f7a5b]"
                 : toast.type === "error"

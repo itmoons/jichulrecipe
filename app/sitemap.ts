@@ -8,11 +8,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: `${base}/`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 1.0,
     },
-    { url: `${base}/calculators`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
-    ...calculatorSlugs.map((slug) => ({ url: `${base}/calculators/${slug}`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 })),
+    { url: `${base}/calculators` },
+    ...calculatorSlugs.map((slug) => ({ url: `${base}/calculators/${slug}` })),
   ];
 }

@@ -71,7 +71,7 @@ export default function TransferPlan({ ledgerId }: { ledgerId: string }) {
           <div className="text-[12px] text-zinc-500">송금이 필요 없거나(균형) 데이터가 없습니다.</div>
         ) : (
           plan.map((r, idx) => (
-            <div key={idx} className="rounded-2xl border border-blue-100 bg-white p-3">
+            <div key={idx} className="rounded-lg border border-blue-100 bg-white p-3">
               <div className="flex items-center justify-between gap-2">
                 <div className="text-[12px] font-bold text-zinc-900">
                   {nameOf(r.from_user_id)} → {nameOf(r.to_user_id)}

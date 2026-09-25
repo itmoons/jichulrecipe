@@ -121,7 +121,7 @@ export default function NotificationsList({
               onClick={() => setFilter("all")}
               className={`rounded-lg px-3 py-1.5 text-xs font-medium ${
                 filter === "all"
-                  ? "bg-[#1f7a5b] text-slate-900"
+                  ? "bg-[#1f7a5b] text-white"
                   : "bg-zinc-100 text-zinc-700"
               }`}
             >
@@ -133,7 +133,7 @@ export default function NotificationsList({
               onClick={() => setFilter("unread")}
               className={`rounded-lg px-3 py-1.5 text-xs font-medium ${
                 filter === "unread"
-                  ? "bg-[#1f7a5b] text-slate-900"
+                  ? "bg-[#1f7a5b] text-white"
                   : "bg-zinc-100 text-zinc-700"
               }`}
             >
@@ -155,7 +155,7 @@ export default function NotificationsList({
           return (
             <div
               key={n.id}
-              className={`relative rounded-2xl border p-4 ${
+              className={`relative rounded-lg border p-4 ${
                 isUnread
                   ? "border-amber-200 bg-amber-50"
                   : "border-zinc-200 bg-zinc-50"
@@ -195,7 +195,7 @@ export default function NotificationsList({
                   <button
                     onClick={() => approve(coupleLinkId, n.id)}
                     disabled={loadingAction === `approve:${coupleLinkId}`}
-                    className="rounded-lg bg-[#1f7a5b] px-3 py-2 text-xs font-semibold text-slate-900 disabled:opacity-60"
+                    className="rounded-lg bg-[#1f7a5b] px-3 py-2 text-xs font-semibold text-white disabled:opacity-60"
                   >
                     승인
                   </button>

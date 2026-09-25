@@ -392,8 +392,6 @@ export default function YearlyDashboardClient() {
     return (
       <PageContainer title="연간 지출 레시피 대시보드">
         <div className="pointer-events-none fixed inset-0 -z-10 landing-surface" />
-        <div className="pointer-events-none fixed left-[-80px] top-[40%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,184,108,0.25)] blur-3xl" />
-        <div className="pointer-events-none fixed right-[-60px] bottom-[8%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,193,130,0.22)] blur-3xl" />
 
         <div className="flex min-h-[60vh] items-center justify-center">
           <p className="text-xs text-slate-500">
@@ -410,10 +408,8 @@ export default function YearlyDashboardClient() {
       <PageContainer title="연간 지출 레시피 대시보드">
         {/* 배경 */}
         <div className="pointer-events-none fixed inset-0 -z-10 landing-surface" />
-        <div className="pointer-events-none fixed left-[-80px] top-[40%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,184,108,0.25)] blur-3xl" />
-        <div className="pointer-events-none fixed right-[-60px] bottom-[8%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,193,130,0.22)] blur-3xl" />
 
-        <div className="mx-auto max-w-xl rounded-2xl bg-white/95 p-6 text-center shadow-sm shadow-blue-50">
+        <div className="mx-auto max-w-xl rounded-lg bg-white p-6 text-center shadow-sm ">
           {/* 연도 네비 */}
           <div className="mb-3 flex items-center justify-center gap-3 text-[12px] font-semibold text-slate-900">
             <button
@@ -444,7 +440,7 @@ export default function YearlyDashboardClient() {
           <button
             type="button"
             onClick={handleGoSetup}
-            className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-slate-900 shadow-md shadow-orange-100 hover:bg-[#348f6c] transition"
+            className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-white shadow-md hover:bg-[#176247] transition"
             style={{ ["--brand-blue" as any]: BRAND_blue }}
           >
             🍽 기본 레시피 입력하러 가기
@@ -470,8 +466,6 @@ export default function YearlyDashboardClient() {
     <PageContainer title="연간 지출 레시피 대시보드">
       {/* 배경 */}
       <div className="pointer-events-none fixed inset-0 -z-10 landing-surface" />
-      <div className="pointer-events-none fixed left-[-80px] top-[40%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,184,108,0.25)] blur-3xl" />
-      <div className="pointer-events-none fixed right-[-60px] bottom-[8%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,193,130,0.22)] blur-3xl" />
 
       {/* 헤더 */}
       <motion.section
@@ -481,7 +475,7 @@ export default function YearlyDashboardClient() {
         className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between"
       >
         <div>
-          <div className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-[11px] font-medium text-slate-600 shadow-sm">
+          <div className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-[11px] font-medium text-slate-600 shadow-sm">
             <span
               className="h-2 w-2 rounded-full"
               style={{ backgroundColor: BRAND_blue }}
@@ -507,7 +501,7 @@ export default function YearlyDashboardClient() {
 
         {/* 우측: 연도 네비 + 안내 */}
         <div className="flex flex-col items-end gap-2 text-[11px] text-slate-500">
-          <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-2 py-1 shadow-sm">
+          <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-2 py-1 shadow-sm">
             <button
               type="button"
               onClick={() => handleChangeYear(-1)}
@@ -541,7 +535,7 @@ export default function YearlyDashboardClient() {
         className="mb-4 grid gap-4 md:grid-cols-3"
       >
         {/* 연간 세후 소득 합계 & 평균 */}
-        <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-blue-50">
+        <div className="rounded-lg bg-white p-4 shadow-sm ">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-700">
               연간 세후 소득 합계
@@ -563,7 +557,7 @@ export default function YearlyDashboardClient() {
         </div>
 
         {/* 연간 계획 지출 합계 & 평균 */}
-        <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-blue-50">
+        <div className="rounded-lg bg-white p-4 shadow-sm ">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-700">
               연간 계획 지출 합계
@@ -587,7 +581,7 @@ export default function YearlyDashboardClient() {
         </div>
 
         {/* 연간 저축(적금) & 비율 */}
-        <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-blue-50">
+        <div className="rounded-lg bg-white p-4 shadow-sm ">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-700">
               연간 적금(저축) 합계
@@ -622,7 +616,7 @@ export default function YearlyDashboardClient() {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.08 }}
-        className="mb-4 rounded-2xl bg-white/95 p-4 shadow-sm shadow-blue-50"
+        className="mb-4 rounded-lg bg-white p-4 shadow-sm "
       >
         <h3 className="mb-2 text-[12px] font-semibold text-slate-900">
           연간 지출 비율 한 눈에 보기
@@ -679,7 +673,7 @@ export default function YearlyDashboardClient() {
         className="grid gap-4 md:grid-cols-[1.3fr_0.7fr]"
       >
         {/* 카테고리 테이블 */}
-        <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-blue-50">
+        <div className="rounded-lg bg-white p-4 shadow-sm ">
           <div className="mb-3 flex items-center justify-between">
             <h3 className="text-[12px] font-semibold text-slate-900">
               카테고리별 연간 지출 레시피
@@ -722,7 +716,7 @@ export default function YearlyDashboardClient() {
 
         {/* 해석/코멘트 카드 */}
         <div className="space-y-4">
-          <div className="rounded-2xl bg-white/95 p-4 shadow-sm shadow-blue-50">
+          <div className="rounded-lg bg-white p-4 shadow-sm ">
             <h3 className="mb-2 text-[12px] font-semibold text-slate-900">
               {currentYear}년 레시피 한 줄 정리
             </h3>
@@ -765,7 +759,7 @@ export default function YearlyDashboardClient() {
             </ul>
           </div>
 
-          <div className="rounded-2xl bg-gradient-to-r from-[#FFF7EB] to-[#FFF4E5] p-4 text-[11px] leading-relaxed text-slate-700 shadow-sm shadow-blue-50">
+          <div className="rounded-lg bg-[#f6f7f5] p-4 text-[11px] leading-relaxed text-slate-700 shadow-sm ">
             <p className="mb-2">
               👨‍🍳 <strong>TIP.</strong> 연간 레벨에서 보면 월별로 조금씩 조정한
               결과가 얼마나 누적되는지 보입니다.

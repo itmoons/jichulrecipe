@@ -10,12 +10,11 @@ function cn(...xs: Array<string | false | null | undefined>) {
 
 /** 레시피북 톤(연노랑 + 주황) */
 const UI = {
-  paperBg: "bg-[#ffffff]",
-  paperDots:
-    "bg-[radial-gradient(circle,rgba(251,146,60,0.14)_1px,transparent_1px)] bg-[size:16px_16px] mx-auto w-full max-w-[1320px] px-3 py-4 sm:px-4 sm:py-6",
-  ink: "text-[#3B2F1E]",
-  inkSoft: "text-[#7f7f7f]",
-  card: "bg-[#f1f8f4] border-[#dcefe5]",
+  paperBg: "bg-transparent",
+  paperDots: "w-full",
+  ink: "text-slate-900",
+  inkSoft: "text-slate-600",
+  card: "bg-white border-[#dce5dd]",
 };
 
 function toNumberSafe(v: string) {
@@ -180,7 +179,7 @@ export default function CutbackGoalPage() {
       baseTotal <= 0
         ? {
             label: "입력 필요",
-            badge: "bg-[#1f7a5b] text-[#ffffff]",
+            badge: "bg-[#1f7a5b] text-white",
             msg: "카테고리 기준 지출(전월/평균)을 입력하세요.",
           }
         : targetCut > totalMaxCut
@@ -192,7 +191,7 @@ export default function CutbackGoalPage() {
         : remaining > 1
         ? {
             label: "부분 달성",
-            badge: "bg-[#1f7a5b] text-[#ffffff]",
+            badge: "bg-[#1f7a5b] text-white",
             msg: "일부 카테고리 상한 때문에 목표를 전부 채우지 못했습니다. 상한/우선순위를 조정해보세요.",
           }
         : {
@@ -225,19 +224,19 @@ export default function CutbackGoalPage() {
           <div className="mb-5 flex items-center justify-between gap-3">
             <Link
               href="/calculators"
-              className="rounded-full border border-[#dcefe5] bg-[#f1f8f4] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b] whitespace-nowrap break-keep"
+              className="rounded-full border border-[#e2e5e1] bg-[#f1f8f4] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b] whitespace-nowrap break-keep"
             >
               ← 계산기 모음
             </Link>
 
-            <span className="rounded-full bg-[#1f7a5b] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff] whitespace-nowrap break-keep">
+            <span className="rounded-full bg-[#1f7a5b] px-3 py-1.5 text-[12px] font-semibold text-white whitespace-nowrap break-keep">
               절감 목표 역산
             </span>
           </div>
 
           {/* 헤더 */}
           <div className="mb-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#dcefe5] bg-[#f1f8f4] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm whitespace-nowrap break-keep">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#e2e5e1] bg-[#f1f8f4] px-3 py-1 text-xs font-medium text-[#7f7f7f] shadow-sm whitespace-nowrap break-keep">
               <span className="inline-block h-2 w-2 rounded-full bg-[#1f7a5b]" />
               Recipe Calculator
             </div>
@@ -253,7 +252,7 @@ export default function CutbackGoalPage() {
 
           <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
             {/* 입력 */}
-            <section className={cn("rounded-3xl border p-4 sm:p-6 shadow-sm break-keep", UI.card)}>
+            <section className={cn("rounded-xl border p-4 sm:p-6 shadow-sm break-keep", UI.card)}>
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <h2 className={cn("text-lg font-semibold", UI.ink)}>입력</h2>
@@ -288,7 +287,7 @@ export default function CutbackGoalPage() {
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <button
                     onClick={addRow}
-                    className="rounded-2xl border border-[#dcefe5] bg-white px-4 py-2 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b] whitespace-nowrap break-keep"
+                    className="rounded-lg border border-[#e2e5e1] bg-white px-4 py-2 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b] whitespace-nowrap break-keep"
                   >
                     + 카테고리 추가
                   </button>
@@ -298,7 +297,7 @@ export default function CutbackGoalPage() {
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-[#dcefe5] bg-white p-4">
+                <div className="rounded-lg border border-[#e2e5e1] bg-white p-4">
                   <div className="text-[12px] font-semibold text-[#3B2F1E]">카테고리 입력</div>
                   <div className="mt-2 text-xs text-[#7f7f7f]">
                     우선순위 “높음”은 보호 카테고리(덜 자름)입니다. 상한은 “현실적으로 줄일 수 있는 최대치”를 적으세요.
@@ -306,7 +305,7 @@ export default function CutbackGoalPage() {
 
                   <div className="mt-3 grid gap-2">
                     {rows.map((r, idx) => (
-                      <div key={`${r.key}-${idx}`} className="rounded-xl border border-[#dcefe5] bg-white p-3">
+                      <div key={`${r.key}-${idx}`} className="rounded-xl border border-[#e2e5e1] bg-white p-3">
                         <div className="flex items-start justify-between gap-2">
                           <div className="min-w-0 flex-1">
                             <TextInput
@@ -319,7 +318,7 @@ export default function CutbackGoalPage() {
                           {/* ✅ 삭제 버튼 깨짐/줄바꿈 방지 */}
                           <button
                             onClick={() => removeRow(idx)}
-                            className="rounded-full border border-[#dcefe5] bg-white px-3 py-1 text-xs font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]
+                            className="rounded-full border border-[#e2e5e1] bg-white px-3 py-1 text-xs font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]
                                        whitespace-nowrap break-keep shrink-0 min-w-[56px]"
                           >
                             삭제
@@ -346,7 +345,7 @@ export default function CutbackGoalPage() {
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-[#dcefe5] bg-white p-4">
+                <div className="rounded-lg border border-[#e2e5e1] bg-white p-4">
                   <div className={cn("text-[12px] font-semibold", UI.ink)}>해석 팁</div>
                   <ul className={cn("mt-2 list-disc pl-5 text-[12px] leading-relaxed", UI.inkSoft)}>
                     <li>상한이 너무 높으면 “실행 불가한 계획”이 됩니다. 너무 낮으면 목표 달성이 어려워져요.</li>
@@ -358,7 +357,7 @@ export default function CutbackGoalPage() {
             </section>
 
             {/* 결과 */}
-            <section className={cn("rounded-3xl border p-4 sm:p-6 shadow-sm break-keep", UI.card)}>
+            <section className={cn("rounded-xl border p-4 sm:p-6 shadow-sm break-keep", UI.card)}>
               <h2 className={cn("text-lg font-semibold", UI.ink)}>결과</h2>
               <p className={cn("mt-1 text-[12px]", UI.inkSoft)}>{calc.status.msg}</p>
 
@@ -375,9 +374,9 @@ export default function CutbackGoalPage() {
 
               {/* 부족분 */}
               {calc.remaining > 1 && (
-                <div className="mt-3 rounded-2xl border border-[#dcefe5] bg-white p-4">
+                <div className="mt-3 rounded-lg border border-[#e2e5e1] bg-white p-4">
                   <div className="text-[12px] font-semibold text-[#3B2F1E]">부족분</div>
-                  <div className="mt-1 text-2xl font-extrabold text-[#ffffff]">
+                  <div className="mt-1 text-2xl font-bold text-[#ffffff]">
                     {formatKRW(calc.remaining)}원
                   </div>
                   <p className="mt-1 text-[12px] text-[#6d6d6d]">
@@ -387,7 +386,7 @@ export default function CutbackGoalPage() {
               )}
 
               {/* TOP 3 */}
-              <div className="mt-4 rounded-2xl border border-[#dcefe5] bg-white p-4">
+              <div className="mt-4 rounded-lg border border-[#e2e5e1] bg-white p-4">
                 <div className={cn("text-[12px] font-semibold", UI.ink)}>어디서 줄이나요? (TOP 3)</div>
                 <div className="mt-3 grid gap-2">
                   {calc.top3.length === 0 ? (
@@ -404,7 +403,7 @@ export default function CutbackGoalPage() {
               </div>
 
               {/* 전체 테이블 */}
-              <div className="mt-4 rounded-2xl border border-[#dcefe5] bg-white p-4">
+              <div className="mt-4 rounded-lg border border-[#e2e5e1] bg-white p-4">
                 <div className={cn("text-[12px] font-semibold", UI.ink)}>카테고리별 권장 컷</div>
                 <div className="mt-3 overflow-x-auto">
                   <table className="min-w-[720px] w-full text-[12px]">
@@ -421,7 +420,7 @@ export default function CutbackGoalPage() {
                     </thead>
                     <tbody>
                       {calc.result.map((x) => (
-                        <tr key={x.key} className="border-t border-[#dcefe5]">
+                        <tr key={x.key} className="border-t border-[#e2e5e1]">
                           <td className="py-2 pr-3 font-semibold text-[#3B2F1E]">{x.key}</td>
                           <td className="py-2 pr-3 text-[#7f7f7f]">{formatKRW(x.base)}원</td>
                           <td className="py-2 pr-3 font-bold text-[#ffffff]">-{formatKRW(x.cut)}원</td>
@@ -440,13 +439,13 @@ export default function CutbackGoalPage() {
               <div className="mt-5 flex flex-col gap-2 sm:flex-row">
                 <Link
                   href="/calculators/emergency-fund-timeline"
-                  className="rounded-2xl bg-[#1f7a5b] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C] whitespace-nowrap break-keep"
+                  className="rounded-lg bg-[#1f7a5b] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#176247] whitespace-nowrap break-keep"
                 >
                   다음: 비상금 목표 기간 →
                 </Link>
                 <Link
                   href="/calculators"
-                  className="rounded-2xl border border-[#dcefe5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b] whitespace-nowrap break-keep"
+                  className="rounded-lg border border-[#e2e5e1] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b] whitespace-nowrap break-keep"
                 >
                   계산기 모음으로
                 </Link>
@@ -490,7 +489,7 @@ function MoneyInput({
           placeholder="0"
           className={cn(
             "h-11 w-full rounded-xl border bg-white pl-8 pr-3 text-[12px] outline-none",
-            "border-[#dcefe5] focus:border-[#1f7a5b] focus:ring-2 focus:ring-[#1f7a5b]/20"
+            "border-[#e2e5e1] focus:border-[#1f7a5b] focus:ring-2 focus:ring-[#1f7a5b]/20"
           )}
         />
       </div>
@@ -517,7 +516,7 @@ function TextInput({
         onChange={(e) => setValue(e.target.value)}
         className={cn(
           "h-10 w-full rounded-xl border bg-white px-3 text-[12px] font-semibold outline-none",
-          "border-[#dcefe5] focus:border-[#1f7a5b] focus:ring-2 focus:ring-[#1f7a5b]/20"
+          "border-[#e2e5e1] focus:border-[#1f7a5b] focus:ring-2 focus:ring-[#1f7a5b]/20"
         )}
       />
     </div>
@@ -551,7 +550,7 @@ function PctInput({
           placeholder="0"
           className={cn(
             "h-11 w-full rounded-xl border bg-white px-3 pr-10 text-[12px] outline-none",
-            "border-[#dcefe5] focus:border-[#1f7a5b] focus:ring-2 focus:ring-[#1f7a5b]/20"
+            "border-[#e2e5e1] focus:border-[#1f7a5b] focus:ring-2 focus:ring-[#1f7a5b]/20"
           )}
         />
         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-[#9C7A55]">
@@ -588,7 +587,7 @@ function SelectInput({
         onChange={(e) => onChange(e.target.value)}
         className={cn(
           "h-11 w-full rounded-xl border bg-white px-3 text-[12px] outline-none",
-          "border-[#dcefe5] focus:border-[#1f7a5b] focus:ring-2 focus:ring-[#1f7a5b]/20"
+          "border-[#e2e5e1] focus:border-[#1f7a5b] focus:ring-2 focus:ring-[#1f7a5b]/20"
         )}
       >
         {options.map((o) => (
@@ -603,7 +602,7 @@ function SelectInput({
 
 function EmptyNote({ text }: { text: string }) {
   return (
-    <div className="rounded-xl border border-[#dcefe5] bg-white px-3 py-2 text-[12px] font-semibold text-[#7f7f7f] break-keep">
+    <div className="rounded-xl border border-[#e2e5e1] bg-white px-3 py-2 text-[12px] font-semibold text-[#7f7f7f] break-keep">
       {text}
     </div>
   );
@@ -611,7 +610,7 @@ function EmptyNote({ text }: { text: string }) {
 
 function TopRow({ label, cut, cutPct }: { label: string; cut: number; cutPct: number }) {
   return (
-    <div className="flex items-center justify-between rounded-xl border border-[#dcefe5] bg-white px-3 py-2">
+    <div className="flex items-center justify-between rounded-xl border border-[#e2e5e1] bg-white px-3 py-2">
       <span className="text-[12px] font-semibold text-[#3B2F1E] break-keep">{label}</span>
       <span className="text-[12px] font-bold text-[#ffffff] whitespace-nowrap break-keep">
         -{formatKRW(cut)}원 ({pct(cutPct)}%)
@@ -630,11 +629,11 @@ function MetricCard({
   accent?: boolean;
 }) {
   return (
-    <div className={cn("rounded-2xl border border-[#dcefe5] bg-white p-4", accent && "bg-[#FFF7D6]")}>
+    <div className={cn("rounded-lg border border-[#e2e5e1] bg-white p-4", accent && "bg-[#FFF7D6]")}>
       <div className="text-xs font-semibold text-[#7f7f7f] break-keep">{title}</div>
       <div
         className={cn(
-          "mt-1 text-lg sm:text-xl font-extrabold",
+          "mt-1 text-lg sm:text-xl font-bold",
           accent ? "text-[#ffffff]" : "text-[#3B2F1E]"
         )}
       >

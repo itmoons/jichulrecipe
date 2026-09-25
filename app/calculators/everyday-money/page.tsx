@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
+import { RecipeShell } from "@/components/calculators/RecipeShell";
 
 type Tool = "raise" | "severance" | "salary" | "housing" | "margin" | "compound" | "return";
 
@@ -27,8 +27,8 @@ function Field({ label, value, onChange, suffix = "원" }: { label: string; valu
   return (
     <label className="block">
       <span className="mb-2 block text-sm font-semibold text-slate-700">{label}</span>
-      <div className="flex overflow-hidden rounded-xl border border-slate-200 bg-white transition focus-within:border-orange-500 focus-within:ring-4 focus-within:ring-orange-100">
-        <input inputMode="decimal" value={value} onChange={(e) => onChange(e.target.value.replace(/[^0-9.]/g, ""))} className="min-w-0 flex-1 px-4 py-3 text-right font-semibold text-slate-900 outline-none" />
+      <div className="flex h-11 overflow-hidden rounded-lg border border-[#dce5dd] bg-white transition focus-within:border-[#1f7a5b] focus-within:ring-2 focus-within:ring-[#1f7a5b]/20">
+        <input inputMode="decimal" value={value} onChange={(e) => onChange(e.target.value.replace(/[^0-9.]/g, ""))} className="min-w-0 flex-1 px-4 text-right text-sm font-semibold text-slate-900 outline-none" />
         <span className="flex items-center border-l border-slate-100 bg-slate-50 px-3 text-sm font-medium text-slate-500">{suffix}</span>
       </div>
     </label>
@@ -58,7 +58,9 @@ export default function EverydayMoneyPage() {
 
   useEffect(() => {
     const requested = new URLSearchParams(window.location.search).get("tool") as Tool | null;
-    if (tools.some((item) => item.id === requested)) activateTool(requested!);
+    if (!tools.some((item) => item.id === requested)) return;
+    const timer = window.setTimeout(() => activateTool(requested!), 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   const result = useMemo(() => {
@@ -106,33 +108,22 @@ export default function EverydayMoneyPage() {
   };
 
   return (
-    <main className="app-surface min-h-screen px-4 py-8 sm:px-6 sm:py-12">
-      <div className="mx-auto max-w-6xl">
-        <div className="rounded-3xl border border-white/80 bg-white/72 px-6 py-8 shadow-[0_16px_40px_rgba(255,138,61,0.10)] backdrop-blur-xl sm:px-10 sm:py-10">
-          <Link href="/calculators" className="text-sm font-semibold text-orange-700 hover:text-orange-800">← 계산기 전체 보기</Link>
-          <div className="mt-5 max-w-2xl">
-            <p className="text-sm font-bold text-orange-700">생활 금융 빠른 계산</p>
-            <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">복잡한 돈 계산, 필요한 숫자만 입력하세요.</h1>
-            <p className="mt-3 text-base leading-7 text-slate-600">결과는 참고용 예상치입니다. 급여·세금·금융 상품의 실제 조건은 해당 기관의 안내를 확인해 주세요.</p>
-          </div>
-        </div>
-
-        <div className="mt-6 grid gap-6 lg:grid-cols-[1.05fr_1fr]">
-          <section className="rounded-3xl border border-white/80 bg-white/72 p-5 shadow-[0_16px_40px_rgba(255,138,61,0.08)] backdrop-blur-xl sm:p-7">
+    <RecipeShell badge="생활 금융" title="생활 금융 빠른 계산" subtitle="연봉·퇴직금·전월세·마진율 등 필요한 계산을 골라 숫자를 입력하세요.">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <section className="rounded-xl border border-[#dce5dd] bg-white p-5 shadow-sm sm:p-7">
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {tools.map((item) => <button key={item.id} onClick={() => activateTool(item.id)} className={`rounded-2xl border p-4 text-left transition ${tool === item.id ? "border-[#1f7a5b] bg-[#1f7a5b] text-slate-900 shadow-md shadow-orange-100" : "border-slate-200 bg-white text-slate-700 hover:border-orange-200 hover:bg-orange-50"}`}><span className="text-xl font-bold">{item.icon}</span><span className="mt-3 block text-sm font-bold">{item.title}</span><span className={`mt-1 block text-xs leading-5 ${tool === item.id ? "text-slate-700" : "text-slate-500"}`}>{item.description}</span></button>)}
+              {tools.map((item) => <button key={item.id} onClick={() => activateTool(item.id)} className={`rounded-lg border p-4 text-left transition ${tool === item.id ? "border-[#1f7a5b] bg-[#1f7a5b] text-white shadow-sm" : "border-[#dce5dd] bg-white text-slate-700 hover:border-[#1f7a5b] hover:bg-[#f7faf8]"}`}><span className="text-xl font-bold">{item.icon}</span><span className="mt-3 block text-sm font-bold">{item.title}</span><span className={`mt-1 block text-xs leading-5 ${tool === item.id ? "text-white/85" : "text-slate-500"}`}>{item.description}</span></button>)}
             </div>
             <div className="mt-7 space-y-5">{fields[tool].map((field) => <Field key={field.label} {...field} onChange={field.setter} />)}</div>
           </section>
 
-          <aside className="rounded-3xl border border-orange-100 bg-[#dcefe5] p-6 text-slate-900 shadow-xl shadow-orange-100/60 sm:p-8">
-            <p className="text-sm font-semibold text-orange-600">계산 결과</p>
-            <div className="mt-4 border-b border-orange-200 pb-6"><p className="text-sm text-slate-600">{result.label}</p><p className="mt-2 text-4xl font-bold tracking-tight sm:text-5xl">{result.headline}</p></div>
+          <aside className="rounded-xl border border-[#dce5dd] bg-white p-6 text-slate-900 shadow-sm sm:p-8">
+            <p className="text-sm font-semibold text-[#176247]">계산 결과</p>
+            <div className="mt-4 border-b border-[#dce5dd] pb-6"><p className="text-sm text-slate-600">{result.label}</p><p className="mt-2 break-words text-3xl font-bold tracking-tight sm:text-4xl">{result.headline}</p></div>
             <dl className="mt-6 space-y-4">{result.rows.map(([label, value]) => <div key={label} className="flex items-center justify-between gap-4 text-sm"><dt className="text-slate-600">{label}</dt><dd className="font-bold text-slate-900">{value}</dd></div>)}</dl>
-            <div className="mt-8 rounded-2xl border border-white/80 bg-white/65 p-4 text-sm leading-6 text-slate-600">계산 결과를 기준으로 예산을 세울 때는, 실수령액과 고정비를 먼저 반영하면 더 안전합니다.</div>
+            <div className="mt-8 rounded-lg border border-[#e2e5e1] bg-white p-4 text-sm leading-6 text-slate-600">계산 결과를 기준으로 예산을 세울 때는, 실수령액과 고정비를 먼저 반영하면 더 안전합니다.</div>
           </aside>
         </div>
-      </div>
-    </main>
+    </RecipeShell>
   );
 }

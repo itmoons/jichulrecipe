@@ -21,11 +21,11 @@ export default function InsuranceRatioCheckPage() {
     // 단정 대신 “경보 레벨”만 (보수적/일반적으로 쓰이는 점검 프레임)
     const level =
       inc <= 0
-        ? { label: "입력 필요", badge: "bg-[#1f7a5b] text-[#ffffff]" }
+        ? { label: "입력 필요", badge: "bg-[#1f7a5b] text-white" }
         : ratio < 5
         ? { label: "낮음", badge: "bg-[#34D399] text-white" }
         : ratio < 10
-        ? { label: "보통", badge: "bg-[#1f7a5b] text-[#ffffff]" }
+        ? { label: "보통", badge: "bg-[#1f7a5b] text-white" }
         : { label: "과다 의심", badge: "bg-[#1f7a5b] text-white" };
 
     const target5 = inc * 0.05;
@@ -46,7 +46,7 @@ export default function InsuranceRatioCheckPage() {
     >
       <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
         {/* 입력 */}
-        <section className={cn("rounded-3xl border p-4 sm:p-6 shadow-sm", UI.card)}>
+        <section className={cn("rounded-xl border p-4 sm:p-6 shadow-sm", UI.card)}>
           <div className="flex items-start justify-between gap-3">
             <div>
               <h2 className={cn("text-lg font-semibold", UI.ink)}>입력</h2>
@@ -62,7 +62,7 @@ export default function InsuranceRatioCheckPage() {
             <MoneyInput label="월 보험료 합계" value={monthlyInsurance} setValue={setMonthlyInsurance} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#dcefe5] bg-white p-4">
+          <div className="mt-4 rounded-lg border border-[#e2e5e1] bg-white p-4">
             <div className="text-[12px] font-semibold text-[#3B2F1E]">팁</div>
             <ul className="mt-2 list-disc pl-5 text-[12px] text-[#6d6d6d]">
               <li>보장성/저축성/실손 등 성격이 섞이면 ‘합계’만으로도 과다 신호를 볼 수 있습니다.</li>
@@ -72,7 +72,7 @@ export default function InsuranceRatioCheckPage() {
         </section>
 
         {/* 결과 */}
-        <section className={cn("rounded-3xl border p-4 sm:p-6 shadow-sm", UI.card)}>
+        <section className={cn("rounded-xl border p-4 sm:p-6 shadow-sm", UI.card)}>
           <h2 className={cn("text-lg font-semibold", UI.ink)}>결과</h2>
 
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -82,7 +82,7 @@ export default function InsuranceRatioCheckPage() {
             <MetricCard title="8% 기준(참고)" value={`${formatKRW(calc.target8)}원`} />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#dcefe5] bg-white p-4">
+          <div className="mt-4 rounded-lg border border-[#e2e5e1] bg-white p-4">
             <div className={cn("text-[12px] font-semibold", UI.ink)}>점검 포인트</div>
             <div className="mt-3 grid gap-2">
               <Row label="현재 레벨" value={calc.level.label} tone={calc.level.label === "과다 의심" ? "danger" : "ok"} />
@@ -105,13 +105,13 @@ export default function InsuranceRatioCheckPage() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/calculators/pension-pace"
-              className="rounded-2xl bg-[#1f7a5b] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#EA580C]"
+              className="rounded-lg bg-[#1f7a5b] px-4 py-2 text-center text-[12px] font-semibold text-white shadow-sm hover:bg-[#176247]"
             >
               다음: 연금저축/IRP 페이스 →
             </Link>
             <Link
               href="/calculators"
-              className="rounded-2xl border border-[#dcefe5] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]"
+              className="rounded-lg border border-[#e2e5e1] bg-white px-4 py-2 text-center text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]"
             >
               계산기 모음으로
             </Link>

@@ -51,7 +51,7 @@ function Surface({
   return (
     <section
       className={cx(
-        "rounded-[18px] border border-[#f1e4da] bg-white shadow-[0_4px_16px_rgba(85,47,18,0.05)]",
+        "rounded-xl border border-[#f1e4da] bg-white shadow-sm",
         className
       )}
     >
@@ -121,7 +121,7 @@ function QuickCard({
   return (
     <Link
       href={href}
-      className="group block rounded-[18px] border border-[#f1e4da] bg-white p-5 transition hover:-translate-y-[2px] hover:border-orange-200 hover:bg-[#fffdfb] hover:shadow-[0_10px_22px_rgba(211,92,16,0.09)]"
+      className="group block rounded-xl border border-[#f1e4da] bg-white p-5 transition hover:-translate-y-[2px] hover:border-orange-200 hover:bg-[#fffdfb] shadow-sm"
     >
       <div className="flex h-full min-h-[190px] flex-col justify-between sm:min-h-[140px]">
         <div className="flex items-start justify-between gap-3">
@@ -343,17 +343,17 @@ export default function CoupleLedgerPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f5f8f6] px-4 py-7 sm:px-6 sm:py-10">
-      <div className="mx-auto max-w-[1180px]">
+    <main className="min-h-screen bg-[#f6f7f5] px-4 py-7 sm:px-6 sm:py-10">
+      <div className="mx-auto w-full max-w-[1320px]">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-[11px] font-bold tracking-[0.14em] text-[#1f7a5b]">SHARED MONEY</p>
             <h1 className="mt-1 text-[26px] font-bold tracking-[-0.05em] text-slate-900">우리의 공동 지출</h1>
           </div>
-          <Link href="/couple-settings" className="rounded-lg border border-[#dbe9e1] bg-white px-3.5 py-2 text-[12px] font-semibold text-slate-600 transition hover:bg-[#f1f8f4]">공동 장부 설정</Link>
+          <Link href="/couple-settings" className="rounded-lg border border-[#e2e5e1] bg-white px-3.5 py-2 text-[12px] font-semibold text-slate-600 transition hover:bg-[#f1f8f4]">공동 장부 설정</Link>
         </div>
 
-        <section className="overflow-hidden rounded-[24px] bg-[#1f7a5b] text-white shadow-[0_16px_36px_rgba(31,122,91,0.18)]">
+        <section className="overflow-hidden rounded-xl bg-[#1f7a5b] text-white shadow-sm">
           <div className="grid gap-8 px-6 py-7 sm:px-9 sm:py-9 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
             <div>
               <div className="flex items-center gap-2 text-[12px] font-semibold text-white/75"><span className="h-2 w-2 rounded-full bg-[#9bd6bd]" /> 두 사람이 함께 기록 중</div>
@@ -363,7 +363,7 @@ export default function CoupleLedgerPage() {
               <Link href="/couple-ledger/entry" className="mt-6 inline-flex rounded-lg bg-white px-4 py-3 text-[13px] font-bold text-[#176247] transition hover:bg-[#eaf5ef]">+ 공동 지출 기록</Link>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-sm">
+            <div className="grid grid-cols-2 gap-3 rounded-lg border border-[#e2e5e1] bg-white/10 p-4 ">
               <div className="rounded-xl bg-white/10 p-4">
                 <p className="text-[11px] text-white/65">내가 결제한 금액</p>
                 <p className="mt-2 text-[20px] font-bold tracking-[-0.04em]">{money(summary.myPaid)}원</p>
@@ -381,7 +381,7 @@ export default function CoupleLedgerPage() {
         </section>
 
         <div className="mt-5 grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
-          <Surface className="overflow-hidden border-[#dbe9e1] shadow-none">
+          <Surface className="overflow-hidden border-[#e2e5e1] shadow-none">
             <div className="flex items-center justify-between border-b border-[#edf3ef] px-5 py-4 sm:px-6">
               <div><h2 className="text-[16px] font-bold tracking-[-0.03em] text-slate-900">최근 공동 지출</h2><p className="mt-1 text-[11px] text-slate-500">함께 기록한 내역을 최신순으로 확인하세요.</p></div>
               <Link href="/couple-ledger/calendar" className="text-[12px] font-bold text-[#1f7a5b]">전체 보기</Link>
@@ -400,7 +400,7 @@ export default function CoupleLedgerPage() {
             )}
           </Surface>
 
-          <Surface className="border-[#dbe9e1] p-5 shadow-none sm:p-6">
+          <Surface className="border-[#e2e5e1] p-5 shadow-none sm:p-6">
             <div className="flex items-start justify-between"><div><h2 className="text-[16px] font-bold tracking-[-0.03em] text-slate-900">소비 비중</h2><p className="mt-1 text-[11px] text-slate-500">이번 달 카테고리별 합계예요.</p></div><Link href="/couple-ledger/analytics" className="rounded-lg bg-[#f1f8f4] px-2.5 py-2 text-[11px] font-bold text-[#176247]">분석 보기</Link></div>
             <div className="mt-7 space-y-5">
               {summary.topCategories.length === 0 ? <p className="py-7 text-center text-[12px] text-slate-500">아직 분석할 지출이 없어요.</p> : summary.topCategories.map((row) => <BarRow key={row.label} label={row.label} amount={row.amount} max={chartMax} />)}
@@ -409,9 +409,9 @@ export default function CoupleLedgerPage() {
         </div>
 
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
-          <Link href="/couple-ledger/entry" className="rounded-xl border border-[#dbe9e1] bg-white p-5 transition hover:border-[#8ec9ae] hover:bg-[#f7faf8]"><p className="text-[12px] font-bold text-[#1f7a5b]">01</p><p className="mt-5 text-[15px] font-bold text-slate-900">지출 기록</p><p className="mt-1 text-[12px] text-slate-500">오늘의 공동 지출을 추가해요.</p></Link>
-          <Link href="/couple-ledger/calendar" className="rounded-xl border border-[#dbe9e1] bg-white p-5 transition hover:border-[#8ec9ae] hover:bg-[#f7faf8]"><p className="text-[12px] font-bold text-[#1f7a5b]">02</p><p className="mt-5 text-[15px] font-bold text-slate-900">달력으로 보기</p><p className="mt-1 text-[12px] text-slate-500">날짜별 소비를 한눈에 확인해요.</p></Link>
-          <Link href="/couple-ledger/analytics" className="rounded-xl border border-[#dbe9e1] bg-white p-5 transition hover:border-[#8ec9ae] hover:bg-[#f7faf8]"><p className="text-[12px] font-bold text-[#1f7a5b]">03</p><p className="mt-5 text-[15px] font-bold text-slate-900">소비 분석</p><p className="mt-1 text-[12px] text-slate-500">두 사람의 소비 흐름을 살펴봐요.</p></Link>
+          <Link href="/couple-ledger/entry" className="rounded-xl border border-[#e2e5e1] bg-white p-5 transition hover:border-[#8ec9ae] hover:bg-[#f7faf8]"><p className="text-[12px] font-bold text-[#1f7a5b]">01</p><p className="mt-5 text-[15px] font-bold text-slate-900">지출 기록</p><p className="mt-1 text-[12px] text-slate-500">오늘의 공동 지출을 추가해요.</p></Link>
+          <Link href="/couple-ledger/calendar" className="rounded-xl border border-[#e2e5e1] bg-white p-5 transition hover:border-[#8ec9ae] hover:bg-[#f7faf8]"><p className="text-[12px] font-bold text-[#1f7a5b]">02</p><p className="mt-5 text-[15px] font-bold text-slate-900">달력으로 보기</p><p className="mt-1 text-[12px] text-slate-500">날짜별 소비를 한눈에 확인해요.</p></Link>
+          <Link href="/couple-ledger/analytics" className="rounded-xl border border-[#e2e5e1] bg-white p-5 transition hover:border-[#8ec9ae] hover:bg-[#f7faf8]"><p className="text-[12px] font-bold text-[#1f7a5b]">03</p><p className="mt-5 text-[15px] font-bold text-slate-900">소비 분석</p><p className="mt-1 text-[12px] text-slate-500">두 사람의 소비 흐름을 살펴봐요.</p></Link>
         </div>
       </div>
     </main>

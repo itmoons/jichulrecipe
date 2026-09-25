@@ -9,6 +9,7 @@ import { ToasterHost } from "@/components/ui/toaster-host";
 import SiteFooter from "@/components/layout/SiteFooter";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { SiteSidebar } from "@/components/layout/SiteSidebar";
+import { PageExperience } from "@/components/layout/PageExperience";
 
 const pretendard = localFont({
   src: "./fonts/PretendardVariable.woff2",
@@ -163,7 +164,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-762XP39BW8"></script>
       </head>
 
-      <body className="min-h-screen bg-[#f5f8f6] pb-20 text-slate-900 font-sans lg:pb-0">
+      <body className="min-h-screen bg-[#f6f7f5] pb-20 text-slate-900 font-sans lg:pb-0">
         <noscript>
           <iframe
             src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
@@ -177,7 +178,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="xl:pl-60">
           {/* 모바일·태블릿에서만 상단 메뉴를 제공하고, 데스크톱은 왼쪽 사이드바로 통합한다. */}
           <div className="xl:hidden"><SiteHeader /></div>
-          {children}
+          <PageExperience>{children}</PageExperience>
           <ToasterHost />
           <SiteFooter />
         </div>

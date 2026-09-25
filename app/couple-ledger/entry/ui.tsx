@@ -94,7 +94,7 @@ function TabButton({
       type="button"
       onClick={onClick}
       className={cx(
-        "inline-flex shrink-0 items-center gap-1 rounded-[12px] px-4 py-2.5 text-[10px] font-medium transition-all duration-200",
+        "inline-flex shrink-0 items-center gap-1 rounded-[12px] px-4 py-2.5 text-[12px] font-medium transition-all duration-200",
         active
           ? "border border-[#c6e2d4] bg-[#f1f8f4] text-[#1f7a5b] shadow-sm"
           : "border border-slate-200 bg-white text-slate-600 hover:border-[#c6e2d4] hover:bg-[#f1f8f4] hover:text-[#1f7a5b]"
@@ -116,7 +116,7 @@ function Surface({
   return (
     <section
       className={cx(
-        "rounded-[20px] md:rounded-[24px] border border-[#F3F4F6] bg-white shadow-[0_8px_24px_rgba(15,23,42,0.04)]",
+        "rounded-xl md:rounded-xl border border-[#F3F4F6] bg-white shadow-sm",
         className
       )}
     >
@@ -135,8 +135,8 @@ function DataCard({
   subtle?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-[18px] border border-[#d5f9ff] bg-[#f9fdff] px-4 py-4">
-      <div className="text-[11px] font-medium text-slate-500">{label}</div>
+    <div className="rounded-xl border border-[#dce5dd] bg-[#f7faf8] px-4 py-4">
+      <div className="text-[12px] font-medium text-slate-500">{label}</div>
       <div className="mt-1 text-[14px] md:text-[15px] font-semibold text-slate-900">
         {value}
       </div>
@@ -154,7 +154,7 @@ function RecipeField({
 }) {
   return (
     <div>
-      <div className="text-[11px] font-medium text-slate-500">{label}</div>
+      <div className="text-[12px] font-medium text-slate-500">{label}</div>
       {children}
     </div>
   );
@@ -183,7 +183,7 @@ function InlineReceiptField({
         onChange={(e) => onPick(e.target.files?.[0] || null)}
       />
 
-      <div className="flex min-h-[46px] items-center gap-2 rounded-[16px] border border-[#E5E7EB] bg-white px-3 py-2">
+      <div className="flex min-h-[46px] items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-3 py-2">
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
@@ -229,13 +229,13 @@ function InlineReceiptField({
 }
 
 const inputBaseClass =
-  "mt-1.5 w-full rounded-[16px] border border-[#E5E7EB] bg-white px-3.5 py-2.5 text-[14px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#FDBA74] focus:ring-4 focus:ring-[#f1f8f4]";
+  "mt-1.5 w-full rounded-xl border border-[#dce5dd] bg-white px-3.5 py-2.5 text-[14px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#1f7a5b] focus:ring-4 focus:ring-[#f1f8f4]";
 
 const primaryButtonClass =
   "inline-flex items-center justify-center rounded-[12px] bg-[#1f7a5b] px-4 py-2.5 text-[13px] font-medium text-white transition hover:bg-[#1f7a5b] disabled:opacity-60";
 
 const neutralButtonClass =
-  "inline-flex items-center justify-center rounded-[12px] border border-slate-200 bg-white px-4 py-2.5 text-[10px] font-medium text-slate-700 transition hover:bg-slate-50";
+  "inline-flex items-center justify-center rounded-[12px] border border-slate-200 bg-white px-4 py-2.5 text-[12px] font-medium text-slate-700 transition hover:bg-slate-50";
 
 export default function CoupleLedgerEntryUI() {
   const [checking, setChecking] = useState(true);
@@ -249,7 +249,7 @@ export default function CoupleLedgerEntryUI() {
   const [partnerList, setPartnerList] = useState<PersonalExpense[]>([]);
 
   const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState("데이트");
+  const [category, setCategory] = useState("식사");
   const [memo, setMemo] = useState("");
   const [expenseDate, setExpenseDate] = useState(() => {
     const d = new Date();
@@ -537,6 +537,7 @@ export default function CoupleLedgerEntryUI() {
   }, []);
 
   const openMobileAddForm = () => {
+    setTab("shared");
     setShowMobileAddForm(true);
     setTimeout(() => {
       addFormRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -583,7 +584,7 @@ export default function CoupleLedgerEntryUI() {
 
       setAmount("");
       setMemo("");
-      setCategory("데이트");
+      setCategory("식사");
       setExpenseDate(() => {
         const d = new Date();
         const mm = String(d.getMonth() + 1).padStart(2, "0");
@@ -730,13 +731,15 @@ export default function CoupleLedgerEntryUI() {
 
   const mySharedPaidTotal = useMemo(() => {
     if (!ctx?.partner_user_id) return 0;
+    const d = new Date();
+    const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
     return sharedList
-      .filter((x) => x.created_by !== ctx.partner_user_id)
+      .filter((x) => x.created_by !== ctx.partner_user_id && x.expense_date.startsWith(ym))
       .reduce((sum, x) => sum + Number(x.amount || 0), 0);
   }, [sharedList, ctx?.partner_user_id]);
 
   if (checking) {
-    return <div className="mx-auto max-w-[1180px] landing-surface min-h-screen p-6 text-[14px] text-slate-600">불러오는 중…</div>;
+    return <div className="mx-auto w-full max-w-[1320px] landing-surface min-h-screen p-6 text-[14px] text-slate-600">불러오는 중…</div>;
   }
 
   if (!isLoggedIn) {
@@ -760,7 +763,7 @@ export default function CoupleLedgerEntryUI() {
   if (!ctx?.couple_link_id) {
     return (
       <div className="landing-surface min-h-screen">
-        <div className="mx-auto max-w-5xl px-4 py-6 md:px-6 md:py-8">
+        <div className="mx-auto w-full max-w-[1320px] px-4 py-6 sm:px-6 md:py-8 lg:px-0">
           <Surface className="p-5 md:p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
@@ -790,7 +793,7 @@ export default function CoupleLedgerEntryUI() {
 
   return (
     <div className="landing-surface min-h-screen pb-24 md:pb-10">
-      <div className="mx-auto max-w-[1320px] px-4 py-5 md:px-6 md:py-8">
+      <div className="mx-auto w-full max-w-[1320px] px-4 py-5 sm:px-6 md:py-8 lg:px-0">
         <Surface className="overflow-hidden">
           <div className="border-b border-[#F3F4F6] bg-white px-4 py-5 md:px-6 md:py-6">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
@@ -798,11 +801,11 @@ export default function CoupleLedgerEntryUI() {
                 <div className="text-[18px] md:text-[20px] font-semibold tracking-[-0.03em] text-slate-900">
                   우리의 지출 레시피
                 </div>
-                <div className="mt-2 max-w-2xl text-[10px] md:text-[14px] leading-6 text-slate-600">
-                  함께 쓴 돈을 한 장에 정리하고, 정산까지 이어지는 커플 가계부
+                <div className="mt-2 max-w-2xl text-[13px] md:text-[14px] leading-6 text-slate-600">
+                  함께 쓴 돈을 날짜별로 기록하고 정산까지 이어가는 커플 가계부
                 </div>
 
-                <div className="mt-4 flex flex-wrap gap-1 text-[6px]">
+                <div className="mt-4 flex flex-wrap gap-2">
                   <Pill tone="accent">함께 기록 중</Pill>
                   <Pill tone={sharedLocked ? "muted" : "soft"}>
                     공동 공유 {sharedLocked ? "OFF" : "ON"}
@@ -814,6 +817,7 @@ export default function CoupleLedgerEntryUI() {
                     편집 {canEdit ? "ON" : "OFF"}
                   </Pill>
                 </div>
+                {!sharedLocked && <button type="button" onClick={openMobileAddForm} className="mt-4 inline-flex rounded-lg bg-[#1f7a5b] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#176247]">+ 공동 지출 빠르게 기록</button>}
               </div>
 
               <CoupleLedgerNav active="entry" />
@@ -860,13 +864,13 @@ export default function CoupleLedgerEntryUI() {
           </div>
 
           {sharedLocked ? (
-            <div className="mt-5 rounded-[20px] border border-slate-200 bg-slate-50 p-4 text-[14px] text-slate-700">
+            <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 text-[14px] text-slate-700">
               공동 장부 공유가 꺼져 있습니다. 커플 설정에서 공동 공유를 켜면 정산이 활성화됩니다.
             </div>
           ) : (
             <>
               <div className="mt-5 grid gap-4 xl:grid-cols-[1.05fr_0.9fr_1.15fr]">
-                <div className="rounded-[20px] md:rounded-[24px] border border-[#d5f9ff] bg-[#f9fdff] p-4">
+                <div className="rounded-xl md:rounded-xl border border-[#d5f9ff] bg-[#f9fdff] p-4">
                   <div className="text-[12px] font-medium text-slate-500">기간 설정</div>
 
                   <div className="mt-3 flex flex-wrap gap-2">
@@ -926,7 +930,7 @@ export default function CoupleLedgerEntryUI() {
                   )}
                 </div>
 
-                <div className="rounded-[20px] md:rounded-[24px] border border-[#d5f9ff] bg-white p-4">
+                <div className="rounded-xl md:rounded-xl border border-[#d5f9ff] bg-white p-4">
                   <div className="text-[12px] font-medium text-slate-500">내 부담 비율</div>
                   <div className="mt-2 text-[12px] leading-5 text-slate-500">
                     50이면 반반, 60이면 내가 60% 부담합니다.
@@ -941,7 +945,7 @@ export default function CoupleLedgerEntryUI() {
                       onChange={(e) => setMySharePct(Number(e.target.value))}
                       className="w-full accent-[#1f7a5b]"
                     />
-                    <div className="min-w-[68px] rounded-[16px] border border-[#c6e2d4] bg-[#f1f8f4] px-3 py-2 text-center text-[14px] font-semibold text-[#1f7a5b]">
+                    <div className="min-w-[68px] rounded-xl border border-[#c6e2d4] bg-[#f1f8f4] px-3 py-2 text-center text-[14px] font-semibold text-[#1f7a5b]">
                       {mySharePct}%
                     </div>
                   </div>
@@ -951,12 +955,12 @@ export default function CoupleLedgerEntryUI() {
                   </div>
                 </div>
 
-                <div className="rounded-[20px] md:rounded-[24px] border border-[#c6e2d4] bg-[#f9fdff] p-4">
+                <div className="rounded-xl md:rounded-xl border border-[#c6e2d4] bg-[#f9fdff] p-4">
                   <div className="text-[12px] font-medium text-slate-500">정산 결과</div>
 
                   {settlement ? (
                     <>
-                      <div className="mt-3 rounded-[18px] md:rounded-[20px] border border-[#d5f9ff] bg-white px-4 py-4">
+                      <div className="mt-3 rounded-xl md:rounded-xl border border-[#d5f9ff] bg-white px-4 py-4">
                         <div className="text-[11px] font-medium text-slate-500">정산 문장</div>
                         <div className="mt-1 text-[14px] md:text-[16px] font-semibold leading-7 tracking-[-0.02em] text-slate-900">
                           {settlement.who_pays_to === "even" && "이번 기간은 정산 없음"}
@@ -992,8 +996,8 @@ export default function CoupleLedgerEntryUI() {
         <div className="mt-5 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <div className="flex w-max min-w-max gap-2 px-0">
             <TabButton active={tab === "shared"} onClick={() => setTab("shared")} icon="🧾" label="함께" />
-            <TabButton active={tab === "mine"} onClick={() => setTab("mine")} icon="✍️" label="내 레시피" />
-            <TabButton active={tab === "partner"} onClick={() => setTab("partner")} icon="💌" label="상대 레시피" />
+            <TabButton active={tab === "mine"} onClick={() => setTab("mine")} icon="✍️" label="내 개인 지출 공유" />
+            <TabButton active={tab === "partner"} onClick={() => setTab("partner")} icon="💌" label="상대 개인 지출 공유" />
           </div>
         </div>
 
@@ -1003,7 +1007,7 @@ export default function CoupleLedgerEntryUI() {
               <div className="text-[17px] md:text-[18px] font-semibold tracking-[-0.02em] text-slate-900">
                 {listTitle}
               </div>
-              <div className="mt-2 text-[10px] leading-5 text-slate-600">
+              <div className="mt-2 text-[12px] leading-5 text-slate-600">
                 {tab === "shared" && "둘이 함께 사용한 지출을 레시피처럼 남깁니다."}
                 {tab === "mine" && "내 개인 지출입니다. 개인 공유가 켜져 있어야 보입니다."}
                 {tab === "partner" && "상대 개인 지출입니다. 개인 공유가 켜져 있어야 보입니다."}
@@ -1028,13 +1032,13 @@ export default function CoupleLedgerEntryUI() {
           </div>
 
           {tab === "shared" && sharedLocked && (
-            <div className="mt-5 rounded-[20px] border border-slate-200 bg-slate-50 p-4 text-[14px] text-slate-700">
+            <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 text-[14px] text-slate-700">
               공동 공유가 꺼져 있어 공동 장부가 비공개 상태입니다. 커플 설정에서 켜면 사용할 수 있습니다.
             </div>
           )}
 
           {(tab === "mine" || tab === "partner") && personalLocked && (
-            <div className="mt-5 rounded-[20px] border border-slate-200 bg-slate-50 p-4 text-[14px] text-slate-700">
+            <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 text-[14px] text-slate-700">
               개인 지출 공유가 꺼져 있습니다. 커플 설정에서 개인 공유를 켜면 내/상대 지출 탭이 활성화됩니다.
             </div>
           )}
@@ -1043,7 +1047,7 @@ export default function CoupleLedgerEntryUI() {
             <div
               ref={addFormRef}
               className={cx(
-                "mt-5 rounded-[20px] md:rounded-[24px] border border-[#c6e2d4] bg-[#f9fdff] p-4 md:p-5",
+                "mt-5 scroll-mt-28 rounded-xl border border-[#c6e2d4] bg-[#f7faf8] p-4 md:p-5",
                 "block",
                 !showMobileAddForm && "hidden md:block"
               )}
@@ -1053,9 +1057,7 @@ export default function CoupleLedgerEntryUI() {
                   <div className="text-[15px] md:text-[16px] font-semibold text-slate-900">
                     새 지출 레시피 적기
                   </div>
-                  <div className="mt-1 text-[13px] text-slate-600">
-                    오늘 함께 사용한 지출을 간단히 남겨보세요.
-                  </div>
+                  <div className="mt-1 text-[13px] text-slate-600">금액을 먼저 입력하고 날짜·구분·메모를 덧붙이세요. 내가 결제한 건은 개인 레시피 달력에도 표시됩니다.</div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Pill tone="accent">Recipe Note</Pill>
@@ -1069,39 +1071,41 @@ export default function CoupleLedgerEntryUI() {
                 </div>
               </div>
 
-              <div className="mt-5 grid gap-3 grid-cols-1 md:grid-cols-2 xl:grid-cols-6">
-                <RecipeField label="날짜">
+              <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <RecipeField label="금액">
                   <input
-                    type="date"
-                    value={expenseDate}
-                    onChange={(e) => setExpenseDate(e.target.value)}
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="예: 45,000"
+                    inputMode="numeric"
                     className={inputBaseClass}
                   />
                 </RecipeField>
 
-                <RecipeField label="카테고리">
+                <RecipeField label="구분">
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                     className={inputBaseClass}
                   >
+                    <option>식사</option>
+                    <option>장보기</option>
+                    <option>교통</option>
+                    <option>생활</option>
+                    <option>여가/취미</option>
                     <option>데이트</option>
                     <option>식비</option>
                     <option>카페</option>
-                    <option>교통</option>
-                    <option>장보기</option>
                     <option>여행</option>
-                    <option>생활</option>
                     <option>기타</option>
                   </select>
                 </RecipeField>
 
-                <RecipeField label="금액">
+                <RecipeField label="날짜">
                   <input
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="예: 45000"
-                    inputMode="numeric"
+                    type="date"
+                    value={expenseDate}
+                    onChange={(e) => setExpenseDate(e.target.value)}
                     className={inputBaseClass}
                   />
                 </RecipeField>
@@ -1136,14 +1140,15 @@ export default function CoupleLedgerEntryUI() {
                 </div>
               </div>
 
-              <div className="mt-3 text-[11px] leading-5 text-slate-500">
-                * 편집 허용이 켜져 있으면 수정/삭제도 가능합니다.
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs leading-5 text-slate-500">
+                <span>공동 지출의 수정·삭제는 커플장부에서 관리합니다.</span>
+                <Link href="/dashboard/calendar" className="font-semibold text-[#176247] underline underline-offset-2">개인 레시피 달력 보기 →</Link>
               </div>
             </div>
           )}
 
           {tab === "shared" && editingId && canEdit && (
-            <div className="mt-5 rounded-[20px] md:rounded-[24px] border border-[#c6e2d4] bg-[#f9fdff] p-4 md:p-5">
+            <div className="mt-5 rounded-xl md:rounded-xl border border-[#c6e2d4] bg-[#f9fdff] p-4 md:p-5">
               <div className="text-[15px] font-semibold text-slate-900">지출 레시피 수정</div>
               <div className="mt-2 text-[10px] text-slate-600">선택한 항목을 다시 정리합니다.</div>
 
@@ -1226,14 +1231,14 @@ export default function CoupleLedgerEntryUI() {
 
           <div className="mt-6 grid gap-3">
             {list.length === 0 ? (
-              <div className="rounded-[20px] md:rounded-[22px] border border-slate-200 bg-slate-50 p-8 text-center text-[14px] text-slate-600">
+              <div className="rounded-xl md:rounded-xl border border-slate-200 bg-slate-50 p-8 text-center text-[14px] text-slate-600">
                 아직 항목이 없습니다. {tab === "shared" ? "공동 지출을 추가해 보세요." : "공유 설정을 확인하세요."}
               </div>
             ) : (
               list.map((e: any) => (
                 <div
                   key={e.id}
-                  className="group rounded-[18px] md:rounded-[22px] border border-[#F3F4F6] bg-white px-4 py-4 shadow-[0_8px_20px_rgba(27,22,17,0.03)] transition hover:shadow-[0_14px_28px_rgba(27,22,17,0.05)]"
+                  className="group rounded-xl md:rounded-xl border border-[#F3F4F6] bg-white px-4 py-4 shadow-sm transition"
                 >
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="min-w-0 flex-1">
@@ -1316,7 +1321,7 @@ export default function CoupleLedgerEntryUI() {
             )}
           </div>
 
-          <div className="mt-5 rounded-[20px] md:rounded-[22px] border border-[#d5f9ff] bg-[#f9fdff] p-4 text-[11px] leading-5 text-slate-600">
+          <div className="mt-5 rounded-xl md:rounded-xl border border-[#d5f9ff] bg-[#f9fdff] p-4 text-[11px] leading-5 text-slate-600">
             <b className="text-slate-900">운영 원칙</b>
             <div className="mt-1 text-[8px] sm:text-[8px]">
               - 개인 지출 공유는 갈등도 높일 수 있으므로 OFF가 합리적입니다.
@@ -1332,7 +1337,7 @@ export default function CoupleLedgerEntryUI() {
         <button
           type="button"
           onClick={openMobileAddForm}
-          className="fixed bottom-5 right-4 z-40 inline-flex md:hidden items-center gap-2 rounded-full bg-[#1f7a5b] px-4 py-3 text-[13px] font-semibold text-white shadow-[0_14px_30px_rgba(12,134,234,0.28)]"
+          className="fixed bottom-5 right-4 z-40 inline-flex md:hidden items-center gap-2 rounded-full bg-[#1f7a5b] px-4 py-3 text-[13px] font-semibold text-white shadow-sm"
         >
           <span className="text-[16px]">＋</span>
           <span>새 레시피</span>
@@ -1343,7 +1348,7 @@ export default function CoupleLedgerEntryUI() {
         <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 px-4">
           <div
             className={cx(
-              "min-w-[220px] rounded-[10px] px-4 py-2.5 text-[12px] font-medium text-white shadow-[0_12px_30px_rgba(0,0,0,0.16)]",
+              "min-w-[220px] rounded-[10px] px-4 py-2.5 text-[12px] font-medium text-white shadow-sm",
               toast.type === "success" && "bg-[#1f7a5b]",
               toast.type === "error" && "bg-[#d84b4b]",
               toast.type === "info" && "bg-slate-900"

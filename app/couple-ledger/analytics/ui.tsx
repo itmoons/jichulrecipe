@@ -118,7 +118,7 @@ function Surface({
   return (
     <section
       className={cx(
-        "rounded-[20px] md:rounded-[24px] border border-[#F3F4F6] bg-white shadow-[0_8px_24px_rgba(15,23,42,0.04)]",
+        "rounded-xl md:rounded-xl border border-[#F3F4F6] bg-white shadow-sm",
         className
       )}
     >
@@ -161,7 +161,7 @@ function DataCard({
   subtle?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-[18px] border border-[#d5f9ff] bg-[#f9fdff] px-4 py-4">
+    <div className="rounded-xl border border-[#d5f9ff] bg-[#f9fdff] px-4 py-4">
       <div className="text-[11px] font-medium text-slate-500">{label}</div>
       <div className="mt-1 text-[14px] md:text-[15px] font-semibold text-slate-900">
         {value}
@@ -438,7 +438,7 @@ export default function CoupleLedgerAnalyticsUI() {
 
   if (checking) {
     return (
-      <div className="mx-auto max-w-[1180px] landing-surface min-h-screen p-6 text-[14px] text-slate-600">
+      <div className="mx-auto w-full max-w-[1320px] landing-surface min-h-screen p-6 text-[14px] text-slate-600">
         불러오는 중…
       </div>
     );
@@ -467,7 +467,7 @@ export default function CoupleLedgerAnalyticsUI() {
   if (!ctx?.couple_link_id) {
     return (
       <div className="landing-surface min-h-screen">
-        <div className="mx-auto max-w-5xl px-4 py-6 md:px-6 md:py-8">
+        <div className="mx-auto w-full max-w-[1320px] px-4 py-6 sm:px-6 md:py-8 lg:px-0">
           <Surface className="p-5 md:p-6">
             <div className="text-[20px] md:text-[22px] font-semibold tracking-[-0.02em] text-slate-900">
               지출 분석
@@ -494,7 +494,7 @@ export default function CoupleLedgerAnalyticsUI() {
 
   return (
     <div className="landing-surface min-h-screen pb-10">
-      <div className="mx-auto max-w-[1320px] px-4 py-5 md:px-6 md:py-8">
+      <div className="mx-auto w-full max-w-[1320px] px-4 py-5 sm:px-6 md:py-8 lg:px-0">
         <Surface className="overflow-hidden">
           <div className="border-b border-[#F3F4F6] bg-white px-4 py-5 md:px-6 md:py-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -548,14 +548,14 @@ export default function CoupleLedgerAnalyticsUI() {
 
         {sharedLocked ? (
           <Surface className="mt-4 p-5 md:p-6">
-            <div className="rounded-[20px] border border-slate-200 bg-slate-50 p-4 text-[14px] text-slate-700">
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-[14px] text-slate-700">
               공동 공유가 꺼져 있어 분석을 표시할 수 없습니다.
             </div>
           </Surface>
         ) : (
           <>
             <Surface className="mt-4 p-4 md:p-6">
-              <div className="rounded-[20px] border border-[#d5f9ff] bg-[#f9fdff] p-4 text-[13px] leading-6 text-slate-700">
+              <div className="rounded-xl border border-[#d5f9ff] bg-[#f9fdff] p-4 text-[13px] leading-6 text-slate-700">
                 <b className="text-slate-900">한 줄 해석</b>
                 <div className="mt-1">{insightText}</div>
               </div>
@@ -595,7 +595,7 @@ export default function CoupleLedgerAnalyticsUI() {
 
                 <div className="mt-5 h-[320px]">
                   {categoryRows.length === 0 ? (
-                    <div className="flex h-full items-center justify-center rounded-[18px] border border-slate-200 bg-slate-50 text-[14px] text-slate-600">
+                    <div className="flex h-full items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-[14px] text-slate-600">
                       이번 달 카테고리 데이터가 없습니다.
                     </div>
                   ) : (
@@ -638,7 +638,7 @@ export default function CoupleLedgerAnalyticsUI() {
 
                 <div className="mt-5 h-[320px]">
                   {summary.total === 0 ? (
-                    <div className="flex h-full items-center justify-center rounded-[18px] border border-slate-200 bg-slate-50 text-[14px] text-slate-600">
+                    <div className="flex h-full items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-[14px] text-slate-600">
                       이번 달 결제 데이터가 없습니다.
                     </div>
                   ) : (
@@ -692,7 +692,7 @@ export default function CoupleLedgerAnalyticsUI() {
 
               <div className="mt-5 h-[360px]">
                 {dailyRows.length === 0 ? (
-                  <div className="flex h-full items-center justify-center rounded-[18px] border border-slate-200 bg-slate-50 text-[14px] text-slate-600">
+                  <div className="flex h-full items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-[14px] text-slate-600">
                     이번 달 일자별 데이터가 없습니다.
                   </div>
                 ) : (
@@ -732,7 +732,7 @@ export default function CoupleLedgerAnalyticsUI() {
               </div>
 
               <div className="mt-5 overflow-x-auto">
-                <table className="min-w-[620px] border-separate border-spacing-0 overflow-hidden rounded-[18px] border border-[#E5E7EB] sm:min-w-full">
+                <table className="min-w-[620px] border-separate border-spacing-0 overflow-hidden rounded-xl border border-[#E5E7EB] sm:min-w-full">
                   <thead>
                     <tr className="bg-slate-50">
                       <th className="px-4 py-3 text-left text-[12px] font-medium text-slate-600">
@@ -778,7 +778,7 @@ export default function CoupleLedgerAnalyticsUI() {
         <div className="fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 px-4">
           <div
             className={cx(
-              "min-w-[220px] rounded-[10px] px-4 py-2.5 text-[12px] font-medium text-white shadow-[0_12px_30px_rgba(0,0,0,0.16)]",
+              "min-w-[220px] rounded-[10px] px-4 py-2.5 text-[12px] font-medium text-white shadow-sm",
               toast.type === "success" && "bg-[#1f7a5b]",
               toast.type === "error" && "bg-[#d84b4b]",
               toast.type === "info" && "bg-slate-900"

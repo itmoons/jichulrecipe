@@ -19,27 +19,27 @@ export function RecipeShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className={cn("min-h-screen", UI.paperBg)}>
-      <div className={cn("min-h-screen", UI.paperDots)}>
-        <div className="mx-auto px-2 py-2 sm:py-2">
+    <div className={cn("w-full", UI.paperBg)}>
+      <div className={cn("w-full", UI.paperDots)}>
+        <div className="w-full py-1">
           <div className="mb-5 flex items-center justify-between gap-3">
             <Link
               href={backHref}
-              className="rounded-full border border-[#dcefe5] bg-[#f1f8f4] px-3 py-1.5 text-[12px] font-semibold text-[#7f7f7f] hover:border-[#1f7a5b]"
+              className="rounded-lg border border-[#dce5dd] bg-white px-3 py-2 text-xs font-semibold text-slate-600 hover:border-[#1f7a5b] hover:text-[#176247]"
             >
               ← 계산기 모음
             </Link>
-            <span className="rounded-full bg-[#1f7a5b] px-3 py-1.5 text-[12px] font-semibold text-[#ffffff]">
+            <span className="rounded-lg bg-[#eaf5ef] px-3 py-1.5 text-xs font-semibold text-[#176247]">
               {badge}
             </span>
           </div>
 
           <div className="mb-6">
-            <h1 className={cn("text-2xl sm:text-3xl font-semibold tracking-tight", UI.ink)}>
+            <h1 className={cn("text-2xl font-semibold tracking-tight sm:text-3xl", UI.ink)}>
               {title}
             </h1>
             {subtitle ? (
-              <p className={cn("mt-2 text-[12px] sm:text-base", UI.inkSoft)}>{subtitle}</p>
+              <p className={cn("mt-2 max-w-3xl text-sm leading-6 sm:text-base", UI.inkSoft)}>{subtitle}</p>
             ) : null}
           </div>
 

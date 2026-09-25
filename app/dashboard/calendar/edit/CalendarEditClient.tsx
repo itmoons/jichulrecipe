@@ -2,14 +2,18 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ArrowLeft, Check, Plus, X } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
+import { useDraftAutosave } from "@/app/hooks/useDraftAutosave";
+import { DailyMemoComposer } from "@/components/ledger/DailyMemoComposer";
+import { MyCoupleExpensesForDay } from "@/components/ledger/MyCoupleExpensesForDay";
 
 const BRAND_blue = "#1f7a5b";
 const BRAND_BLUE1 = "#c6e2d4";
-const BRAND_BLUE2 = "#dcefe5";
+const BRAND_BLUE2 = "#e2e5e1";
 
 
 /** 항목 단위 (메모 + 금액 + 카테고리) */
@@ -161,6 +165,11 @@ function dedupeManualSameAsRecurring(items: MoneyItem[]) {
 }
 
 export default function CalendarEditClient() {
+  const params = useSearchParams();
+  return <CalendarEditor key={params.get("date") ?? "no-date"} />;
+}
+
+function CalendarEditor() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dateParam = searchParams.get("date"); // YYYY-MM-DD
@@ -181,6 +190,9 @@ export default function CalendarEditClient() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [loadedUser, setLoadedUser] = useState<string | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [memoPending, setMemoPending] = useState(false);
   const [monthlyGoal, setMonthlyGoal] = useState<MonthlyGoal>({ expense: 0, saving: 0 });
   const [goalExpenseInput, setGoalExpenseInput] = useState("");
   const [goalSavingInput, setGoalSavingInput] = useState("");
@@ -206,11 +218,15 @@ export default function CalendarEditClient() {
         } = await supabase.auth.getUser();
 
         if (authError) {
+          if (cancelled) return;
+          setLoadFailed(true);
           console.warn("Supabase auth error (daily_recipes load):", authError);
           setLoading(false);
           return;
         }
         if (!user) {
+          if (cancelled) return;
+          setLoadFailed(true);
           setLoading(false);
           return;
         }
@@ -232,6 +248,8 @@ export default function CalendarEditClient() {
           .maybeSingle();
 
         if (error) {
+          if (cancelled) return;
+          setLoadFailed(true);
           console.warn("Supabase daily_recipes load error:", error);
           setLoading(false);
           return;
@@ -242,6 +260,7 @@ export default function CalendarEditClient() {
         }
 
         if (!data) {
+          setLoadedUser(user.id);
           setForm({
             incomeItems: [createItem()],
             expenseItems: [createItem()],
@@ -295,6 +314,7 @@ export default function CalendarEditClient() {
         const expenseItems = dedupeManualSameAsRecurring(expenseItemsRaw);
         const savingItems = dedupeManualSameAsRecurring(savingItemsRaw);
 
+        setLoadedUser(user.id);
         setForm({
           incomeItems: incomeItems.length > 0 ? incomeItems : [createItem()],
           expenseItems: expenseItems.length > 0 ? expenseItems : [createItem()],
@@ -303,6 +323,8 @@ export default function CalendarEditClient() {
 
         setLoading(false);
       } catch (err) {
+        if (cancelled) return;
+        setLoadFailed(true);
         console.error("Supabase daily_recipes load exception:", err);
         setLoading(false);
       }
@@ -486,12 +508,14 @@ export default function CalendarEditClient() {
     toast.success(`${monthKey.replace("-", "년 ")}월 목표를 저장했어요.`);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const saveDraft = async (snapshot: FormState) => {
+    const editor = document.getElementById("daily-recipe-form") as HTMLFormElement | null;
+    if (editor && !editor.checkValidity()) throw new Error("입력 중인 금액 형식을 확인해 주세요.");
+    if ([...snapshot.incomeItems, ...snapshot.expenseItems, ...snapshot.savingItems].some(item => !Number.isFinite(item.amount) || item.amount < 0)) {
+      throw new Error("금액은 0 이상의 숫자로 입력해 주세요.");
+    }
     if (!dateParam) {
-      alert("날짜 정보가 없어 저장할 수 없습니다.");
-      return;
+      throw new Error("날짜 정보가 없습니다.");
     }
     const dateKey = dateParam as string;
 
@@ -499,9 +523,9 @@ export default function CalendarEditClient() {
       items.map((i) => ({ ...i, id: i.id?.trim() ? i.id : crypto.randomUUID() }));
 
     // ✅ 저장 직전에도 중복 제거
-    const fixedIncome = dedupeManualSameAsRecurring(form.incomeItems);
-    const fixedExpense = dedupeManualSameAsRecurring(form.expenseItems);
-    const fixedSaving = dedupeManualSameAsRecurring(form.savingItems);
+    const fixedIncome = dedupeManualSameAsRecurring(snapshot.incomeItems);
+    const fixedExpense = dedupeManualSameAsRecurring(snapshot.expenseItems);
+    const fixedSaving = dedupeManualSameAsRecurring(snapshot.savingItems);
 
     // ✅ 정리
     const clean = (items: MoneyItem[]) =>
@@ -514,7 +538,7 @@ export default function CalendarEditClient() {
           amount: Number(i.amount || 0) || 0,
         }))
         // 완전 빈 행 제거
-        .filter((i) => i.category || i.label || i.amount);
+        .filter((i) => i.category || i.subcategory || i.label || i.amount);
 
     const cleanedIncome = clean(fixedIncome);
     const cleanedExpense = clean(fixedExpense);
@@ -528,14 +552,11 @@ export default function CalendarEditClient() {
 
       if (authError) {
         console.warn("Supabase auth error (daily_recipes save):", authError);
-        alert("로그인 정보를 불러오지 못했어요. 다시 로그인해 주세요.");
-        return;
+        throw authError;
       }
 
-      if (!user) {
-        alert("로그인 후에 레시피를 서버에 저장할 수 있어요.");
-        router.push("/sign-in");
-        return;
+      if (!user || user.id !== loadedUser) {
+        throw new Error("로그인 계정이 변경되었습니다. 다시 로그인해 주세요.");
       }
 
       const { error: upsertError } = await supabase
@@ -557,43 +578,39 @@ export default function CalendarEditClient() {
 
       if (upsertError) {
         console.error("daily_recipes upsert 실패:", upsertError.message);
-        alert("서버에 레시피 저장 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요.");
-        return;
+        throw upsertError;
       }
 
-      toast.success("오늘 지출 레시피가 저장되었어요!", {
-        style: {
-          background: "#FEF9C3", // tailwind: yellow-100
-          color: "#713F12",      // tailwind: yellow-900
-          border: "1px solid #FDE68A", // tailwind: blue-200
-        },
-      });
-      router.push("/dashboard/calendar");
     } catch (err) {
       console.error("daily_recipes 저장 처리 중 오류:", err);
-      toast.error("저장에 실패했어요. 잠시 후 다시 시도해주세요.", {
-        style: {
-          background: "#FEE2E2", // red-100
-          color: "#7F1D1D",      // red-900
-          border: "1px solid #FCA5A5", // red-300
-        },
-      });
+      throw err;
     }
+  };
+
+  const autosave = useDraftAutosave(form, !!loadedUser && !loading && !!dateParam, saveDraft);
+  const navigate = async (href: string) => {
+    if (memoPending && !window.confirm("아직 추가하지 않은 오늘의 메모가 있습니다. 이동할까요?")) return;
+    if (!loadedUser || await autosave.flush()) router.push(href);
+    else toast.error("저장하지 못해 이동을 멈췄어요. 연결 상태를 확인한 뒤 다시 시도해 주세요.");
+  };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (await autosave.flush()) toast.success("기록을 저장했어요.");
   };
 
   return (
     <main
       className={[
         "landing-surface min-h-screen text-neutral-900 flex flex-col items-stretch",
-        "bg-[radial-gradient(circle_at_1px_1px,#e5e7eb_1px,transparent_0)]",
+        "bg-[#f6f7f5]",
         "[background-size:18px_18px]",
       ].join(" ")}
     >
-      <div className="w-full max-w-full lg:max-w-[1180px] mx-auto flex flex-col">
-        <header className="flex items-center justify-between px-4 py-5 sm:px-8 lg:px-0">
+      <div className="mx-auto flex w-full max-w-[1244px] flex-col px-4 sm:px-6 lg:px-8">
+        <header className="flex items-center justify-between gap-4 py-6 sm:py-8">
           <div className="flex items-center gap-3">
             <button
-              onClick={() => router.push("/dashboard/calendar")}
+              onClick={() => void navigate("/dashboard/calendar")}
               className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-neutral-200 bg-white hover:bg-neutral-50"
             >
               <ArrowLeft size={18} className="text-neutral-700" />
@@ -612,18 +629,25 @@ export default function CalendarEditClient() {
 
           <button
             type="submit"
+            disabled={!loadedUser || loading || autosave.status === "saving"}
             form="daily-recipe-form"
             className="inline-flex min-w-[120px] items-center justify-center gap-1.5 rounded-[10px] px-3 sm:px-4 py-1.5 text-xs sm:text-[12px] font-medium shadow-sm"
             style={{ backgroundColor: BRAND_blue, color: "#ffffff" }}
           >
             <Check size={16} />
-            레시피 저장
+            {autosave.status === "saving" ? "저장 중…" : "지금 저장"}
           </button>
         </header>
 
-        <section className="w-full max-w-full mx-auto flex flex-col px-4 pb-8 sm:px-8 lg:px-0">
-          <form id="daily-recipe-form" onSubmit={handleSubmit} className="w-full space-y-4">
-            <div className="rounded-2xl border border-[#c6e2d4] bg-[#eaf5ef] px-4 py-3.5 shadow-sm">
+        <section className="mx-auto flex w-full max-w-full flex-col pb-10 sm:pb-14">
+          <div role="status" aria-live="polite" className="mb-3 text-xs text-slate-600">
+            {loadFailed ? "기록을 불러오지 못했습니다. 로그인·연결 상태를 확인하고 새로고침해 주세요." : !loadedUser ? "기록을 불러오는 중…" : autosave.status === "error" ? "저장 실패 · 입력 내용은 화면에 남아 있습니다." : autosave.status === "saving" ? "저장 중…" : autosave.status === "pending" ? "변경 사항 저장 대기 중…" : autosave.status === "saved" ? "저장 완료" : "입력을 멈추면 자동 저장됩니다."}
+            {autosave.status === "error" && <button type="button" onClick={() => void autosave.flush()} className="ml-3 font-semibold text-[#176247] underline">다시 저장</button>}
+          </div>
+          {dateParam && <MyCoupleExpensesForDay key={dateParam} date={dateParam} />}
+          <form id="daily-recipe-form" onSubmit={handleSubmit} onCompositionStart={autosave.onCompositionStart} onCompositionEnd={autosave.onCompositionEnd} className="w-full space-y-4">
+            <fieldset disabled={!loadedUser || loading} className="flex min-w-0 flex-col gap-5 sm:gap-6">
+            <div className="rounded-lg border border-[#c6e2d4] bg-[#eaf5ef] px-4 py-3.5 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="flex flex-col">
                   <span className="text-[11px] font-semibold text-[#176247]">
@@ -645,9 +669,9 @@ export default function CalendarEditClient() {
                   <button
                     type="button"
                     onClick={() =>
-                      router.push(`/dashboard/calendar/edit?date=${getAdjacentDate(dateParam, -1)}`)
+                      void navigate(`/dashboard/calendar/edit?date=${getAdjacentDate(dateParam, -1)}`)
                     }
-                    className="inline-flex items-center gap-1 rounded-full border border-[#b9dfcb] bg-transparent px-3 py-1.5 font-medium transition hover:bg-white/60"
+                    className="inline-flex items-center gap-1 rounded-full border border-[#b9dfcb] bg-transparent px-3 py-1.5 font-medium transition hover:bg-white"
                   >
                     <ArrowLeft size={12} />
                     전날로 이동
@@ -655,9 +679,9 @@ export default function CalendarEditClient() {
                   <button
                     type="button"
                     onClick={() =>
-                      router.push(`/dashboard/calendar/edit?date=${getAdjacentDate(dateParam, +1)}`)
+                      void navigate(`/dashboard/calendar/edit?date=${getAdjacentDate(dateParam, +1)}`)
                     }
-                    className="inline-flex items-center gap-1 rounded-full border border-[#b9dfcb] bg-transparent px-3 py-1.5 font-medium transition hover:bg-white/60"
+                    className="inline-flex items-center gap-1 rounded-full border border-[#b9dfcb] bg-transparent px-3 py-1.5 font-medium transition hover:bg-white"
                   >
                     다음날로 이동
                     <ArrowLeft size={12} className="rotate-180" />
@@ -670,7 +694,7 @@ export default function CalendarEditClient() {
               <span className="font-bold text-[#176247]">빠른 기록</span> · 1. 금액 입력 → 2. 구분 선택 → 3. 메모는 필요할 때만 입력
             </p>
 
-            <section className="grid overflow-hidden rounded-2xl border border-[#dbe9e1] bg-white lg:grid-cols-[0.9fr_1.1fr]">
+            <section className="grid overflow-hidden rounded-lg border border-[#e2e5e1] bg-white lg:grid-cols-[0.9fr_1.1fr]">
               <div className="border-b border-[#edf3ef] p-4 lg:border-b-0 lg:border-r sm:p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -680,8 +704,8 @@ export default function CalendarEditClient() {
                   <span className="shrink-0 rounded-full bg-[#eaf5ef] px-2 py-1 text-[10px] font-bold text-[#176247]">{monthKey.replace("-", ".")}</span>
                 </div>
                 <div className="mt-4 grid grid-cols-2 gap-2">
-                  <label className="min-w-0"><span className="mb-1 block text-[10px] font-semibold text-slate-500">지출 목표</span><input inputMode="numeric" value={goalExpenseInput ? Number(goalExpenseInput).toLocaleString("ko-KR") : ""} onChange={(e) => setGoalExpenseInput(e.target.value.replace(/\D/g, ""))} placeholder="예: 150만" className="h-9 w-full rounded-lg border border-[#dbe9e1] px-2.5 text-[12px] outline-none placeholder:text-slate-300 focus:border-[#1f7a5b]" /></label>
-                  <label className="min-w-0"><span className="mb-1 block text-[10px] font-semibold text-slate-500">저축 목표</span><input inputMode="numeric" value={goalSavingInput ? Number(goalSavingInput).toLocaleString("ko-KR") : ""} onChange={(e) => setGoalSavingInput(e.target.value.replace(/\D/g, ""))} placeholder="예: 50만" className="h-9 w-full rounded-lg border border-[#dbe9e1] px-2.5 text-[12px] outline-none placeholder:text-slate-300 focus:border-[#1f7a5b]" /></label>
+                  <label className="min-w-0"><span className="mb-1 block text-[10px] font-semibold text-slate-500">지출 목표</span><input inputMode="numeric" value={goalExpenseInput ? Number(goalExpenseInput).toLocaleString("ko-KR") : ""} onChange={(e) => setGoalExpenseInput(e.target.value.replace(/\D/g, ""))} placeholder="예: 150만" className="h-9 w-full rounded-lg border border-[#e2e5e1] px-2.5 text-[12px] outline-none placeholder:text-slate-300 focus:border-[#1f7a5b]" /></label>
+                  <label className="min-w-0"><span className="mb-1 block text-[10px] font-semibold text-slate-500">저축 목표</span><input inputMode="numeric" value={goalSavingInput ? Number(goalSavingInput).toLocaleString("ko-KR") : ""} onChange={(e) => setGoalSavingInput(e.target.value.replace(/\D/g, ""))} placeholder="예: 50만" className="h-9 w-full rounded-lg border border-[#e2e5e1] px-2.5 text-[12px] outline-none placeholder:text-slate-300 focus:border-[#1f7a5b]" /></label>
                 </div>
                 <button type="button" onClick={saveMonthlyGoal} disabled={savingGoal} className="mt-3 h-9 w-full rounded-lg bg-[#1f7a5b] text-[12px] font-bold text-white disabled:opacity-50">{savingGoal ? "저장 중…" : "이번 달 목표 저장"}</button>
               </div>
@@ -692,7 +716,7 @@ export default function CalendarEditClient() {
               </div>
             </section>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
+            <div className="grid grid-cols-1 items-start gap-5 md:grid-cols-2 2xl:grid-cols-3">
               <RecipeCard
                 sectionKey="income"
                 title="들어온 재료 (수입)"
@@ -741,7 +765,9 @@ export default function CalendarEditClient() {
                 서버에서 오늘 레시피를 불러오는 중입니다…
               </p>
             )}
+            </fieldset>
           </form>
+          {dateParam && <DailyMemoComposer date={dateParam} userId={loadedUser} onPendingChange={setMemoPending} />}
         </section>
       </div>
     </main>
@@ -822,7 +848,7 @@ function RecipeCard({
     tone === "income"
       ? "border-[#c6e2d4] bg-white"
       : tone === "expense"
-      ? "border-[#dbe9e1] bg-white"
+      ? "border-[#e2e5e1] bg-white"
       : "border-[#c6e2d4] bg-[#f7fcf9]";
 
   const totalColor =
@@ -837,7 +863,7 @@ function RecipeCard({
   return (
     <section
       className={[
-        "rounded-2xl border px-4 py-4 shadow-[0_3px_12px_rgba(31,122,91,0.05)] flex flex-col gap-3",
+        "rounded-lg border p-5 shadow-sm flex flex-col gap-4",
         toneStyle,
       ].join(" ")}
     >
@@ -854,9 +880,9 @@ function RecipeCard({
         </div>
       </div>
 
-      <div className="h-[1px] w-full bg-white/70 my-1" />
+      <div className="h-px w-full bg-slate-100" />
 
-      <div className="space-y-1.5">
+      <div className="space-y-3">
         {items.map((item) => {
           const recurring = isRecurringItem(item);
 
@@ -865,7 +891,7 @@ function RecipeCard({
               key={item.id}
               className={[
                 // ✅ 깨짐 해결 핵심: wrap + min-w + shrink-0 조합
-                "flex flex-wrap items-center gap-1.5 rounded-xl bg-white/70 px-2 py-1.5",
+                "flex flex-wrap items-center gap-2 rounded-md border border-slate-100 bg-white p-3",
               ].join(" ")}
             >
               {/* ✅ 구분/세부: 1개 드롭다운(단계형) */}
@@ -886,7 +912,7 @@ function RecipeCard({
                   type="text"
                   readOnly={recurring}
                   className={[
-                    "w-full min-w-0 rounded-md border px-2 py-1  text-[10px] outline-none focus:border-neutral-400",
+                    "w-full min-w-0 rounded-md border px-2 py-1 text-[10px] outline-none focus:border-neutral-400",
                     recurring
                       ? "border-neutral-200 bg-neutral-100 text-neutral-600 cursor-not-allowed"
                       : "border-neutral-200 bg-white",
@@ -950,7 +976,7 @@ function RecipeCard({
       <button
         type="button"
         onClick={onAdd}
-        className="mt-1 inline-flex items-center justify-center gap-1 rounded-full border border-dashed border-neutral-300 bg-white/70 px-2.5 py-1 text-[11px] font-medium text-neutral-600 hover:bg-neutral-50"
+        className="mt-1 inline-flex items-center justify-center gap-1 rounded-full border border-dashed border-neutral-300 bg-white px-2.5 py-1 text-[11px] font-medium text-neutral-600 hover:bg-neutral-50"
       >
         <Plus size={12} />
         항목 추가 (수동)
@@ -982,10 +1008,15 @@ function CategoryCascadeSelect({
   onChangeSubcategory,
 }: CategoryCascadeSelectProps) {
   const rootRef = React.useRef<HTMLDivElement | null>(null);
+  const popupRef = React.useRef<HTMLDivElement | null>(null);
+  const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+  const popupId = React.useId();
+  const [position, setPosition] = React.useState<React.CSSProperties>({ visibility: "hidden" });
 
   const [open, setOpen] = React.useState(false);
   const [step, setStep] = React.useState<1 | 2 | 3>(1);
   const [customCategory, setCustomCategory] = React.useState("");
+  const [customSubcategory, setCustomSubcategory] = React.useState("");
 
   // 드롭다운 내부에서 즉시 보여줄 임시 category
   const [activeCategory, setActiveCategory] = React.useState<string>(category || "");
@@ -996,6 +1027,52 @@ function CategoryCascadeSelect({
 
   const cats = React.useMemo(() => Object.keys(optionMap), [optionMap]);
   const subs = activeCategory ? optionMap[activeCategory] ?? [] : [];
+
+  // Render outside the card so overflow/stacking contexts cannot clip the picker.
+  // VisualViewport also accounts for the on-screen keyboard on mobile.
+  React.useLayoutEffect(() => {
+    if (!open) return;
+    const place = () => {
+      const anchor = triggerRef.current?.getBoundingClientRect();
+      if (!anchor) return;
+      const viewport = window.visualViewport;
+      const top = viewport?.offsetTop ?? 0;
+      const left = viewport?.offsetLeft ?? 0;
+      const height = viewport?.height ?? window.innerHeight;
+      const width = viewport?.width ?? window.innerWidth;
+      const margin = 12;
+      const below = top + height - anchor.bottom - margin - 6;
+      const above = anchor.top - top - margin - 6;
+      const popupWidth = Math.min(300, width - margin * 2);
+      const upward = below < 380 && above > below;
+      const available = upward ? above : below;
+      const compact = available < 280;
+      setPosition({
+        position: "fixed",
+        left: Math.max(left + margin, Math.min(anchor.left, left + width - popupWidth - margin)),
+        top: compact ? top + margin : upward ? anchor.top - 6 : anchor.bottom + 6,
+        width: popupWidth,
+        maxHeight: Math.max(0, Math.min(420, compact ? height - margin * 2 : available)),
+        transform: upward && !compact ? "translateY(-100%)" : undefined,
+        visibility: "visible",
+      });
+    };
+    const onScroll = (event: Event) => {
+      if (event.target instanceof Node && popupRef.current?.contains(event.target)) return;
+      place();
+    };
+    place();
+    window.addEventListener("resize", place);
+    window.addEventListener("scroll", onScroll, true);
+    window.visualViewport?.addEventListener("resize", place);
+    window.visualViewport?.addEventListener("scroll", place);
+    return () => {
+      window.removeEventListener("resize", place);
+      window.removeEventListener("scroll", onScroll, true);
+      window.visualViewport?.removeEventListener("resize", place);
+      window.visualViewport?.removeEventListener("scroll", place);
+    };
+  }, [open]);
 
   const label = React.useMemo(() => {
     const c = (category || "").trim();
@@ -1013,12 +1090,24 @@ function CategoryCascadeSelect({
       const el = rootRef.current;
       const target = e.target as Node | null;
       if (!el || !target) return;
-      if (!el.contains(target)) setOpen(false);
+      if (!el.contains(target) && !popupRef.current?.contains(target)) setOpen(false);
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setOpen(false);
+        triggerRef.current?.focus();
+      }
     };
 
     // pointerdown이 click보다 먼저라서 안정적
     document.addEventListener("pointerdown", onDocPointerDown);
-    return () => document.removeEventListener("pointerdown", onDocPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onDocPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
   }, [open]);
 
   const selectCategory = (c: string) => {
@@ -1027,12 +1116,7 @@ function CategoryCascadeSelect({
   // ✅ 여기서 subcategory를 따로 호출하지 말 것!
   onChangeCategory(c);
 
-  const nextSubs = optionMap[c] ?? [];
-  if (!nextSubs.length) {
-    setOpen(false);
-    setStep(1);
-    return;
-  }
+  setCustomSubcategory("");
   setStep(2);
 };
 
@@ -1047,22 +1131,27 @@ function CategoryCascadeSelect({
     if (!value) return;
     setActiveCategory(value);
     onChangeCategory(value);
-    setOpen(false);
-    setStep(1);
+    setStep(2);
+    setCustomSubcategory("");
     setCustomCategory("");
   };
 
   return (
     <div ref={rootRef} className="relative shrink-0" data-cascade-root="1">
       <button
+        ref={triggerRef}
+        aria-expanded={open}
+        aria-controls={open ? popupId : undefined}
+        aria-haspopup="dialog"
         type="button"
         disabled={!!disabled}
         onClick={() => {
           if (disabled) return;
           setOpen((v) => !v);
-          setStep(1);
+          setStep(category ? 2 : 1);
           setActiveCategory(category || "");
           setCustomCategory("");
+          setCustomSubcategory(subcategory || "");
         }}
         className={[
           "h-[32px] w-[7.25rem] rounded-md border px-2",
@@ -1078,10 +1167,10 @@ function CategoryCascadeSelect({
         <span className="text-neutral-400">▾</span>
       </button>
 
-      {open && !disabled && (
-        <div className="absolute right-0 z-50 mt-1 w-[240px] overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-lg sm:left-0 sm:right-auto">
+      {open && !disabled && createPortal(
+        <div ref={popupRef} id={popupId} role="dialog" aria-label="구분 및 세부 항목 선택" style={position} className="z-[100] flex flex-col overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-md">
           {/* Header */}
-          <div className="flex items-center justify-between px-3 py-2 border-b border-neutral-100">
+          <div className="flex shrink-0 items-center justify-between px-3 py-2 border-b border-neutral-100">
             <div className="text-[10px] text-neutral-500">
               {step === 1 ? "구분 선택" : step === 2 ? "세부 선택" : "새 구분 직접 입력"}
             </div>
@@ -1106,7 +1195,7 @@ function CategoryCascadeSelect({
           </div>
 
           {/* List */}
-          <div className="max-h-[260px] overflow-auto py-1">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain py-1">
             {step === 1 && (
               <>
                 <button
@@ -1189,7 +1278,7 @@ function CategoryCascadeSelect({
                   value={customCategory}
                   onChange={(e) => setCustomCategory(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") {
+                    if (e.key === "Enter" && !e.nativeEvent.isComposing && e.keyCode !== 229) {
                       e.preventDefault();
                       saveCustomCategory();
                     }
@@ -1210,13 +1299,35 @@ function CategoryCascadeSelect({
             )}
           </div>
 
+          {step === 2 && (
+            <div className="shrink-0 border-t border-neutral-200 bg-white p-3">
+              <label className="block text-xs font-medium text-neutral-600">
+                세부 항목 직접 입력
+                <input
+                  value={customSubcategory}
+                  onChange={(e) => setCustomSubcategory(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.nativeEvent.isComposing && e.keyCode !== 229) {
+                      e.preventDefault();
+                      if (customSubcategory.trim()) selectSubcategory(normalizeLabel(customSubcategory));
+                    }
+                  }}
+                  maxLength={40}
+                  placeholder="목록에 없는 세부 항목"
+                  className="mt-2 h-9 w-full rounded-md border border-neutral-200 px-2 text-sm outline-none focus:border-[#1f7a5b]"
+                />
+              </label>
+              <button type="button" disabled={!customSubcategory.trim()} onClick={() => selectSubcategory(normalizeLabel(customSubcategory))} className="mt-2 h-9 w-full rounded-md bg-[#1f7a5b] text-xs font-semibold text-white disabled:opacity-40">이 세부 항목으로 선택</button>
+            </div>
+          )}
+
           {/* Footer */}
-          <div className="px-3 py-2 border-t border-neutral-100 bg-neutral-50 text-[10px] text-neutral-600">
+          <div className="shrink-0 px-3 py-2 border-t border-neutral-100 bg-neutral-50 text-[10px] text-neutral-600">
             선택:{" "}
             <span className="font-medium">{activeCategory ? activeCategory : "구분"}</span>
             {subcategory ? <span className="font-medium"> · {subcategory}</span> : null}
           </div>
-        </div>
+        </div>, document.body
       )}
     </div>
   );

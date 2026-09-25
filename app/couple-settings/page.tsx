@@ -26,9 +26,9 @@ function Toggle({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <div className="flex items-start justify-between gap-4 rounded-2xl border border-orange-100 bg-white p-4 shadow-sm">
+    <div className="flex items-start justify-between gap-4 rounded-lg border border-orange-100 bg-white p-4 shadow-sm">
       <div className="min-w-0">
-        <div className="text-[12px] font-extrabold text-slate-900">{label}</div>
+        <div className="text-[12px] font-bold text-slate-900">{label}</div>
         <div className="mt-1 text-xs text-slate-600">{desc}</div>
       </div>
 
@@ -152,13 +152,13 @@ export default function CoupleSettingsPage() {
   if (!isLoggedIn) {
     return (
       <div className="p-6">
-        <div className="rounded-2xl border border-orange-100 bg-white p-5">
-          <div className="text-lg font-extrabold text-slate-900">커플 공유 설정</div>
+        <div className="rounded-lg border border-orange-100 bg-white p-5">
+          <div className="text-lg font-bold text-slate-900">커플 공유 설정</div>
           <div className="mt-1 text-[12px] text-slate-600">로그인 후 사용할 수 있습니다.</div>
           <div className="mt-4">
             <Link
               href="/sign-in"
-              className="inline-flex items-center justify-center rounded-xl bg-[#1f7a5b] px-4 py-2 text-[12px] font-bold text-white hover:bg-[#348f6c]"
+              className="inline-flex items-center justify-center rounded-xl bg-[#1f7a5b] px-4 py-2 text-[12px] font-bold text-white hover:bg-[#176247]"
             >
               로그인하기
             </Link>
@@ -171,9 +171,9 @@ export default function CoupleSettingsPage() {
   if (!settings) {
     return (
       <div className="bg-recipe min-h-screen">
-        <div className="mx-auto max-w-5xl px-4 py-6">
-          <div className="rounded-2xl border border-orange-100 bg-white p-5 shadow-sm">
-            <div className="text-lg font-extrabold text-slate-900">커플 공유 설정</div>
+        <div className="mx-auto w-full max-w-[1320px] px-4 py-6 sm:px-6 lg:px-0">
+          <div className="rounded-lg border border-orange-100 bg-white p-5 shadow-sm">
+            <div className="text-lg font-bold text-slate-900">커플 공유 설정</div>
             <div className="mt-1 text-[12px] text-slate-600">
               아직 커플 연결이 없습니다. 먼저 커플을 연결해 주세요.
             </div>
@@ -181,7 +181,7 @@ export default function CoupleSettingsPage() {
             <div className="mt-4 flex flex-wrap gap-2">
               <Link
                 href="/couple-link"
-                className="inline-flex items-center justify-center rounded-xl bg-[#1f7a5b] px-4 py-2 text-[12px] font-bold text-white hover:bg-[#348f6c]"
+                className="inline-flex items-center justify-center rounded-xl bg-[#1f7a5b] px-4 py-2 text-[12px] font-bold text-white hover:bg-[#176247]"
               >
                 커플 연결하러 가기
               </Link>
@@ -202,7 +202,7 @@ export default function CoupleSettingsPage() {
           {toast && (
             <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 px-4">
               <div
-                className={`min-w-[220px] rounded-2xl px-4 py-3 text-[12px] font-semibold text-white shadow-xl ${
+                className={`min-w-[220px] rounded-lg px-4 py-3 text-[12px] font-semibold text-white shadow-sm ${
                   toast.type === "success"
                     ? "bg-[#1f7a5b]"
                     : toast.type === "error"
@@ -226,10 +226,10 @@ export default function CoupleSettingsPage() {
 
   return (
     <div className="bg-recipe min-h-screen">
-      <div className="mx-auto max-w-5xl px-4 py-6">
+      <div className="mx-auto w-full max-w-[1320px] px-4 py-6 sm:px-6 lg:px-0">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <div className="text-xl font-extrabold text-slate-900">커플 공유 설정</div>
+            <div className="text-xl font-bold text-slate-900">커플 공유 설정</div>
             <div className="mt-1 text-[12px] text-slate-600">
               공동장부/개인지출 공유를 켜고 끌 수 있습니다. 기본은 <b>공동 ON</b>, <b>개인 OFF</b>, <b>편집 제한</b>입니다.
             </div>
@@ -275,7 +275,7 @@ export default function CoupleSettingsPage() {
           <button
             onClick={save}
             disabled={saving || !changed}
-            className="inline-flex items-center justify-center rounded-xl bg-[#1f7a5b] px-5 py-2 text-[12px] font-extrabold text-white hover:bg-[#348f6c] disabled:opacity-60"
+            className="inline-flex items-center justify-center rounded-xl bg-[#1f7a5b] px-5 py-2 text-[12px] font-bold text-white hover:bg-[#176247] disabled:opacity-60"
           >
             {saving ? "저장 중…" : changed ? "설정 저장" : "변경 없음"}
           </button>
@@ -288,7 +288,7 @@ export default function CoupleSettingsPage() {
           </div>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-orange-100 bg-white p-4 text-[11px] text-slate-600">
+        <div className="mt-4 rounded-lg border border-orange-100 bg-white p-4 text-[11px] text-slate-600">
           <b>운영 팁</b>
           <div className="mt-1">
             - 개인 공유는 갈등 비용이 커질 수 있어 기본 OFF가 합리적입니다. (정보 비대칭을 줄이되 사생활 비용을 관리)
@@ -302,7 +302,7 @@ export default function CoupleSettingsPage() {
       {toast && (
         <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 px-4">
           <div
-            className={`min-w-[220px] rounded-2xl px-4 py-3 text-[12px] font-semibold text-white shadow-xl ${
+            className={`min-w-[220px] rounded-lg px-4 py-3 text-[12px] font-semibold text-white shadow-sm ${
               toast.type === "success"
                 ? "bg-[#1f7a5b]"
                 : toast.type === "error"

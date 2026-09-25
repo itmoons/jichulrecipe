@@ -38,7 +38,7 @@ export default function NotificationsPage() {
   if (!userId) {
     return (
       <main className="landing-surface min-h-screen px-4 py-6">
-        <div className="mx-auto w-full max-w-[1320px] rounded-2xl bg-white p-6 shadow-sm">
+        <div className="mx-auto w-full max-w-[1320px] rounded-lg bg-white p-6 shadow-sm">
           <h1 className="text-lg font-bold text-zinc-900">알림 내역</h1>
           <p className="mt-2 text-sm text-zinc-600">
             로그인 후 알림 내역을 확인할 수 있습니다.
@@ -73,7 +73,7 @@ export default function NotificationsPage() {
           </Link>
         </div>
 
-        <div className="rounded-2xl bg-white p-4 shadow-sm">
+        <div className="rounded-lg bg-white p-4 shadow-sm">
           <NotificationsList userId={userId} />
         </div>
       </div>

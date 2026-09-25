@@ -174,7 +174,7 @@ export default function ResetPasswordPage() {
   if (!hasRecoverySession) {
     return (
       <main className="flex min-h-screen items-center justify-center landing-surface px-4">
-        <div className="w-full max-w-md rounded-3xl bg-white/95 p-6 text-center shadow-lg shadow-orange-100">
+        <div className="w-full max-w-md rounded-xl bg-white p-6 text-center shadow-sm ">
           <h1 className="mb-2 text-base font-semibold text-slate-900">
             유효하지 않은 비밀번호 재설정 링크입니다
           </h1>
@@ -186,7 +186,7 @@ export default function ResetPasswordPage() {
           <button
             type="button"
             onClick={() => router.replace("/sign-in")}
-            className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-slate-900 shadow-md shadow-orange-100 hover:bg-[#348f6c]"
+            className="inline-flex items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-white shadow-md hover:bg-[#176247]"
             style={{ ["--brand-blue" as any]: BRAND_BLUE }}
           >
             로그인 페이지로 이동
@@ -198,14 +198,12 @@ export default function ResetPasswordPage() {
 
   return (
     <main className="relative flex min-h-screen items-center justify-center landing-surface px-4">
-      <div className="pointer-events-none fixed left-[-80px] top-[40%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,184,108,0.25)] blur-3xl" />
-      <div className="pointer-events-none fixed right-[-60px] bottom-[8%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,193,130,0.22)] blur-3xl" />
 
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: "easeOut" }}
-        className="mt-[12rem] w-full max-w-md rounded-3xl bg-white/95 p-6 shadow-lg shadow-orange-100"
+        className="mt-[12rem] w-full max-w-md rounded-xl bg-white p-6 shadow-sm "
       >
         <div className="mb-4 flex flex-col gap-1">
           <div className="inline-flex items-center gap-2">
@@ -264,7 +262,7 @@ export default function ResetPasswordPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="mt-2 flex w-full items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-slate-900 shadow-md shadow-orange-100 transition hover:bg-[#348f6c] disabled:cursor-not-allowed disabled:opacity-70"
+            className="mt-2 flex w-full items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-white shadow-md transition hover:bg-[#176247] disabled:cursor-not-allowed disabled:opacity-70"
             style={{ ["--brand-blue" as any]: BRAND_BLUE }}
           >
             {isSubmitting ? "변경 중..." : "비밀번호 변경하기"}

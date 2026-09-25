@@ -2,7 +2,7 @@
 
 .page {
   min-height: 100vh;
-  background: #fffaf6;
+  background: #f6f7f5;
   padding: 32px 16px 56px;
   color: #0f172a;
 }
@@ -51,16 +51,16 @@
   font-size: 10px;
   font-weight: 700;
   color: #0b1220;
-  background: rgba(255, 138, 61, 0.12);
-  border: 1px solid rgba(255, 138, 61, 0.28);
+  background: #edf1eb;
+  border: 1px solid #d9dfd7;
   white-space: nowrap;
 }
 
 /* Cards */
 .card {
   background: #fff;
-  border: 1px solid #f3e5da;
-  border-radius: 16px;
+  border: 1px solid #e2e5e1;
+  border-radius: 8px;
   padding: 20px;
   box-shadow: none;
 }
@@ -129,7 +129,7 @@
 .input:focus,
 .select:focus {
   border-color: rgba(255, 138, 61, 0.55);
-  box-shadow: 0 0 0 4px rgba(255, 138, 61, 0.14);
+  box-shadow: 0 0 0 3px rgba(31, 122, 91, 0.12);
   background: #fff;
 }
 
@@ -153,7 +153,7 @@
   box-sizing: border-box;
   height: 36px;
   border-radius: 9px;
-  border: 1px solid #f47a28;
+  border: 1px solid #1f7a5b;
   background: #1f7a5b;
   color: #fff;
   font-size: 11px;
@@ -161,7 +161,7 @@
   letter-spacing: -0.01em;
   padding: 0 15px;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(211, 92, 16, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  box-shadow: none;
   transition: transform 140ms ease, background 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
   white-space: nowrap;
 }
@@ -177,15 +177,14 @@
 }
 
 .btnPrimary:hover {
-  background: #ff963f;
+  background: #176247;
   border-color: #1f7a5b;
-  box-shadow: 0 6px 12px rgba(211, 92, 16, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  transform: translateY(-1px);
+  box-shadow: none;
 }
 
 .btnPrimary:active {
-  background: #f97d2d;
-  box-shadow: inset 0 1px 2px rgba(130, 55, 12, 0.16);
+  background: #13523b;
+  box-shadow: none;
   transform: translateY(0);
 }
 
@@ -200,9 +199,9 @@
   box-sizing: border-box;
   height: 36px;
   border-radius: 9px;
-  border: 1px solid #f1d4bf;
-  background: #fffdfb;
-  color: #b94d0c;
+  border: 1px solid #d9dfd7;
+  background: #fff;
+  color: #475569;
   font-size: 11px;
   font-weight: 750;
   letter-spacing: -0.01em;
@@ -213,8 +212,8 @@
   transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 140ms ease, box-shadow 160ms ease;
 }
 
-.btnSecondary:hover { background: #fff5ed; border-color: #f6b483; box-shadow: 0 3px 8px rgba(211, 92, 16, 0.08); transform: translateY(-1px); }
-.btnSecondary:active { background: #ffefe2; transform: translateY(0); box-shadow: none; }
+.btnSecondary:hover { background: #f6f7f5; border-color: #a5b5a9; box-shadow: none; }
+.btnSecondary:active { background: #edf1eb; box-shadow: none; }
 .btnSecondary:disabled { cursor: not-allowed; opacity: 0.55; }
 
 .btnDanger {
@@ -275,16 +274,16 @@
 }
 
 .tbody tr:hover td {
-  background: rgba(255, 138, 61, 0.05);
+  background: #f6f7f5;
 }
 
 .ruleGroupRow td {
   padding: 10px 12px;
-  background: #fffaf6;
-  color: #9a5a2f;
+  background: #f6f7f5;
+  color: #475569;
   font-size: 11px;
   font-weight: 800;
-  border-bottom: 1px solid #f3e5da;
+  border-bottom: 1px solid #e2e5e1;
 }
 
 .ruleGroupRow span {
@@ -415,7 +414,7 @@
   background: #1f7a5b;
   border-color: #1f7a5b;
   color: #fff;
-  box-shadow: 0 2px 5px rgba(211, 92, 16, 0.16);
+  box-shadow: none;
 }
 
 

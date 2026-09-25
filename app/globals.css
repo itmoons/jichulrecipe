@@ -8,9 +8,11 @@
 
 /* 지출레시피 Theme — 차분한 그린 기반의 정돈된 금융 UI */
 @theme {
+  --shadow-sm: 0 1px 2px rgb(25 35 28 / 0.04);
+  --shadow-md: 0 4px 12px rgb(25 35 28 / 0.07);
   --color-orange-50: #f1f8f4;
-  --color-orange-100: #dcefe5;
-  --color-orange-200: #c6e2d4;
+  --color-orange-100: #e8ebe6;
+  --color-orange-200: #d9dfd7;
   --color-orange-400: #53a77f;
   --color-orange-500: #1f7a5b;
   --color-orange-600: #176247;
@@ -23,22 +25,22 @@
   --color-sky-500: #1f7a5b;
   --color-sky-600: #176247;
   --color-blue-50: #f7faf8;
-  --color-blue-100: #dcefe5;
-  --color-blue-200: #c6e2d4;
+  --color-blue-100: #e8ebe6;
+  --color-blue-200: #d9dfd7;
   --color-blue-400: #53a77f;
   --color-blue-500: #1f7a5b;
   --color-blue-600: #176247;
 }
 
 :root {
-  --background: #f5f8f6;
+  --background: #f6f7f5;
   --foreground: #1f2937;
 
   --recipe-orange: #1f7a5b;
   --recipe-orange-strong: #176247;
   --recipe-orange-soft: #f1f8f4;
 
-  --recipe-border: #c6e2d4;
+  --recipe-border: #e2e5e1;
   --recipe-card: #ffffff;
 
   --recipe-muted: #6b7280;
@@ -51,8 +53,10 @@ body {
 }
 
 body {
-  background: #f5f8f6;
+  background: var(--background);
   color: var(--foreground);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
 }
 
 img,
@@ -92,28 +96,96 @@ a[class~="bg-[#1f7a5b]"] {
   color: #fff;
 }
 
-button[class~="bg-[#1f7a5b]"] svg,
-a[class~="bg-[#1f7a5b]"] svg {
+button[class~="bg-[#1f7a5b]"] :where(span, svg),
+a[class~="bg-[#1f7a5b]"] :where(span, svg) {
   color: currentColor;
 }
 
-.bg-recipe {
-  background:
-    radial-gradient(800px 320px at 10% 0%, rgba(31, 122, 91, 0.10), transparent 60%),
-    radial-gradient(800px 320px at 90% 20%, rgba(83, 167, 127, 0.10), transparent 60%),
-    linear-gradient(to bottom, #ffffff, #f5f8f6);
-}
-
-.app-surface {
-  background:
-    radial-gradient(780px 440px at 6% 0%, rgba(31, 122, 91, 0.09), transparent 68%),
-    radial-gradient(680px 400px at 96% 0%, rgba(83, 167, 127, 0.09), transparent 64%),
-    linear-gradient(135deg, #ffffff, #f5f8f6);
-}
-
+.bg-recipe,
+.app-surface,
 .landing-surface {
-  background:
-    radial-gradient(780px 440px at 0% 0%, rgba(31, 122, 91, 0.10), transparent 65%),
-    radial-gradient(680px 400px at 100% 0%, rgba(83, 167, 127, 0.08), transparent 64%),
-    #f5f8f6;
+  background: var(--background);
+}
+
+/* 계산기마다 남아 있던 입력 크기와 밝은 배경 위 흰 글자를 한곳에서 보정한다. */
+.calculator-detail input:not([type="checkbox"]),
+.calculator-detail select {
+  min-height: 44px;
+  font-size: 14px;
+}
+
+.calculator-detail h1 + p [class~="text-[#ffffff]"],
+.calculator-detail .bg-white > [class~="text-[#ffffff]"],
+.calculator-detail .bg-\[\#f1f8f4\] > [class~="text-[#ffffff]"] {
+  color: #176247;
+}
+
+.calculator-detail a[href="/calculators"] {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  border-radius: 8px;
+  background: #fff;
+  padding: 8px 12px;
+  color: #475569;
+}
+
+.calculator-detail div:has(> h1) > div.inline-flex { display: none; }
+.calculator-detail div:has(> h1) > h1 { margin-top: 0; }
+.calculator-detail div.mb-5.flex.items-center.justify-between > span[class~="bg-[#1f7a5b]"] {
+  border-radius: 8px;
+  background: #eaf5ef;
+  color: #176247;
+}
+
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes route-progress {
+  from { transform: scaleX(0.06); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes route-fly {
+  0% { opacity: 0; transform: translate(28px, 7px) rotate(-18deg) scale(0.8); }
+  35% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-56px, -20px) rotate(18deg) scale(1); }
+}
+
+@keyframes loading-progress {
+  0% { transform: scaleX(0.08); }
+  50% { transform: scaleX(0.7); }
+  100% { transform: scaleX(0.96); }
+}
+
+.site-page-enter { animation: page-enter 360ms ease-out both; }
+.site-tip-enter { animation: page-enter 220ms ease-out both; }
+.site-wayfinding a,
+.site-wayfinding button { transition: background-color 180ms ease, color 180ms ease, transform 180ms ease; }
+.site-wayfinding a:hover { transform: translateX(2px); }
+.site-route-loader { position: absolute; inset: auto 0 0; z-index: 40; height: 3px; pointer-events: none; }
+.site-route-progress { height: 3px; background: #1f7a5b; transform-origin: left; animation: route-progress 1.8s ease-out both; }
+.analysis-progress-track { position: relative; overflow: hidden; height: 8px; border-radius: 999px; background: #e4ede7; }
+.analysis-progress-fill { position: relative; height: 100%; border-radius: inherit; background: #1f7a5b; transition: width 300ms ease; }
+.analysis-progress-fill::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.32), transparent); animation: analysis-sheen 1.7s ease-in-out infinite; }
+@keyframes analysis-sheen { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+.site-initial-loader { position: relative; min-height: 55vh; overflow: hidden; background: #f6f7f5; }
+.site-initial-progress { position: absolute; inset: 0 0 auto; height: 3px; background: #1f7a5b; transform-origin: left; animation: loading-progress 1.8s ease-in-out infinite; }
+.site-initial-content { display: flex; min-height: 55vh; flex-direction: column; align-items: center; justify-content: center; }
+.site-initial-ingredients { display: flex; gap: 18px; align-items: center; font-size: 29px; }
+.site-initial-ingredients span { display: inline-block; animation: route-fly 1.15s ease-in-out infinite; }
+.site-initial-ingredients span:nth-child(2) { animation-delay: 140ms; }
+.site-initial-ingredients span:nth-child(3) { animation-delay: 280ms; }
+.site-initial-ingredients span:nth-child(4) { animation-delay: 420ms; font-weight: 700; color: #176247; }
+
+@media (prefers-reduced-motion: reduce) {
+  .site-page-enter, .site-tip-enter, .site-route-progress, .analysis-progress-fill::after, .site-initial-progress, .site-initial-ingredients span { animation: none; }
+  .site-wayfinding a:hover { transform: none; }
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

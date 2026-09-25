@@ -5,13 +5,13 @@ import Link from "next/link";
 
 export default function SiteFooter() {
   return (
-    <footer className="border-t border-slate-200 bg-white/90 backdrop-blur-sm">
+    <footer className="border-t border-slate-200 bg-white ">
       <div className="mx-auto w-full max-w-[980px] px-4 py-8 sm:px-6 sm:py-10">
         <div className="flex flex-col gap-6 sm:gap-8 md:flex-row md:items-start md:justify-between">
           {/* 브랜드 */}
           <div className="min-w-0">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
                 <Image
                   src="/logo/logo.png"
                   alt="지출레시피 로고"
@@ -22,7 +22,7 @@ export default function SiteFooter() {
               </div>
 
               <div>
-                <p className="text-[15px] font-black tracking-[-0.03em] text-slate-800">
+                <p className="text-[15px] font-bold tracking-[-0.03em] text-slate-800">
                   지출레시피
                 </p>
                 <p className="text-[12px] text-slate-500">

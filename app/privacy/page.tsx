@@ -78,7 +78,7 @@ export default function PrivacyPolicyPage() {
                 있습니다.
               </p>
 
-              <div className="overflow-x-auto rounded-2xl border border-gray-200">
+              <div className="overflow-x-auto rounded-lg border border-gray-200">
                 <table className="min-w-full border-collapse text-sm">
                   <thead className="bg-gray-50">
                     <tr>
@@ -191,7 +191,7 @@ export default function PrivacyPolicyPage() {
 
           <section>
             <h2 className="mb-3 text-xl font-semibold">10. 문의처</h2>
-            <div className="rounded-2xl border border-gray-200 bg-gray-50 p-5 text-gray-700">
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-5 text-gray-700">
               <p>개인정보 관련 문의는 아래로 연락해 주시기 바랍니다.</p>
               <div className="mt-3 space-y-1">
                 <p>

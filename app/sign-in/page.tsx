@@ -253,14 +253,12 @@ function SignInInner() {
 
   return (
     <main className="relative flex min-h-screen items-center justify-center landing-surface px-4">
-      <div className="pointer-events-none fixed left-[-80px] top-[40%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,184,108,0.25)] blur-3xl" />
-      <div className="pointer-events-none fixed right-[-60px] bottom-[8%] -z-10 h-52 w-52 rounded-full bg-[rgba(255,193,130,0.22)] blur-3xl" />
 
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: "easeOut" }}
-        className="mt-[-14rem] w-full max-w-md rounded-3xl bg-white/95 p-6 shadow-lg shadow-orange-100"
+        className="mt-[-14rem] w-full max-w-md rounded-xl bg-white p-6 shadow-sm "
       >
         <div className="mb-5 flex flex-col gap-1">
           <div className="inline-flex items-center gap-2">
@@ -372,7 +370,7 @@ function SignInInner() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="mt-1 flex w-full items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-slate-900 shadow-md shadow-orange-100 transition hover:bg-[#348f6c] disabled:cursor-not-allowed disabled:opacity-70"
+            className="mt-1 flex w-full items-center justify-center rounded-xl bg-[color:var(--brand-blue)] px-4 py-2.5 text-[12px] font-semibold text-white shadow-md transition hover:bg-[#176247] disabled:cursor-not-allowed disabled:opacity-70"
             style={{ ["--brand-blue" as any]: BRAND_BLUE }}
           >
             {isSubmitting
@@ -404,7 +402,7 @@ export default function SignInPage() {
     <Suspense
       fallback={
         <main className="flex min-h-screen items-center justify-center landing-surface px-4">
-          <div className="w-full max-w-md rounded-3xl bg-white/90 p-6 shadow-lg shadow-orange-100" aria-label="로그인 화면 불러오는 중">
+          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-sm " aria-label="로그인 화면 불러오는 중">
             <div className="h-4 w-24 animate-pulse rounded bg-orange-100" />
             <div className="mt-4 h-7 w-20 animate-pulse rounded bg-slate-100" />
             <div className="mt-2 h-3 w-3/4 animate-pulse rounded bg-slate-100" />
