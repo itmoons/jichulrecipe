@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { supabase } from "@/lib/supabaseClient";
 import { SpendingInsights } from "@/components/dashboard/SpendingInsights";
+import { SpendingDiagnosis } from "@/components/dashboard/SpendingDiagnosis";
 
 const BRAND_blue = "#1f7a5b";
 const BRAND_GREEN = "#22C55E";
@@ -867,6 +868,7 @@ function DashboardInner() {
         </section>
 
         <SpendingInsights current={stats.days} previous={previousStats?.days ?? []} range={accountingRange} previousRange={previousRange} today={getTodayKeyKST()} />
+        <SpendingDiagnosis days={stats.days} today={getTodayKeyKST()} />
 
         {/* 메인 2컬럼 - 모바일은 그대로 세로, 웹만 2단 */}
         <section className="mb-4 flex flex-col gap-3 lg:grid lg:grid-cols-12 lg:gap-5">

@@ -6,6 +6,7 @@ import "./globals.css";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { ToasterHost } from "@/components/ui/toaster-host";
+import { AppPromotion } from "@/components/layout/AppPromotion";
 import SiteFooter from "@/components/layout/SiteFooter";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { SiteSidebar } from "@/components/layout/SiteSidebar";
@@ -27,11 +28,11 @@ const GTM_ID = "GTM-KP9QNXS6";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "지출레시피 | 무료 가계부 · 지출분석 · 소비습관 진단",
+    default: "지출레시피 | 소비 분석과 생활비 절약을 돕는 무료 가계부",
     template: `%s | ${SITE_NAME}`,
   },
   description:
-    "무료 가계부 지출레시피로 지출/수입을 기록하고, 카테고리·월별 통계와 소비습관 분석까지 한 번에. 자동 분류와 대시보드로 예산 관리가 쉬워집니다.",
+    "가계부를 쓰는 이유는 기록이 아니라 절약이니까. 지출을 기록하고 소비 패턴과 고정비·구독료를 분석해 이번 달 줄일 생활비를 점검하세요. 개인·커플 가계부와 돈 계산 도구를 무료로 이용할 수 있습니다.",
   keywords: [
     "가계부",
     "무료 가계부",
@@ -180,6 +181,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="xl:hidden"><SiteHeader /></div>
           <PageExperience>{children}</PageExperience>
           <ToasterHost />
+          <AppPromotion />
           <SiteFooter />
         </div>
         <MobileBottomNav />

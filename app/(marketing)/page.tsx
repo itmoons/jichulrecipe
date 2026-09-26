@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -175,6 +175,29 @@ function ProductPreview() {
 export default function HomePage() {
   const router = useRouter();
   const [loggedIn, setLoggedIn] = useState(false);
+  const landingRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const root = landingRef.current;
+    if (!root || !('IntersectionObserver' in window)) return;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (reducedMotion.matches) return;
+    const observer = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.classList.add('landing-slide-visible');
+        observer.unobserve(entry.target);
+      }
+    }, { threshold: 0.08, rootMargin: '0px 0px -24px 0px' });
+    root.querySelectorAll('[data-landing-slide]').forEach(element => observer.observe(element));
+    const stopOnReducedMotion = () => {
+      if (!reducedMotion.matches) return;
+      observer.disconnect();
+      root.querySelectorAll('.landing-slide-visible').forEach(element => element.classList.remove('landing-slide-visible'));
+    };
+    reducedMotion.addEventListener('change', stopOnReducedMotion);
+    return () => { observer.disconnect(); reducedMotion.removeEventListener('change', stopOnReducedMotion); };
+  }, []);
 
   useEffect(() => {
     supabase.auth
@@ -192,45 +215,45 @@ export default function HomePage() {
   };
 
   return (
-    <main className="landing-surface min-h-screen overflow-hidden text-slate-900">
+    <main ref={landingRef} className="landing-surface min-h-screen overflow-hidden text-slate-900">
       <section className="relative px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-24">
         <div className="relative mx-auto grid max-w-[1180px] items-center gap-12 lg:grid-cols-[0.84fr_1.16fr] lg:gap-10">
-          <div className="max-w-xl">
+          <div data-landing-slide="left" className="max-w-xl">
             <p className="text-xs font-semibold tracking-wide text-[#1f7a5b]">
               매일 쓰는 가계부, 지출레시피
             </p>
             <h1 className="mt-5 text-3xl font-semibold leading-[1.3] tracking-[-0.04em] text-slate-900 sm:text-5xl">
-              오늘 쓴 돈을 기록하고,
+              가계부를 쓰는 이유는
               <br />
-              <span>이번 달을 살펴보세요.</span>
+              <span>기록이 아니라 절약이니까.</span>
             </h1>
             <p className="mt-6 max-w-md text-base leading-7 text-slate-600 sm:text-lg">
-              수입·지출 기록부터 달력, 소비 분석, 고정비·구독 점검까지 한 곳에서
-              관리해보세요.
+              지출을 기록하면 소비 패턴을 분석하고, 이번 달 줄일 수 있는 생활비를 찾아드려요.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <button
                 onClick={start}
                 className="rounded-lg bg-[#1f7a5b] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#176247]"
               >
-                {loggedIn ? "오늘의 지출 기록하기" : "무료로 시작하기"} →
+                무료로 시작하기 →
               </button>
               <Link
-                href="/calculators"
+                href={loggedIn ? "/dashboard" : "/sign-in?redirect=%2Fdashboard"}
                 className="rounded-lg border border-[#e2e5e1] bg-white px-6 py-4 text-center text-sm font-bold text-slate-700 shadow-sm transition hover:bg-white"
               >
-                금융 계산기 둘러보기
+                소비 분석 보기
               </Link>
             </div>
             <p className="mt-5 text-xs text-slate-500">기록부터 월별 분석까지 무료로 이용할 수 있습니다.</p>
+            <div className="mt-4 flex flex-wrap gap-4 text-xs font-semibold text-[#176247]"><Link href="/calculators">생활비 계산 도구 →</Link><Link href="/couple-household">커플·부부 가계부 알아보기 →</Link></div>
           </div>
-          <ProductPreview />
+          <div data-landing-slide="right"><ProductPreview /></div>
         </div>
       </section>
 
       <section className="border-y border-[#e2e5e1] bg-white px-5 py-16 sm:px-8 sm:py-24">
         <div className="mx-auto max-w-[1180px]">
-          <div className="max-w-xl">
+          <div data-landing-slide="up" className="max-w-xl">
             <p className="text-xs font-semibold text-[#1f7a5b]">기록 · 분석 · 저축</p>
             <h2 className="mt-3 text-3xl font-bold tracking-[-0.04em] text-slate-900 sm:text-4xl">
               가계부가 복잡할 필요는 없어요.
@@ -241,9 +264,11 @@ export default function HomePage() {
             </p>
           </div>
           <div className="mt-10 grid gap-4 md:grid-cols-3">
-            {featureCards.map((card) => (
+            {featureCards.map((card, index) => (
               <Link
                 key={card.title}
+                data-landing-slide="up"
+                style={{ animationDelay: `${index * 90}ms` }}
                 href={card.href}
                 className="group border-t border-[#e2e5e1] py-6 pr-6 transition hover:border-[#1f7a5b]"
               >
@@ -268,7 +293,7 @@ export default function HomePage() {
       </section>
 
       <section className="px-5 py-16 sm:px-8 sm:py-20">
-        <div className="mx-auto max-w-[1180px]">
+        <div data-landing-slide="up" className="mx-auto max-w-[1180px]">
           <p className="text-xs font-semibold text-[#1f7a5b]">이용 안내</p>
           <h2 className="mt-3 text-3xl font-bold tracking-[-0.04em] text-slate-900">
             무료 가계부, 이렇게 시작하세요.
@@ -293,7 +318,7 @@ export default function HomePage() {
 
       <section className="px-5 py-16 sm:px-8 sm:py-24">
         <div className="mx-auto grid max-w-[1180px] items-center gap-10 rounded-xl border border-[#e2e5e1] bg-white p-7 shadow-sm md:grid-cols-[1fr_0.9fr] md:p-12">
-          <div>
+          <div data-landing-slide="left">
             <p className="text-sm font-bold text-[#1f7a5b]">
               YOUR MONEY, YOUR RHYTHM
             </p>
@@ -312,7 +337,7 @@ export default function HomePage() {
               소비 분석 미리 보기
             </Link>
           </div>
-          <div className="rounded-lg border border-[#e2e5e1] bg-white p-5">
+          <div data-landing-slide="right" className="rounded-lg border border-[#e2e5e1] bg-white p-5">
             <div className="rounded-lg bg-white p-5 shadow-sm">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-bold text-slate-700">
@@ -348,7 +373,7 @@ export default function HomePage() {
       </section>
 
       <section className="px-5 pb-20 sm:px-8 sm:pb-28">
-        <div className="mx-auto max-w-[1180px] border-t border-[#d9dfd7] py-10 text-slate-900 sm:py-14">
+        <div data-landing-slide="up" className="mx-auto max-w-[1180px] border-t border-[#d9dfd7] py-10 text-slate-900 sm:py-14">
           <p className="text-xs font-medium text-slate-500">
             하루 한 번, 지출을 정리하는 습관
           </p>

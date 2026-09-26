@@ -3,6 +3,7 @@
 
 import React, { useMemo, useState } from "react";
 import Link from "next/link";
+import { canonicalCalculatorSlug } from "@/lib/calculators/routes";
 
 type CalcItem = {
   title: string;
@@ -273,11 +274,11 @@ const categories: Category[] = [
 ];
 
 const quickLinks = [
-  { label: "연봉 실수령액", href: "/calculators/net-pay-insurance", detail: "4대보험 반영" },
+  { label: "연봉 실수령액", href: "/calculators/salary", detail: "공제율 범위 추정" },
   { label: "연봉 인상률", href: "/calculators/everyday-money?tool=raise", detail: "인상 후 연봉" },
   { label: "퇴직금", href: "/calculators/everyday-money?tool=severance", detail: "예상 금액" },
   { label: "월급 → 연봉", href: "/calculators/everyday-money?tool=salary", detail: "상여 포함 환산" },
-  { label: "대출 이자", href: "/calculators/loan-payment", detail: "월 상환액" },
+  { label: "대출 이자", href: "/calculators/loan-interest", detail: "월 상환액" },
   { label: "전월세", href: "/calculators/everyday-money?tool=housing", detail: "전환율 환산" },
   { label: "할인율", href: "/calculators/discount-rate", detail: "할인 가격 비교" },
   { label: "마진율", href: "/calculators/everyday-money?tool=margin", detail: "원가·판매가" },
@@ -482,7 +483,7 @@ export default function CalculatorsHubPage() {
                     {items.map((it) => (
                       <Link
                         key={it.slug}
-                        href={`/calculators/${it.slug}`}
+                        href={`/calculators/${canonicalCalculatorSlug(it.slug)}`}
                         className={cn(
                           "group rounded-xl border bg-white p-5 transition",
                           "border-slate-200 hover:border-[#1f7a5b] hover:shadow-md"

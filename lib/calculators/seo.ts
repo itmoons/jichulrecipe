@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { canonicalCalculatorSlug } from "./routes";
 
 export const SITE_URL = "https://www.jiculrecipe.com";
 
@@ -32,11 +33,11 @@ export const calculatorGuides: Record<string, { question: string; approach: stri
   "revolving-cost": { question: "카드 리볼빙을 이용하면 비용이 얼마나 늘까요?", approach: "이월 금액과 수수료율을 바탕으로 예상 비용을 확인합니다.", caution: "실제 청구액과 상환 일정은 카드사 약관을 확인하세요." },
   "credit-line-cost": { question: "마이너스통장을 사용한 기간의 이자는 얼마일까요?", approach: "사용 금액, 금리, 기간을 입력해 예상 이자 비용을 계산합니다.", caution: "일별 잔액과 실제 이자 계산 방식에 따라 차이가 납니다." },
   "tax-deduction-check": { question: "연말정산 공제 항목을 빠뜨리지 않았을까요?", approach: "기본 항목을 체크하며 준비할 증빙과 확인 사항을 정리합니다.", caution: "공제 요건과 한도는 해당 과세연도 공식 안내로 재확인하세요." },
-  "net-pay-insurance": { question: "월급에서 4대보험료를 빼면 얼마가 남을까요?", approach: "급여와 공제 항목을 입력해 예상 실수령액을 살펴봅니다.", caution: "실제 급여명세서의 세금·수당·보험료와 차이가 있을 수 있습니다." },
+  "net-pay-insurance": { question: "연봉을 월급으로 환산하면 예상 실수령 범위는 얼마일까요?", approach: "세전 연봉 또는 월급에 가정 공제율 7~10%를 적용해 월 실수령 범위를 추정합니다.", caution: "실제 세금·4대보험 요율이나 개인별 공제는 계산하지 않습니다. 급여명세서를 확인하세요." },
   "insurance-ratio-check": { question: "보험료가 월 소득에서 얼마나 차지할까요?", approach: "보험료를 합산해 소득 대비 비율을 확인합니다.", caution: "보장 내용과 중복 가입 여부도 함께 검토하세요." },
   "pension-pace": { question: "연금저축·IRP 납입 목표를 맞추려면 얼마씩 넣어야 할까요?", approach: "현재 납입액과 남은 기간으로 월별 필요한 납입액을 계산합니다.", caution: "세액공제 요건과 한도는 최신 공식 안내를 확인하세요." },
   "fee-accumulator": { question: "작은 수수료가 오래 쌓이면 얼마일까요?", approach: "건별 수수료와 반복 횟수를 이용해 누적 비용을 계산합니다.", caution: "수수료 면제·우대 조건이 있는지 확인하세요." },
-  "everyday-money": { question: "생활 속 돈 계산을 어디서 시작할까요?", approach: "지출, 예산, 대출 등 상황에 맞는 계산 도구를 골라보세요.", caution: "결과는 입력값을 바탕으로 한 참고용입니다." },
+  "everyday-money": { question: "생활 속 돈 계산을 어디서 시작할까요?", approach: "연봉 인상률, 퇴직금, 월급·연봉 환산, 전월세 전환, 마진율, 복리와 투자 수익률을 선택해 계산합니다.", caution: "결과는 입력값을 바탕으로 한 참고용입니다." },
   "savings-interest": { question: "매월 적금하면 만기에 이자를 얼마나 받을까요?", approach: "월 납입액, 연 이율, 납입 개월 수로 원금과 세전 단리 이자를 계산합니다.", caution: "매월 초 납입을 가정한 추정치이며 실제 상품의 납입일·세금·우대 조건과 다를 수 있습니다." },
   "discount-rate": { question: "이 가격은 실제로 몇 퍼센트 할인된 걸까요?", approach: "정가와 할인 가격의 차액을 정가로 나누어 할인율을 계산합니다.", caution: "배송비와 추가 쿠폰은 포함하지 않습니다." },
   "hourly-wage-converter": { question: "시급을 월급이나 연봉으로 바꾸면 얼마일까요?", approach: "시급, 하루 근무시간, 주당 근무일수로 주급·월급·연봉의 세전 금액을 환산합니다.", caution: "주휴수당·연장수당·세금·4대보험을 제외한 단순 환산입니다." },
@@ -46,7 +47,7 @@ const names: Record<string, string> = {
   "fixed-cost-ratio": "고정비 비율 계산기", "subscription-total": "구독료 계산기", "annual-vs-monthly": "연간 결제와 월간 결제 비교 계산기", "autopay-leak-check": "자동결제 누수 점검 계산기", "mobile-plan-optimizer": "통신비 비교 계산기", "utility-season-compare": "관리비·공과금 비교 계산기", "food-budget-cap": "식비 예산 계산기", "coffee-delivery-accum": "커피·배달 지출 계산기", "transport-compare": "교통비 비교 계산기", "category-deviation-alert": "소비 카테고리 점검 계산기",
   "monthly-budget-split": "월 예산 배분 계산기", "variable-spend-safe": "가변비 안전예산 계산기", "no-spend-goal": "무지출 목표 계산기", "cutback-goal": "지출 절감 목표 계산기", "emergency-fund-timeline": "비상금 목표 기간 계산기", "cashflow-calendar": "현금흐름 캘린더 계산기", "card-billing-date-shift": "카드 결제일 변경 계산기", "bonus-allocation": "상여금 배분 계산기",
   "dsr-lite": "DSR 계산기", "loan-payment": "대출 월 상환액 계산기", "rate-sensitivity": "금리 인상 영향 계산기", "prepayment-fee-breakeven": "중도상환수수료 계산기", "refinance-compare": "대환대출 비교 계산기", "revolving-cost": "카드 리볼빙 비용 계산기", "credit-line-cost": "마이너스통장 이자 계산기",
-  "tax-deduction-check": "연말정산 공제 점검 계산기", "net-pay-insurance": "월급 실수령액 계산기", "insurance-ratio-check": "보험료 비율 계산기", "pension-pace": "연금저축 목표 계산기", "fee-accumulator": "수수료 누적 계산기",
+  "tax-deduction-check": "연말정산 공제 점검 계산기", "net-pay-insurance": "연봉 실수령액 계산기 · 월급 환산 범위 추정", "insurance-ratio-check": "보험료 비율 계산기", "pension-pace": "연금저축 목표 계산기", "fee-accumulator": "수수료 누적 계산기",
   "everyday-money": "생활 금융 계산기",
   "savings-interest": "적금 이자 계산기", "discount-rate": "할인율 계산기", "hourly-wage-converter": "시급·월급 환산 계산기",
 };
@@ -76,11 +77,12 @@ export function getRelatedCalculatorSlugs(slug: string): string[] {
 
 export function getCalculatorMetadata(slug: string): Metadata {
   const item = calculatorSeo[slug];
-  const url = `${SITE_URL}/calculators/${slug}`;
+  const url = `${SITE_URL}/calculators/${canonicalCalculatorSlug(slug)}`;
   return {
     title: { absolute: `${item.name} | 계산 방법과 결과 확인 - 지출레시피` },
     description: item.description,
     keywords: item.keywords,
+    robots: { index: true, follow: true },
     alternates: { canonical: url },
     openGraph: { title: `${item.name} - 지출레시피`, description: item.description, url, siteName: "지출레시피", locale: "ko_KR", type: "website" },
     twitter: { card: "summary_large_image", title: `${item.name} - 지출레시피`, description: item.description },

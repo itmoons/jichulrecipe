@@ -4,17 +4,18 @@
 import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { RecipeShell } from "@/components/calculators/RecipeShell";
-import { MoneyInput } from "@/components/calculators/Inputs";
+import { MoneyInput, SelectInput } from "@/components/calculators/Inputs";
 import { MetricCard, Row } from "@/components/calculators/Metric";
-import { cn, UI, toNumberSafe, formatKRW, clamp } from "@/lib/calculators/utils";
+import { cn, UI, toNumberSafe, formatKRW } from "@/lib/calculators/utils";
 
 export default function NetPayInsurancePage() {
   const [grossMonthly, setGrossMonthly] = useState("3200000");
+  const [payPeriod, setPayPeriod] = useState("월급");
 
   // “정확한 보험료율/상하한/과세표준”은 변동 가능 → 단정 금지
   // 대신, 보수적으로 “대략 범위”를 보여주는 방식(유입용 계산기).
   const calc = useMemo(() => {
-    const g = Math.max(0, toNumberSafe(grossMonthly));
+    const g = Math.max(0, toNumberSafe(grossMonthly)) / (payPeriod === "연봉" ? 12 : 1);
 
     // 아주 거친 범위(예: 7~10%)로 표시: 조잡해 보이지 않게 “범위”만 제시
     const lowRate = 0.07;
@@ -32,15 +33,15 @@ export default function NetPayInsurancePage() {
         : { label: "범위 추정", badge: "bg-[#1f7a5b] text-white" };
 
     return { g, lowDeduct, highDeduct, netLow, netHigh, status };
-  }, [grossMonthly]);
+  }, [grossMonthly, payPeriod]);
 
   return (
     <RecipeShell
       badge="실수령"
-      title="4대보험 실수령액 계산기"
+      title="연봉·월급 실수령액 계산기"
       subtitle={
         <>
-          월급에서 4대보험/공제 등을 고려한 <span className="font-semibold text-[#ffffff]">대략 실수령 범위</span>를 봅니다.
+          세전 급여에 가정 공제율 7~10%를 적용한 <span className="font-semibold text-[#ffffff]">대략 실수령 범위</span>입니다. 실제 세금·보험료를 계산하지 않습니다.
         </>
       }
     >
@@ -60,7 +61,12 @@ export default function NetPayInsurancePage() {
           </div>
 
           <div className="mt-4 grid gap-3">
-            <MoneyInput label="월급(세전)" value={grossMonthly} setValue={setGrossMonthly} />
+            <SelectInput label="급여 기준" value={payPeriod} onChange={(value) => {
+              if (value === payPeriod) return;
+              setGrossMonthly(String(Math.round(toNumberSafe(grossMonthly) * (value === "연봉" ? 12 : 1 / 12))));
+              setPayPeriod(value);
+            }} options={["월급", "연봉"]} />
+            <MoneyInput label={`${payPeriod}(세전)`} value={grossMonthly} setValue={setGrossMonthly} />
           </div>
 
           <div className="mt-4 rounded-lg border border-[#e2e5e1] bg-white p-4">

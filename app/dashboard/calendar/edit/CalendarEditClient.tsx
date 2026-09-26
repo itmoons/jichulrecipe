@@ -606,7 +606,7 @@ function CalendarEditor() {
         "[background-size:18px_18px]",
       ].join(" ")}
     >
-      <div className="mx-auto flex w-full max-w-[1244px] flex-col px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-[1320px] min-w-0 flex-col px-4 sm:px-6 lg:px-0">
         <header className="flex items-center justify-between gap-4 py-6 sm:py-8">
           <div className="flex items-center gap-3">
             <button
