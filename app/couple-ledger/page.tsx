@@ -51,7 +51,7 @@ function Surface({
   return (
     <section
       className={cx(
-        "rounded-xl border border-[#f1e4da] bg-white shadow-sm",
+        "rounded-xl border border-[#dfe6e2] bg-white shadow-sm",
         className
       )}
     >
@@ -100,7 +100,7 @@ function SummaryChip({
   value: string;
 }) {
   return (
-    <div className="rounded-[14px] border border-[#f3e5da] bg-[#fffdfb] px-4 py-3">
+    <div className="rounded-xl border border-[#dfe6e2] bg-[#f8fafc] px-4 py-3">
       <div className="text-[11px] font-medium text-slate-500">{label}</div>
       <div className="mt-1 text-[15px] font-bold tracking-[-0.02em] text-slate-900">{value}</div>
     </div>
@@ -121,7 +121,7 @@ function QuickCard({
   return (
     <Link
       href={href}
-      className="group block rounded-xl border border-[#f1e4da] bg-white p-5 transition hover:-translate-y-[2px] hover:border-orange-200 hover:bg-[#fffdfb] shadow-sm"
+      className="group block rounded-xl border border-[#dfe6e2] bg-white p-5 transition hover:-translate-y-[1px] hover:border-[#9fcdb7] hover:bg-[#f8fafc] shadow-sm"
     >
       <div className="flex h-full min-h-[190px] flex-col justify-between sm:min-h-[140px]">
         <div className="flex items-start justify-between gap-3">
@@ -343,7 +343,7 @@ export default function CoupleLedgerPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f6f7f5] px-4 py-7 sm:px-6 sm:py-10">
+    <main className="min-h-screen bg-[#f8fafc] px-4 py-7 sm:px-6 sm:py-10">
       <div className="mx-auto w-full max-w-[1320px]">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div>

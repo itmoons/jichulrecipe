@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -56,27 +56,27 @@ const faqJsonLd = {
 
 function ProductPreview() {
   return (
-    <div className="relative mx-auto w-full max-w-[720px] rounded-xl border border-[#e2e5e1] bg-white p-3 shadow-sm sm:p-4">
-      <div className="overflow-hidden rounded-xl border border-[#1f7a5b]/20 bg-[#f6f7f5]">
-        <div className="flex h-12 items-center justify-between border-b border-[#1f7a5b]/20 bg-white px-4 sm:px-5">
+    <div className="relative mx-auto w-full max-w-[720px] overflow-hidden rounded-2xl border border-[#e7e5de] bg-white">
+      <div className="bg-[#f7f9f8]">
+        <div className="flex h-12 items-center justify-between border-b border-[#e7e5de] bg-white px-4 sm:px-5">
           <div className="flex items-center gap-2">
-            <span className="h-6 w-6 rounded-lg bg-[#1f7a5b]" />
-            <span className="text-xs font-bold text-slate-800">지출레시피</span>
+            <span className="h-6 w-6 rounded-md bg-[#167a5b]" />
+            <span className="text-xs font-semibold text-slate-800">지출레시피</span>
           </div>
           <div className="rounded-full bg-[#1f7a5b]/10 px-3 py-1 text-[10px] font-semibold text-[#1f7a5b]">
             9월 소비 리포트
           </div>
         </div>
         <div className="grid min-h-[315px] grid-cols-1 sm:grid-cols-[132px_1fr]">
-          <aside className="hidden border-r border-[#1f7a5b]/20 bg-white p-4 sm:block">
-            <p className="mb-6 text-[10px] font-bold text-[#1f7a5b]">
-              MY RECIPE
+          <aside className="hidden border-r border-[#e7e5de] bg-white p-4 sm:block">
+            <p className="mb-6 text-[10px] font-semibold text-[#167a5b]">
+              가계부
             </p>
             {["오늘의 기록", "지출 분석", "저축 목표", "정기 지출"].map(
               (item, index) => (
                 <div
                   key={item}
-                  className={`mb-3 rounded-lg px-3 py-2 text-[10px] font-semibold ${index === 0 ? "bg-[#1f7a5b]/15 text-slate-700" : "text-slate-400"}`}
+                  className={`mb-2 border-l-2 px-3 py-2 text-[10px] font-medium ${index === 0 ? "border-[#167a5b] bg-[#f1f6f3] text-slate-800" : "border-transparent text-slate-400"}`}
                 >
                   {item}
                 </div>
@@ -87,15 +87,15 @@ function ProductPreview() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-[11px] text-slate-400">9월 3일 수요일</p>
-                <h3 className="mt-1 text-lg font-bold tracking-tight text-slate-800 sm:text-xl">
-                  오늘의 소비 흐름
+                <h3 className="mt-1 text-lg font-bold tracking-[-0.03em] text-slate-800 sm:text-xl">
+                  오늘 42,800원을 썼어요
                 </h3>
               </div>
-              <span className="rounded-lg bg-[#1f7a5b] px-3 py-2 text-[10px] font-semibold text-white">
+              <span className="rounded-md bg-[#167a5b] px-3 py-2 text-[10px] font-semibold text-white">
                 + 기록하기
               </span>
             </div>
-            <div className="mt-5 grid grid-cols-3 gap-2 sm:gap-3">
+            <div className="mt-5 grid grid-cols-3 divide-x divide-[#e7e5de] border-y border-[#e7e5de] py-3">
               {[
                 {
                   label: "이번 달 지출",
@@ -111,7 +111,7 @@ function ProductPreview() {
               ].map((item) => (
                 <div
                   key={item.label}
-                  className="rounded-lg border border-[#e2e5e1] bg-white p-3 shadow-sm"
+                  className="px-3 first:pl-0 last:pr-0"
                 >
                   <p className="text-[9px] text-slate-400">{item.label}</p>
                   <p
@@ -123,14 +123,15 @@ function ProductPreview() {
                 </div>
               ))}
             </div>
-            <div className="mt-4 rounded-lg border border-[#1f7a5b]/20 bg-white p-4">
-              <div className="flex items-center justify-between">
-                <p className="text-[10px] font-semibold text-slate-600">
-                  이번 주 지출 추이
-                </p>
-                <p className="text-[10px] font-bold text-[#1f7a5b]">
-                  예산 안에서 관리 중
-                </p>
+            <div className="mt-5 border-t border-[#e3e8e5] pt-4">
+              <div className="flex items-center justify-between text-[10px]">
+                <p className="font-semibold text-slate-600">오늘의 지출</p>
+                <p className="font-semibold text-[#167a5b]">예산 안에서 관리 중</p>
+              </div>
+              <div className="mt-3 grid grid-cols-3 gap-2 text-[10px] text-slate-500">
+                <span>식비 <b className="ml-1 font-semibold text-slate-800">18,500원</b></span>
+                <span>생활 <b className="ml-1 font-semibold text-slate-800">14,300원</b></span>
+                <span>교통 <b className="ml-1 font-semibold text-slate-800">10,000원</b></span>
               </div>
               <svg
                 viewBox="0 0 420 100"
@@ -150,7 +151,7 @@ function ProductPreview() {
                 <path
                   d="M0 82 C30 78 32 34 65 54 S105 92 133 55 S175 21 205 49 S245 85 280 62 S319 28 347 48 S388 78 420 35"
                   fill="none"
-                  stroke="#1f7a5b"
+                  stroke="#167a5b"
                   strokeWidth="3"
                   strokeLinecap="round"
                 />
@@ -175,29 +176,6 @@ function ProductPreview() {
 export default function HomePage() {
   const router = useRouter();
   const [loggedIn, setLoggedIn] = useState(false);
-  const landingRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const root = landingRef.current;
-    if (!root || !('IntersectionObserver' in window)) return;
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (reducedMotion.matches) return;
-    const observer = new IntersectionObserver(entries => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        entry.target.classList.add('landing-slide-visible');
-        observer.unobserve(entry.target);
-      }
-    }, { threshold: 0.08, rootMargin: '0px 0px -24px 0px' });
-    root.querySelectorAll('[data-landing-slide]').forEach(element => observer.observe(element));
-    const stopOnReducedMotion = () => {
-      if (!reducedMotion.matches) return;
-      observer.disconnect();
-      root.querySelectorAll('.landing-slide-visible').forEach(element => element.classList.remove('landing-slide-visible'));
-    };
-    reducedMotion.addEventListener('change', stopOnReducedMotion);
-    return () => { observer.disconnect(); reducedMotion.removeEventListener('change', stopOnReducedMotion); };
-  }, []);
 
   useEffect(() => {
     supabase.auth
@@ -215,47 +193,47 @@ export default function HomePage() {
   };
 
   return (
-    <main ref={landingRef} className="landing-surface min-h-screen overflow-hidden text-slate-900">
-      <section className="relative px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-24">
-        <div className="relative mx-auto grid max-w-[1180px] items-center gap-12 lg:grid-cols-[0.84fr_1.16fr] lg:gap-10">
-          <div data-landing-slide="left" className="max-w-xl">
-            <p className="text-xs font-semibold tracking-wide text-[#1f7a5b]">
+    <main className="landing-surface min-h-screen overflow-hidden text-slate-900">
+      <section className="px-4 pb-14 pt-10 sm:px-8 sm:pb-20 sm:pt-16">
+        <div className="mx-auto grid max-w-[1180px] items-center gap-10 lg:grid-cols-[0.84fr_1.16fr] lg:gap-14">
+          <div className="max-w-xl">
+            <p className="text-xs font-semibold tracking-wide text-[#167a5b]">
               매일 쓰는 가계부, 지출레시피
             </p>
-            <h1 className="mt-5 text-3xl font-semibold leading-[1.3] tracking-[-0.04em] text-slate-900 sm:text-5xl">
+            <h1 className="mt-4 text-[30px] font-bold leading-[1.32] tracking-[-0.045em] text-slate-900 sm:text-[44px]">
               가계부를 쓰는 이유는
               <br />
               <span>기록이 아니라 절약이니까.</span>
             </h1>
-            <p className="mt-6 max-w-md text-base leading-7 text-slate-600 sm:text-lg">
+            <p className="mt-5 max-w-md text-[15px] leading-7 text-slate-600 sm:text-base">
               지출을 기록하면 소비 패턴을 분석하고, 이번 달 줄일 수 있는 생활비를 찾아드려요.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-7 flex flex-col items-start gap-4">
               <button
                 onClick={start}
-                className="rounded-lg bg-[#1f7a5b] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#176247]"
+                className="h-12 rounded-xl bg-[#167a5b] px-5 text-sm font-semibold text-white transition hover:bg-[#0e5742]"
               >
-                무료로 시작하기 →
+                무료로 시작하기
               </button>
               <Link
                 href={loggedIn ? "/dashboard" : "/sign-in?redirect=%2Fdashboard"}
-                className="rounded-lg border border-[#e2e5e1] bg-white px-6 py-4 text-center text-sm font-bold text-slate-700 shadow-sm transition hover:bg-white"
+                className="text-sm font-semibold text-[#167a5b] underline-offset-4 hover:underline"
               >
-                소비 분석 보기
+                이번 달 소비 분석 미리보기 →
               </Link>
             </div>
             <p className="mt-5 text-xs text-slate-500">기록부터 월별 분석까지 무료로 이용할 수 있습니다.</p>
-            <div className="mt-4 flex flex-wrap gap-4 text-xs font-semibold text-[#176247]"><Link href="/calculators">생활비 계산 도구 →</Link><Link href="/couple-household">커플·부부 가계부 알아보기 →</Link></div>
+            <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold text-[#0e5742]"><Link href="/calculators">생활비 계산 도구</Link><Link href="/couple-household">커플·부부 가계부</Link></div>
           </div>
-          <div data-landing-slide="right"><ProductPreview /></div>
+          <div><ProductPreview /></div>
         </div>
       </section>
 
-      <section className="border-y border-[#e2e5e1] bg-white px-5 py-16 sm:px-8 sm:py-24">
+      <section className="border-y border-[#e3e8e5] bg-white px-4 py-14 sm:px-8 sm:py-20">
         <div className="mx-auto max-w-[1180px]">
-          <div data-landing-slide="up" className="max-w-xl">
-            <p className="text-xs font-semibold text-[#1f7a5b]">기록 · 분석 · 저축</p>
-            <h2 className="mt-3 text-3xl font-bold tracking-[-0.04em] text-slate-900 sm:text-4xl">
+          <div className="max-w-xl">
+            <p className="text-xs font-semibold text-[#167a5b]">기록 · 분석 · 저축</p>
+            <h2 className="mt-3 text-[27px] font-bold tracking-[-0.04em] text-slate-900 sm:text-3xl">
               가계부가 복잡할 필요는 없어요.
             </h2>
             <p className="mt-4 text-base leading-7 text-slate-600">
@@ -263,28 +241,26 @@ export default function HomePage() {
               분석과 목표 관리까지 자연스럽게 이어집니다.
             </p>
           </div>
-          <div className="mt-10 grid gap-4 md:grid-cols-3">
-            {featureCards.map((card, index) => (
+          <div className="mt-9 grid divide-y divide-[#e3e8e5] border-y border-[#e3e8e5] md:grid-cols-3 md:divide-x md:divide-y-0">
+            {featureCards.map((card) => (
               <Link
                 key={card.title}
-                data-landing-slide="up"
-                style={{ animationDelay: `${index * 90}ms` }}
                 href={card.href}
-                className="group border-t border-[#e2e5e1] py-6 pr-6 transition hover:border-[#1f7a5b]"
+                className="group py-6 md:px-6 md:first:pl-0 md:last:pr-0"
               >
                 <div
                   className="text-xs font-medium tabular-nums text-slate-400"
                 >
                   {card.no}
                 </div>
-                <h3 className="mt-7 text-xl font-bold tracking-tight text-slate-800">
+                <h3 className="mt-6 text-lg font-semibold tracking-tight text-slate-800">
                   {card.title}
                 </h3>
                 <p className="mt-3 text-sm leading-6 text-slate-500">
                   {card.text}
                 </p>
-                <p className="mt-6 text-sm font-bold text-[#1f7a5b]">
-                  자세히 보기 →
+                <p className="mt-5 text-sm font-semibold text-[#167a5b]">
+                  살펴보기
                 </p>
               </Link>
             ))}
@@ -292,13 +268,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="px-5 py-16 sm:px-8 sm:py-20">
-        <div data-landing-slide="up" className="mx-auto max-w-[1180px]">
-          <p className="text-xs font-semibold text-[#1f7a5b]">이용 안내</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-[-0.04em] text-slate-900">
+      <section className="px-4 py-14 sm:px-8 sm:py-20">
+        <div className="mx-auto max-w-[1180px]">
+          <p className="text-xs font-semibold text-[#167a5b]">이용 안내</p>
+          <h2 className="mt-3 text-[27px] font-bold tracking-[-0.04em] text-slate-900 sm:text-3xl">
             무료 가계부, 이렇게 시작하세요.
           </h2>
-          <div className="mt-8 divide-y divide-[#e2e5e1] border-y border-[#e2e5e1]">
+          <div className="mt-8 divide-y divide-[#e3e8e5] border-y border-[#e3e8e5]">
             {faqs.map((faq) => (
               <article
                 key={faq.question}
@@ -316,13 +292,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="px-5 py-16 sm:px-8 sm:py-24">
-        <div className="mx-auto grid max-w-[1180px] items-center gap-10 rounded-xl border border-[#e2e5e1] bg-white p-7 shadow-sm md:grid-cols-[1fr_0.9fr] md:p-12">
-          <div data-landing-slide="left">
-            <p className="text-sm font-bold text-[#1f7a5b]">
-              YOUR MONEY, YOUR RHYTHM
+      <section className="border-y border-[#e3e8e5] bg-white px-4 py-14 sm:px-8 sm:py-20">
+        <div className="mx-auto grid max-w-[1180px] items-center gap-10 md:grid-cols-[1fr_0.9fr]">
+          <div>
+            <p className="text-xs font-semibold text-[#167a5b]">
+              이번 달 소비 요약
             </p>
-            <h2 className="mt-3 text-3xl font-bold tracking-[-0.04em] text-slate-900 sm:text-4xl">
+            <h2 className="mt-3 text-[27px] font-bold tracking-[-0.04em] text-slate-900 sm:text-3xl">
               내 소비를 이해하면
               <br />돈 관리가 쉬워집니다.
             </h2>
@@ -330,28 +306,23 @@ export default function HomePage() {
               고정비부터 작은 습관까지, 지출레시피는 숫자를 나열하지 않고 다음
               행동을 쉽게 찾도록 도와줍니다.
             </p>
-            <Link
-              href="/dashboard"
-              className="mt-7 inline-flex rounded-xl bg-slate-900 px-5 py-3 text-sm font-bold text-white transition hover:bg-slate-700"
-            >
-              소비 분석 미리 보기
-            </Link>
+            <Link href="/dashboard" className="mt-6 inline-flex text-sm font-semibold text-[#167a5b] underline-offset-4 hover:underline">소비 분석으로 이동</Link>
           </div>
-          <div data-landing-slide="right" className="rounded-lg border border-[#e2e5e1] bg-white p-5">
-            <div className="rounded-lg bg-white p-5 shadow-sm">
+          <div className="border-y border-[#e3e8e5] py-5">
+            <div className="py-1">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-bold text-slate-700">
                   9월 지출 요약
                 </p>
-                <span className="rounded-full bg-[#1f7a5b]/15 px-2.5 py-1 text-[10px] font-bold text-slate-700">
+                <span className="rounded-full bg-[#167a5b]/10 px-2.5 py-1 text-[10px] font-semibold text-[#167a5b]">
                   안정적
                 </span>
               </div>
               <div className="mt-6 space-y-4">
                 {[
-                  ["고정비", "42%", "bg-[#1f7a5b]"],
-                  ["생활비", "31%", "bg-[#1f7a5b]"],
-                  ["저축", "27%", "bg-[#1f7a5b]"],
+                  ["고정비", "42%", "bg-[#167a5b]"],
+                  ["생활비", "31%", "bg-[#167a5b]"],
+                  ["저축", "27%", "bg-[#167a5b]"],
                 ].map(([label, value, color]) => (
                   <div key={label}>
                     <div className="mb-2 flex justify-between text-xs font-semibold text-slate-600">
@@ -372,19 +343,19 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="px-5 pb-20 sm:px-8 sm:pb-28">
-        <div data-landing-slide="up" className="mx-auto max-w-[1180px] border-t border-[#d9dfd7] py-10 text-slate-900 sm:py-14">
+      <section className="px-4 pb-20 sm:px-8 sm:pb-24">
+        <div className="mx-auto max-w-[1180px] border-t border-[#e3e8e5] py-10 text-slate-900 sm:py-14">
           <p className="text-xs font-medium text-slate-500">
             하루 한 번, 지출을 정리하는 습관
           </p>
-          <h2 className="mt-3 text-3xl font-bold tracking-[-0.04em] sm:text-4xl">
+          <h2 className="mt-3 text-[27px] font-bold tracking-[-0.04em] sm:text-3xl">
             오늘의 첫 기록을 남겨보세요.
           </h2>
           <button
             onClick={start}
-            className="mt-6 rounded-lg bg-[#1f7a5b] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#176247]"
+            className="mt-6 h-12 rounded-xl bg-[#167a5b] px-5 text-sm font-semibold text-white transition hover:bg-[#0e5742]"
           >
-            {loggedIn ? "오늘 기록하러 가기" : "지출레시피 무료로 시작하기"} →
+            {loggedIn ? "오늘 기록하러 가기" : "지출레시피 무료로 시작하기"}
           </button>
         </div>
       </section>

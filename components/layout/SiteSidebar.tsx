@@ -120,7 +120,7 @@ export function SiteSidebar() {
                 ? href
                 : "/sign-in"
             }
-            className={`flex h-11 items-center gap-3 rounded-lg px-3 text-[13px] font-semibold transition ${active(href) ? "bg-[#eaf5ef] text-[#176247]" : "text-slate-600 hover:bg-[#f6f7f5] hover:text-slate-900"}`}
+            className={`flex h-11 items-center gap-3 rounded-lg px-3 text-[13px] font-semibold transition ${active(href) ? "bg-[#eaf5ef] text-[#176247]" : "text-slate-600 hover:bg-[#f8fafc] hover:text-slate-900"}`}
           >
             <span className="flex w-5 shrink-0 items-center justify-center"><Icon size={18} strokeWidth={active(href) ? 2.25 : 1.8} /></span>
             <span className="truncate">{label}</span>
@@ -132,7 +132,7 @@ export function SiteSidebar() {
         {isLoggedIn ? (
           <Link
             href="/notifications"
-            className="mb-1 flex h-11 items-center gap-3 rounded-lg px-3 text-[13px] font-semibold text-slate-500 transition hover:bg-[#f6f7f5] hover:text-slate-900"
+            className="mb-1 flex h-11 items-center gap-3 rounded-lg px-3 text-[13px] font-semibold text-slate-500 transition hover:bg-[#f8fafc] hover:text-slate-900"
           >
             <span className="flex w-5 shrink-0 items-center justify-center"><Bell size={18} /></span> 알림
           </Link>
@@ -142,7 +142,7 @@ export function SiteSidebar() {
           className={`flex h-11 items-center gap-3 rounded-lg px-3 text-[13px] font-semibold transition ${
             active("/settings")
               ? "bg-[#eaf5ef] text-[#176247]"
-              : "text-slate-500 hover:bg-[#f6f7f5] hover:text-slate-900"
+              : "text-slate-500 hover:bg-[#f8fafc] hover:text-slate-900"
           }`}
         >
           <span className="flex w-5 shrink-0 items-center justify-center"><Settings
@@ -158,7 +158,7 @@ export function SiteSidebar() {
               await supabase.auth.signOut();
               router.push("/");
             }}
-            className="mt-3 w-full rounded-lg border border-[#e2e5e1] py-2.5 text-[12px] font-bold text-slate-600 transition hover:bg-[#f6f7f5]"
+            className="mt-3 w-full rounded-lg border border-[#e2e5e1] py-2.5 text-[12px] font-bold text-slate-600 transition hover:bg-[#f8fafc]"
           >
             로그아웃
           </button>

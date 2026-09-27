@@ -27,9 +27,8 @@ export function MobileBottomNav() {
       <div className="mx-auto flex h-14 max-w-lg items-center justify-between">
         <Link href="/" className={itemClass(pathname === "/")}>홈</Link>
         <Link href="/dashboard/calendar" className={itemClass(pathname.startsWith("/dashboard/calendar"))}>달력</Link>
-        <Link href={`/dashboard/calendar/edit?date=${todayKey()}`} className="-mt-5 inline-flex h-13 w-13 shrink-0 items-center justify-center rounded-full border-4 border-[#f6f7f5] bg-[#1f7a5b] text-xl font-bold text-white shadow-sm sm:h-14 sm:w-14" aria-label="기록하기">+</Link>
+        <Link href={`/dashboard/calendar/edit?date=${todayKey()}`} className="inline-flex h-10 shrink-0 items-center justify-center rounded-lg bg-[#167a5b] px-3 text-[11px] font-bold text-white transition hover:bg-[#0e5742]" aria-label="지출 기록하기">+ 지출</Link>
         <Link href="/dashboard" className={itemClass(pathname === "/dashboard")}>분석</Link>
-        <Link href="/notifications" className={itemClass(pathname.startsWith("/notifications"))}>알림</Link>
         <Link href="/saving" className={itemClass(pathname.startsWith("/saving"))}>저축</Link>
       </div>
     </nav>

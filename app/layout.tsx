@@ -165,7 +165,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-762XP39BW8"></script>
       </head>
 
-      <body className="min-h-screen bg-[#f6f7f5] pb-20 text-slate-900 font-sans lg:pb-0">
+      <body className="min-h-screen bg-[#f7f9f8] pb-20 text-slate-900 font-sans lg:pb-0">
         <noscript>
           <iframe
             src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}

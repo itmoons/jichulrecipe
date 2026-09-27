@@ -6,44 +6,44 @@
 */
 @source "../**/*.{js,ts,jsx,tsx,mdx}";
 
-/* 지출레시피 Theme — 차분한 그린 기반의 정돈된 금융 UI */
+/* 지출레시피 Theme — 백색·뉴트럴 그레이 기반의 생활 금융 UI */
 @theme {
-  --shadow-sm: 0 1px 2px rgb(25 35 28 / 0.04);
-  --shadow-md: 0 4px 12px rgb(25 35 28 / 0.07);
-  --color-orange-50: #f1f8f4;
-  --color-orange-100: #e8ebe6;
-  --color-orange-200: #d9dfd7;
-  --color-orange-400: #53a77f;
-  --color-orange-500: #1f7a5b;
-  --color-orange-600: #176247;
-  --color-orange-700: #13523b;
-  --color-orange-800: #0f4130;
-  --color-sky-50: #f7faf8;
-  --color-sky-100: #eaf5ef;
-  --color-sky-200: #c6e2d4;
+  --shadow-sm: 0 1px 2px rgb(15 23 42 / 0.04);
+  --shadow-md: 0 4px 14px rgb(15 23 42 / 0.06);
+  --color-orange-50: #f1f7f4;
+  --color-orange-100: #e4eee8;
+  --color-orange-200: #cfe0d6;
+  --color-orange-400: #4d9a77;
+  --color-orange-500: #167a5b;
+  --color-orange-600: #0e5742;
+  --color-orange-700: #0b4635;
+  --color-orange-800: #083a2c;
+  --color-sky-50: #f8fafc;
+  --color-sky-100: #eef5f1;
+  --color-sky-200: #d8e8de;
   --color-sky-400: #53a77f;
   --color-sky-500: #1f7a5b;
   --color-sky-600: #176247;
-  --color-blue-50: #f7faf8;
-  --color-blue-100: #e8ebe6;
-  --color-blue-200: #d9dfd7;
+  --color-blue-50: #f8fafc;
+  --color-blue-100: #eef2f5;
+  --color-blue-200: #dce4e9;
   --color-blue-400: #53a77f;
   --color-blue-500: #1f7a5b;
   --color-blue-600: #176247;
 }
 
 :root {
-  --background: #f6f7f5;
-  --foreground: #1f2937;
+  --background: #f7f9f8;
+  --foreground: #14211c;
 
-  --recipe-orange: #1f7a5b;
-  --recipe-orange-strong: #176247;
-  --recipe-orange-soft: #f1f8f4;
+  --recipe-orange: #167a5b;
+  --recipe-orange-strong: #0e5742;
+  --recipe-orange-soft: #f1f7f4;
 
-  --recipe-border: #e2e5e1;
+  --recipe-border: #e3e8e5;
   --recipe-card: #ffffff;
 
-  --recipe-muted: #6b7280;
+  --recipe-muted: #6d7772;
 }
 
 html,
@@ -56,6 +56,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   line-height: 1.6;
+  letter-spacing: -0.01em;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -105,6 +106,17 @@ a[class~="bg-[#1f7a5b]"] :where(span, svg) {
 .app-surface,
 .landing-surface {
   background: var(--background);
+}
+
+/* 웜한 크림색·과한 블러를 걷어내고, 화면의 깊이는 얇은 경계로만 구분한다. */
+.app-surface > div,
+.landing-surface > section {
+  isolation: isolate;
+}
+
+.landing-surface .shadow-sm,
+.app-surface .shadow-sm {
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
 }
 
 /* 계산기마다 남아 있던 입력 크기와 밝은 배경 위 흰 글자를 한곳에서 보정한다. */
@@ -191,7 +203,7 @@ a[class~="bg-[#1f7a5b]"] :where(span, svg) {
 .analysis-progress-fill { position: relative; height: 100%; border-radius: inherit; background: #1f7a5b; transition: width 300ms ease; }
 .analysis-progress-fill::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.32), transparent); animation: analysis-sheen 1.7s ease-in-out infinite; }
 @keyframes analysis-sheen { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
-.site-initial-loader { position: relative; min-height: 55vh; overflow: hidden; background: #f6f7f5; }
+.site-initial-loader { position: relative; min-height: 55vh; overflow: hidden; background: #f8fafc; }
 .site-initial-progress { position: absolute; inset: 0 0 auto; height: 3px; background: #1f7a5b; transform-origin: left; animation: loading-progress 1.8s ease-in-out infinite; }
 .site-initial-content { display: flex; min-height: 55vh; flex-direction: column; align-items: center; justify-content: center; }
 .site-initial-ingredients { display: flex; gap: 18px; align-items: center; font-size: 29px; }

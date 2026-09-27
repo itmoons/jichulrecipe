@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { Bell } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import NotificationsPanel from "@/components/NotificationsPanel";
 
@@ -359,12 +360,13 @@ export function SiteHeader() {
                   closeNav();
                   closeNotif();
                 }}
-                className="relative inline-flex h-7 items-center justify-center rounded-[10px] border border-slate-200 bg-white px-3 text-[10px] font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 lg:hidden"
+                className="relative inline-flex h-8 w-8 items-center justify-center rounded-[10px] border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50 lg:hidden"
+                aria-label="알림"
               >
-                알림
+                <Bell size={16} strokeWidth={1.8} aria-hidden="true" />
                 {unreadCount > 0 && (
                   <span
-                    className="ml-1 inline-flex min-w-[18px] items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold text-white"
+                    className="absolute -right-2 -top-2 inline-flex min-w-[18px] items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold text-white"
                     style={{ backgroundColor: BRAND_ORANGE }}
                   >
                     {unreadCount > 99 ? "99+" : unreadCount}
