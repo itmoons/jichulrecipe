@@ -1,75 +1,33 @@
-export const metadata = {
-  title: "계정 삭제 안내 | 지출레시피",
-};
+import Link from "next/link";
+import { ArrowLeft, ShieldAlert } from "lucide-react";
+import AccountDeleteForm from "./AccountDeleteForm";
+
+export const metadata = { title: "계정 삭제 | 지출레시피" };
 
 export default function AccountDeletePage() {
   return (
-    <main className="min-h-screen bg-white text-gray-900">
-      <div className="mx-auto max-w-3xl px-6 py-12">
-        <h1 className="text-3xl font-bold mb-6">
-          지출레시피 계정 삭제 안내
-        </h1>
-
-        <section className="space-y-6 leading-7 text-gray-700">
-          <p>
-            지출레시피는 사용자가 언제든지 계정 및 관련 데이터를 삭제할 수
-            있도록 지원합니다.
-          </p>
-
-          <div>
-            <h2 className="text-xl font-semibold mb-2">
-              1. 계정 삭제 방법
-            </h2>
-            <ol className="list-decimal pl-6 space-y-2">
-              <li>앱에 로그인합니다.</li>
-              <li>설정 메뉴로 이동합니다.</li>
-              <li>“회원 탈퇴” 또는 “계정 삭제”를 선택합니다.</li>
-              <li>안내에 따라 삭제를 완료합니다.</li>
-            </ol>
-
-            <p className="mt-3">
-              또는 아래 이메일을 통해 삭제 요청이 가능합니다.
-            </p>
-
-            <p className="font-medium mt-2">
-              이메일: your-email@example.com
-            </p>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-semibold mb-2">
-              2. 삭제되는 데이터
-            </h2>
-            <ul className="list-disc pl-6 space-y-1">
-              <li>계정 정보 (이메일, 사용자 ID)</li>
-              <li>지출 기록 및 통계 데이터</li>
-              <li>커플 연동 정보</li>
+    <main className="min-h-screen bg-[#f6f7f5] px-4 py-7 text-slate-900 sm:px-6 sm:py-12">
+      <div className="mx-auto w-full max-w-[1320px]">
+        <Link href="/settings" className="mb-8 inline-flex items-center gap-1.5 rounded-md text-xs font-medium text-slate-500 transition hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#1f7a5b]">
+          <ArrowLeft size={15} aria-hidden="true" /> 설정으로 돌아가기
+        </Link>
+        <header className="mb-7">
+          <p className="mb-2 text-xs font-semibold text-[#1f7a5b]">계정 관리</p>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">계정 삭제</h1>
+          <p className="mt-3 text-sm leading-6 text-slate-500">삭제하기 전에 아래 내용을 확인해 주세요.</p>
+        </header>
+        <div className="overflow-hidden rounded-2xl border border-[#e2e5e1] bg-white shadow-sm">
+          <section aria-labelledby="delete-notice" className="border-b border-slate-100 px-5 py-6 sm:px-7">
+            <div className="flex items-center gap-2 text-sm font-semibold text-slate-800"><ShieldAlert size={18} className="text-rose-500" aria-hidden="true" /><h2 id="delete-notice">삭제한 계정은 복구할 수 없어요</h2></div>
+            <ul className="mt-3 space-y-2 pl-6 text-[13px] leading-6 text-slate-500 list-disc marker:text-slate-300">
+              <li>삭제 후에는 이 계정으로 로그인할 수 없습니다.</li>
+              <li>계정과 연결된 기록은 복구할 수 없습니다.</li>
+              <li>필요한 기록은 삭제 전에 별도로 보관해 주세요.</li>
             </ul>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-semibold mb-2">
-              3. 보관되는 데이터
-            </h2>
-            <p>
-              법령에 따라 일부 데이터는 일정 기간 보관될 수 있습니다.
-            </p>
-            <ul className="list-disc pl-6 space-y-1 mt-2">
-              <li>접속 로그: 최대 3개월</li>
-              <li>거래 관련 기록: 최대 5년</li>
-            </ul>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-semibold mb-2">
-              4. 유의사항
-            </h2>
-            <ul className="list-disc pl-6 space-y-1">
-              <li>계정 삭제 후 데이터는 복구되지 않습니다.</li>
-              <li>삭제 요청은 즉시 처리됩니다.</li>
-            </ul>
-          </div>
-        </section>
+          </section>
+          <AccountDeleteForm />
+        </div>
+        <p className="mt-5 text-center text-xs leading-5 text-slate-400">삭제는 동의와 확인 문구 입력 후에 진행됩니다.</p>
       </div>
     </main>
   );
